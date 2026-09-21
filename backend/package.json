@@ -1,7 +1,7 @@
 {
   "name": "validurehr-backend",
   "version": "1.0.0",
-  "description": "ValidureHR - HRMS Portal REST API",
+  "description": "ValidureHR - HRMS REST API",
   "main": "src/server.js",
   "scripts": {
     "start": "node src/init.js && node src/server.js",
@@ -11,7 +11,8 @@
     "reset:admin": "node src/resetAdmin.js",
     "test": "node --test \"test/unit/*.test.js\" \"test/security/*.test.js\"",
     "test:unit": "node --test \"test/unit/*.test.js\"",
-    "test:security": "node --test \"test/security/*.test.js\""
+    "test:security": "node --test \"test/security/*.test.js\"",
+    "seed:validure": "node src/seedValidure.js"
   },
   "dependencies": {
     "bcryptjs": "^2.4.3",
