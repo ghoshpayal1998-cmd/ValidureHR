@@ -1,0 +1,253 @@
+/* ============================================================
+   Marketing site
+   The product's design system already carries the brand tokens;
+   this adds only what a landing page needs that a dashboard does
+   not — full-bleed sections, a wider measure, and the hero.
+   Nothing here introduces a colour; everything resolves to a
+   token so both themes come for free.
+   ============================================================ */
+
+.site {
+  --site-max: 74rem;
+  display: flex;
+  flex-direction: column;
+  min-height: 100dvh;
+}
+
+.wrap {
+  width: 100%;
+  max-width: var(--site-max);
+  margin-inline: auto;
+  padding-inline: var(--gutter);
+}
+
+/* ------------------------------------------------------------ header */
+.sitehead {
+  position: sticky;
+  top: 0;
+  z-index: var(--z-header);
+  background: var(--overlay);
+  backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--line);
+}
+.sitehead__in {
+  height: var(--header-h);
+  display: flex;
+  align-items: center;
+  gap: var(--s6);
+}
+.sitenav {
+  display: flex;
+  align-items: center;
+  gap: var(--s6);
+  margin-left: auto;
+}
+.sitenav a {
+  font-size: .9rem;
+  font-weight: 500;
+  color: var(--muted);
+  padding-bottom: 2px;
+  border-bottom: 1px solid transparent;
+  transition: color var(--dur-micro) var(--ease-out),
+              border-color var(--dur-micro) var(--ease-out);
+}
+.sitenav a:hover { color: var(--fg); border-bottom-color: var(--accent); }
+.sitehead__cta { display: flex; align-items: center; gap: var(--s3); }
+/* The header CTA carries a short label on narrow screens; the long one
+   does not fit beside the logo below about 620px. */
+.cta-short { display: none; }
+
+/* ------------------------------------------------------------ sections */
+.section { padding-block: var(--section-y); }
+.section--tight { padding-block: clamp(3rem, 6vw, 5rem); }
+.section--surface { background: var(--surface); }
+.section__head { max-width: 46rem; display: grid; gap: var(--s4); }
+.section__head h2 { font-size: clamp(1.9rem, 3.2vw, 2.9rem); }
+
+/* ------------------------------------------------------------ hero */
+.hero {
+  position: relative;
+  overflow: hidden;
+  padding-top: clamp(3.5rem, 7vw, 6rem);
+  padding-bottom: clamp(3rem, 6vw, 5rem);
+}
+/* The dot grid is the site's only decoration — an engineering-studio
+   texture that stays out of the way of the type. */
+.hero::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-image: radial-gradient(var(--line-strong) 1px, transparent 1px);
+  background-size: 26px 26px;
+  -webkit-mask-image: radial-gradient(110% 80% at 72% 12%, #000 10%, transparent 68%);
+  mask-image: radial-gradient(110% 80% at 72% 12%, #000 10%, transparent 68%);
+  opacity: .55;
+  pointer-events: none;
+}
+.hero__in {
+  position: relative;
+  display: grid;
+  grid-template-columns: minmax(0, 1.02fr) minmax(0, .98fr);
+  gap: clamp(2rem, 5vw, 4.5rem);
+  align-items: center;
+}
+.hero h1 {
+  font-size: clamp(2.4rem, 5vw, 4rem);
+  margin-top: var(--s5);
+}
+.hero h1 .tint { color: var(--accent); }
+.hero__lede { margin-top: var(--s5); font-size: 1.0625rem; color: var(--muted); max-width: 44ch; }
+.hero__cta { display: flex; flex-wrap: wrap; gap: var(--s3); margin-top: var(--s8); }
+.hero__note { margin-top: var(--s5); font-size: .8125rem; color: var(--faint); }
+
+/* A small, honest product still — a real slice of the dashboard rather
+   than a stock laptop photograph. */
+.shot {
+  border: 1px solid var(--line);
+  border-radius: var(--r-lg);
+  background: var(--raised);
+  box-shadow: var(--shadow-pop);
+  overflow: hidden;
+}
+.shot__bar {
+  display: flex; align-items: center; gap: var(--s2);
+  padding: var(--s3) var(--s4);
+  border-bottom: 1px solid var(--line);
+  background: var(--bg);
+}
+.shot__dot { width: 9px; height: 9px; border-radius: 50%; background: var(--line-strong); }
+.shot__body { padding: var(--s5); display: grid; gap: var(--s4); }
+
+/* ------------------------------------------------------------ stats */
+.statstrip {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: var(--s6);
+  border-block: 1px solid var(--line);
+  padding-block: var(--s8);
+}
+.statstrip b {
+  display: block;
+  font-family: var(--font-head);
+  font-size: clamp(1.6rem, 2.6vw, 2.2rem);
+  font-weight: 680;
+  letter-spacing: -.02em;
+  line-height: 1;
+  font-variant-numeric: tabular-nums;
+}
+.statstrip span { display: block; margin-top: var(--s2); }
+
+/* ------------------------------------------------------------ features */
+.features {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: var(--s5);
+  margin-top: var(--s10);
+}
+.feature {
+  padding: var(--s6);
+  border: 1px solid var(--line);
+  border-radius: var(--r-lg);
+  background: var(--raised);
+  display: grid;
+  gap: var(--s3);
+  align-content: start;
+  transition: border-color var(--dur-ui) var(--ease-out),
+              transform var(--dur-ui) var(--ease-out);
+}
+.feature:hover { border-color: var(--accent); transform: translateY(-2px); }
+.feature__icon {
+  width: 2.5rem; height: 2.5rem;
+  border-radius: var(--r-sm);
+  display: grid; place-items: center;
+  background: var(--accent-soft);
+  color: var(--accent);
+}
+.feature h3 { font-family: var(--font-body); font-size: 1rem; font-weight: 600; }
+.feature p { font-size: .9rem; color: var(--muted); }
+
+/* ------------------------------------------------------------ steps */
+.steps { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: var(--s6); margin-top: var(--s10); }
+.step { display: grid; gap: var(--s3); align-content: start; padding-top: var(--s5); border-top: 2px solid var(--line); }
+.step[data-on='true'] { border-top-color: var(--accent); }
+.step__n {
+  font-family: var(--font-mono); font-size: 11px; font-weight: 500;
+  letter-spacing: .16em; color: var(--accent);
+}
+.step h3 { font-family: var(--font-body); font-size: 1rem; font-weight: 600; }
+.step p { font-size: .875rem; color: var(--muted); }
+
+/* ------------------------------------------------------------ split */
+.split {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  gap: clamp(2rem, 5vw, 4rem);
+  align-items: center;
+}
+.checks { display: grid; gap: var(--s4); margin-top: var(--s6); }
+.check { display: flex; gap: var(--s3); align-items: flex-start; font-size: .9375rem; }
+.check svg { flex: none; color: var(--accent); margin-top: .18rem; }
+.check b { font-weight: 600; }
+.check span { color: var(--muted); }
+
+/* ------------------------------------------------------------ cta */
+.ctaband {
+  border: 1px solid var(--line);
+  border-radius: var(--r-lg);
+  background: var(--raised);
+  box-shadow: var(--shadow-card);
+  padding: clamp(2rem, 5vw, 3.5rem);
+  text-align: center;
+  display: grid;
+  gap: var(--s5);
+  justify-items: center;
+}
+.ctaband h2 { font-size: clamp(1.7rem, 3vw, 2.4rem); }
+.ctaband p { color: var(--muted); max-width: 48ch; }
+
+/* ------------------------------------------------------------ footer */
+.sitefoot { margin-top: auto; border-top: 1px solid var(--line); padding-block: var(--s10); }
+.sitefoot__in { display: grid; grid-template-columns: 1.4fr repeat(3, 1fr); gap: var(--s8); }
+.sitefoot h4 {
+  font-family: var(--font-mono); font-size: 10px; font-weight: 500;
+  letter-spacing: .14em; text-transform: uppercase; color: var(--faint);
+  margin-bottom: var(--s4);
+}
+.sitefoot ul { list-style: none; padding: 0; display: grid; gap: var(--s3); }
+.sitefoot a { font-size: .875rem; color: var(--muted); }
+.sitefoot a:hover { color: var(--accent); }
+.sitefoot__legal {
+  margin-top: var(--s10); padding-top: var(--s5);
+  border-top: 1px solid var(--line);
+  display: flex; justify-content: space-between; gap: var(--s4); flex-wrap: wrap;
+  font-size: .75rem; color: var(--faint);
+}
+
+/* ------------------------------------------------------------ responsive */
+@media (max-width: 1000px) {
+  .hero__in, .split { grid-template-columns: minmax(0, 1fr); }
+  .features, .steps { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .statstrip { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--s5); }
+  .sitefoot__in { grid-template-columns: 1fr 1fr; }
+}
+@media (max-width: 720px) {
+  .sitenav { display: none; }
+  .features, .steps { grid-template-columns: minmax(0, 1fr); }
+}
+@media (max-width: 620px) {
+  /* Sign in is still reachable from the footer and the closing CTA, so
+     the header keeps only the primary action. */
+  .sitehead__cta .btn--quiet { display: none; }
+  .sitehead__cta .btn--primary {
+    height: 2.25rem; padding-inline: var(--s4); font-size: .8125rem;
+  }
+  .cta-long { display: none; }
+  .cta-short { display: inline; }
+}
+@media (max-width: 380px) {
+  .sitehead .brandword { display: none; }   /* the mark alone still identifies it */
+}
+@media (max-width: 560px) {
+  .sitefoot__in { grid-template-columns: 1fr; }
+  .hero__cta .btn { flex: 1 1 auto; }
+}

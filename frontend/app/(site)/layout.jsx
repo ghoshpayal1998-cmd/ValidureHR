@@ -1,0 +1,93 @@
+import './site.css';
+import Link from 'next/link';
+import Logo from '@/components/Logo';
+import ThemeToggle from '@/components/ThemeToggle';
+
+const NAV = [
+  ['What it does', '#features'],
+  ['How it works', '#how'],
+  ['Built for shifts', '#shifts'],
+  ['Security', '#security'],
+];
+
+const FOOTER = [
+  ['Product', [
+    ['What it does', '#features'],
+    ['How it works', '#how'],
+    ['Built for shifts', '#shifts'],
+    ['Security', '#security'],
+  ]],
+  ['Company', [
+    ['Validure Solutions', 'https://www.validuresolutions.com/'],
+    ['About', 'https://www.validuresolutions.com/#about'],
+    ['Work', 'https://www.validuresolutions.com/#work'],
+    ['Contact', 'https://www.validuresolutions.com/#contact'],
+  ]],
+  ['Get started', [
+    ['Sign in', '/login'],
+    ['Book a walkthrough', '#contact'],
+  ]],
+];
+
+export default function SiteLayout({ children }) {
+  return (
+    <div className="site">
+      <a className="skip" href="#main">Skip to content</a>
+
+      <header className="sitehead">
+        <div className="wrap sitehead__in">
+          <Link href="/" aria-label="ValidureHR home"><Logo size={28} /></Link>
+
+          <nav className="sitenav" aria-label="Site">
+            {NAV.map(([label, href]) => <a key={href} href={href}>{label}</a>)}
+          </nav>
+
+          <div className="sitehead__cta">
+            <ThemeToggle />
+            <Link className="btn btn--quiet" href="/login">Sign in</Link>
+            <a className="btn btn--primary" href="#contact">
+              <span className="cta-long">Book a walkthrough</span>
+              <span className="cta-short">Book a demo</span>
+            </a>
+          </div>
+        </div>
+      </header>
+
+      <main id="main" tabIndex={-1}>{children}</main>
+
+      <footer className="sitefoot">
+        <div className="wrap">
+          <div className="sitefoot__in">
+            <div>
+              <Logo size={28} />
+              <p className="muted" style={{ fontSize: '.875rem', marginTop: 'var(--s4)', maxWidth: '30ch' }}>
+                HR software from an engineering studio — built for the way
+                Indian teams actually work.
+              </p>
+            </div>
+
+            {FOOTER.map(([title, links]) => (
+              <div key={title}>
+                <h4>{title}</h4>
+                <ul>
+                  {links.map(([label, href]) => (
+                    <li key={label}>
+                      {href.startsWith('/')
+                        ? <Link href={href}>{label}</Link>
+                        : <a href={href}>{label}</a>}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            ))}
+          </div>
+
+          <div className="sitefoot__legal">
+            <span>© 2026 Validure Solutions Pvt. Ltd. All rights reserved.</span>
+            <span className="mono">ValidureHR v1.0</span>
+          </div>
+        </div>
+      </footer>
+    </div>
+  );
+}
