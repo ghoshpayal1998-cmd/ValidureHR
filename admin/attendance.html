@@ -1,0 +1,751 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Attendance Management — ValidureHR</title>
+<link rel="icon" href="../assets/brand/validure-mark.svg">
+<link rel="stylesheet" href="../assets/css/vhr.css">
+<script>try{var t=localStorage.getItem('vhr.theme');if(t)document.documentElement.setAttribute('data-theme',t);}catch(e){}</script>
+</head>
+<body data-root="../">
+
+<main class="page" data-page>
+
+  <div class="page__head">
+    <div>
+      <p class="eyebrow">Management</p>
+      <h1 style="margin-top:var(--s2)">Attendance Management</h1>
+      <p class="muted" style="font-size:.875rem;margin-top:.25rem">View, edit, regularise and export employee attendance</p>
+    </div>
+    <div class="row" style="gap:var(--s3)">
+      <button class="btn btn--ghost" type="button" id="exportbtn">Export CSV (9/2026)</button>
+    </div>
+  </div>
+
+  <div class="stack" style="gap:var(--s5)">
+
+    <!-- ------------------------------------------------ alert slot
+         The real screen keeps an error banner until the next action
+         and auto-clears a success banner. Both live here. -->
+    <div id="banners" class="stack" style="gap:var(--s3)"></div>
+
+    <!-- ------------------------------------------------ employee + month filter -->
+    <section class="card">
+      <div class="card__body">
+        <div class="row row--wrap" style="gap:var(--s6);align-items:flex-end">
+
+          <div class="field" style="min-width:17rem">
+            <label class="label" for="empsel">Employee</label>
+            <select class="select" id="empsel"></select>
+          </div>
+
+          <div class="field">
+            <span class="label" id="monthlbl">Month</span>
+            <div class="row" role="group" aria-labelledby="monthlbl" style="gap:var(--s2)">
+              <button class="btn btn--ghost btn--sm" type="button" id="prevmonth" aria-label="Previous month">
+                <span style="display:block;rotate:90deg" id="previcon"></span>
+              </button>
+              <span class="mono" id="monthname" aria-live="polite"
+                    style="min-width:9.5rem;text-align:center;font-size:.875rem;font-weight:600">September 2026</span>
+              <button class="btn btn--ghost btn--sm" type="button" id="nextmonth" aria-label="Next month">
+                <span style="display:block;rotate:-90deg" id="nexticon"></span>
+              </button>
+            </div>
+          </div>
+
+          <span class="spacer"></span>
+
+          <p class="faint" style="font-size:.75rem;max-width:22ch" id="cyclenote">
+            The calendar shows the calendar month. The CSV export follows the payroll cycle, 25th to 24th.
+          </p>
+
+        </div>
+      </div>
+    </section>
+
+    <!-- ------------------------------------------------ month summary -->
+    <div class="grid" id="stats" style="grid-template-columns:repeat(auto-fit,minmax(9rem,1fr));gap:var(--s4)"></div>
+
+    <!-- ------------------------------------------------ month calendar -->
+    <section class="card">
+      <div class="card__head">
+        <div>
+          <h2 style="font-size:1.0625rem;font-family:var(--font-body);font-weight:600" id="calhead">Calendar</h2>
+          <p class="faint" style="font-size:.75rem">Click any day to bulk-mark attendance for all employees. Night shift, 19:00 – 04:00 IST, so a punch-out after midnight belongs to the day it started.</p>
+        </div>
+      </div>
+      <div class="card__body">
+        <div id="calgrid"></div>
+        <div class="row row--wrap" id="legend" style="gap:var(--s2);margin-top:var(--s5)"></div>
+      </div>
+    </section>
+
+    <!-- ------------------------------------------------ one date, everybody -->
+    <section class="card">
+      <div class="card__head">
+        <div>
+          <h2 style="font-size:1.0625rem;font-family:var(--font-body);font-weight:600" id="dayhead">Day Overview</h2>
+          <p class="faint" style="font-size:.75rem">Every employee's state for a single shift date.</p>
+        </div>
+        <div class="field">
+          <label class="label" for="daydate">Date</label>
+          <input class="input" type="date" id="daydate" value="2026-09-21" max="2026-09-21" style="width:auto">
+        </div>
+      </div>
+      <div class="card__body card__body--flush">
+        <div class="tablewrap">
+          <table class="table">
+            <thead>
+              <tr>
+                <th>Code</th><th>Name</th><th>Department</th><th>Status</th>
+                <th>Entry Time</th><th>Exit Time</th><th>Late</th>
+                <th><span class="sr">Actions</span></th>
+              </tr>
+            </thead>
+            <tbody id="daybody"></tbody>
+          </table>
+        </div>
+        <div id="dayempty"></div>
+      </div>
+    </section>
+
+    <!-- ------------------------------------------------ biometric device mapping -->
+    <section class="card">
+      <div class="card__head">
+        <div>
+          <h2 style="font-size:1.0625rem;font-family:var(--font-body);font-weight:600">Device Mapping — biometric machine → employee</h2>
+          <p class="faint" style="font-size:.75rem;max-width:62ch">Names come from the BioMax device itself. Punches from unmapped machines are held back — never stored under the wrong person — and delivered on the sync after you map them.</p>
+        </div>
+        <span class="badge badge--info">Platform admin only</span>
+      </div>
+      <div class="card__body" style="padding-bottom:0">
+        <div class="row row--wrap" id="devices" style="gap:var(--s3)"></div>
+      </div>
+      <div class="card__body card__body--flush" style="margin-top:var(--s4)">
+        <div class="tablewrap">
+          <table class="table">
+            <thead>
+              <tr><th>Machine ID</th><th>Name on Device</th><th>Mapped Employee</th></tr>
+            </thead>
+            <tbody id="mapbody"></tbody>
+          </table>
+        </div>
+        <div id="mapempty"></div>
+      </div>
+      <div class="card__foot">
+        <p class="faint" style="font-size:.75rem" id="unlinked"></p>
+      </div>
+    </section>
+
+  </div>
+</main>
+
+<script src="../assets/js/data.js"></script>
+<script src="../assets/js/shell.js"></script>
+<script>
+(function () {
+  'use strict';
+  var D = window.VHR_DATA, $ = function (id) { return document.getElementById(id); };
+
+  /* The server clock is not IST and this is a mockup, so the page
+     states the date it is presenting instead of reading the
+     visitor's clock. Every date below is a plain ISO string and
+     every weekday comes off a UTC getter. */
+  var TODAY = '2026-09-21';
+
+  var MONTHS = ['January','February','March','April','May','June',
+                'July','August','September','October','November','December'];
+  var SHORT  = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+  var DOW    = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+
+  function pad(n) { return String(n).padStart(2, '0'); }
+  function iso(y, m, d) { return y + '-' + pad(m + 1) + '-' + pad(d); }
+  function parts(s) { var p = s.split('-'); return [+p[0], +p[1] - 1, +p[2]]; }
+  function weekday(s) { var p = parts(s); return new Date(Date.UTC(p[0], p[1], p[2])).getUTCDay(); }
+  function daysInMonth(y, m) { return new Date(Date.UTC(y, m + 1, 0)).getUTCDate(); }
+  function dmy(s) { var p = s.split('-'); return p[2] + '/' + p[1] + '/' + p[0]; }
+  function longDate(s) { var p = parts(s); return p[2] + ' ' + MONTHS[p[1]] + ' ' + p[0]; }
+  function esc(s) { return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/"/g, '&quot;'); }
+
+  /* ---- status palette -------------------------------------------------
+     Ten statuses, and the token set carries six hues. Rather than invent
+     colours, each hue is shared by two statuses and told apart by a solid
+     vs dashed border — and the full label is printed in every cell, badge
+     and legend pill, so nothing depends on colour at all. */
+  var ST = {
+    'Present':      { bg: 'var(--ok-soft)',     fg: 'var(--ok)',        line: 'solid',  short: 'P' },
+    'WFH':          { bg: 'var(--accent-soft)', fg: 'var(--accent-strong)', line: 'solid',  short: 'W' },
+    'Half Day':     { bg: 'var(--warn-soft)',   fg: 'var(--warn)',      line: 'solid',  short: 'H' },
+    'Absent':       { bg: 'var(--err-soft)',    fg: 'var(--err-text)',  line: 'solid',  short: 'A' },
+    'Leave':        { bg: 'var(--info-soft)',   fg: 'var(--info)',      line: 'solid',  short: 'L' },
+    'Earned Leave': { bg: 'var(--info-soft)',   fg: 'var(--info)',      line: 'dashed', short: 'EL' },
+    'Sick Leave':   { bg: 'var(--warn-soft)',   fg: 'var(--warn)',      line: 'dashed', short: 'SL' },
+    'Loss of Pay':  { bg: 'var(--err-soft)',    fg: 'var(--err-text)',  line: 'dashed', short: 'LOP' },
+    'Holiday':      { bg: 'var(--accent-soft)', fg: 'var(--accent-strong)', line: 'dashed', short: 'HO' },
+    'Weekend':      { bg: 'var(--surface)',     fg: 'var(--faint)',     line: 'solid',  short: '—' },
+    'Not marked':   { bg: 'var(--surface)',     fg: 'var(--muted)',     line: 'dashed', short: '·' }
+  };
+  var LEGEND = ['Present','WFH','Half Day','Absent','Leave','Earned Leave','Sick Leave','Loss of Pay','Holiday','Weekend'];
+
+  function badge(status) {
+    var s = ST[status] || ST['Not marked'];
+    return '<span class="badge" style="background:' + s.bg + ';color:' + s.fg + '">' + esc(status) + '</span>';
+  }
+
+  /* ---- roster ---------------------------------------------------------- */
+  var ROSTER = D.employees.slice().sort(function (a, b) { return a.code < b.code ? -1 : 1; });
+  var HOLIDAY = {};
+  D.holidays.forEach(function (h) { HOLIDAY[h.date] = h.name; });
+
+  /* Ananya's September is already published on the employee screens.
+     Reuse it verbatim there so the two pages never disagree. */
+  var PUBLISHED = {};
+  D.attendance.forEach(function (a) { PUBLISHED[a.date] = a; });
+
+  /* Every other employee-month is derived here rather than stored in
+     data.js, which other pages depend on. The hash keeps a given
+     employee's month identical on every reload. */
+  function hash(s) {
+    var h = 2166136261;
+    for (var i = 0; i < s.length; i++) { h ^= s.charCodeAt(i); h = (h * 16777619) >>> 0; }
+    return h;
+  }
+  function hhmm(mins) { return pad(Math.floor(mins / 60) % 24) + ':' + pad(mins % 60); }
+
+  function shiftTimes(emp, date, half) {
+    var inMin = 18 * 60 + 55 + (hash(emp.code + date + 'in') % 20);   /* 18:55 – 19:14 */
+    var outMin = half ? 23 * 60 + 30 : 3 * 60 + 55 + (hash(emp.code + date + 'out') % 25);
+    return { inT: hhmm(inMin), outT: hhmm(outMin), late: inMin > 19 * 60 + 5 };
+  }
+
+  function record(emp, date) {
+    if (HOLIDAY[date]) return { status: 'Holiday', holiday: HOLIDAY[date] };
+    var wd = weekday(date);
+    if (wd === 0 || wd === 6) return { status: 'Weekend' };
+    if (date > TODAY) return { status: 'Future' };
+
+    if (emp.name === D.me.name && PUBLISHED[date]) {
+      var a = PUBLISHED[date];
+      if (a.status === 'Present') return { status: 'Present', inT: a.inTime, outT: a.outTime, late: !!a.late };
+      if (a.status === 'Leave') return { status: 'Leave' };
+    }
+
+    var r = hash(emp.code + date) % 100;
+    if (r < 3)  return { status: 'Absent' };
+    if (r < 6)  { var h = shiftTimes(emp, date, true); return { status: 'Half Day', inT: h.inT, outT: h.outT, late: h.late }; }
+    if (r < 12) return { status: 'WFH' };
+    if (r < 15) return { status: 'Sick Leave' };
+    if (r < 17) return { status: 'Earned Leave' };
+    if (r < 18) return { status: 'Loss of Pay' };
+    if (r < 20) return { status: 'Leave' };
+    if (r < 22) return { status: null };            /* unmarked working day — deliberately not stored */
+    var t = shiftTimes(emp, date, false);
+    return { status: 'Present', inT: t.inT, outT: t.outT, late: t.late };
+  }
+
+  /* ---- page state ------------------------------------------------------ */
+  var state = {
+    emp: ROSTER[2],                 /* Priya Sharma — the roster's demo record */
+    year: 2026,
+    month: 8,                       /* September */
+    day: TODAY
+  };
+
+  /* ---- banners --------------------------------------------------------- */
+  var bannerTimer = null;
+  function banner(kind, msg) {
+    var ok = kind !== 'err';
+    clearTimeout(bannerTimer);
+    $('banners').innerHTML =
+      '<div role="' + (ok ? 'status' : 'alert') + '" class="row" ' +
+      'style="gap:var(--s3);padding:var(--s3) var(--s4);border-radius:var(--r-sm);font-size:.875rem;font-weight:500;' +
+      'border:1px solid ' + (ok ? 'var(--ok)' : 'var(--err)') + ';' +
+      'background:' + (ok ? 'var(--ok-soft)' : 'var(--err-soft)') + ';' +
+      'color:' + (ok ? 'var(--ok)' : 'var(--err-text)') + '">' +
+      VHR.icon(ok ? 'check' : 'alert', 16) + '<span>' + esc(msg) + '</span></div>';
+    /* Success clears itself; an error stays until the next action. */
+    if (ok) bannerTimer = setTimeout(function () { $('banners').innerHTML = ''; }, 4000);
+  }
+
+  /* ---- employee picker ------------------------------------------------- */
+  $('empsel').innerHTML = ROSTER.map(function (e, i) {
+    return '<option value="' + i + '"' + (e.code === state.emp.code ? ' selected' : '') + '>' +
+      esc(e.code + ' — ' + e.name) + '</option>';
+  }).join('');
+  $('empsel').addEventListener('change', function () {
+    state.emp = ROSTER[+this.value];
+    loadMonth();
+  });
+
+  /* ---- month picker ---------------------------------------------------- */
+  $('previcon').innerHTML = VHR.icon('chevron', 15);
+  $('nexticon').innerHTML = VHR.icon('chevron', 15);
+  function step(n) {
+    var m = state.month + n;
+    state.year += Math.floor(m / 12);
+    state.month = ((m % 12) + 12) % 12;
+    loadMonth();
+  }
+  $('prevmonth').addEventListener('click', function () { step(-1); });
+  $('nextmonth').addEventListener('click', function () { step(1); });
+
+  $('exportbtn').addEventListener('click', function () {
+    VHR.toast('Export is not wired in this mockup — the file would be attendance-' +
+      state.year + '-' + pad(state.month + 1) + '.csv');
+  });
+
+  /* ---- month build ----------------------------------------------------- */
+  function monthRecords() {
+    var out = [], n = daysInMonth(state.year, state.month);
+    for (var d = 1; d <= n; d++) {
+      var date = iso(state.year, state.month, d);
+      var rec = record(state.emp, date);
+      rec.date = date; rec.day = d;
+      out.push(rec);
+    }
+    return out;
+  }
+
+  function renderStats(recs) {
+    var working = recs.filter(function (r) { return r.status !== 'Weekend' && r.status !== 'Holiday'; }).length;
+    function count(s) { return recs.filter(function (r) { return r.status === s; }).length; }
+    var tiles = [
+      { label: 'Working days', val: working, meta: 'excl. weekends & holidays', icon: 'calendarClock', bg: 'var(--accent-soft)', fg: 'var(--accent)' },
+      { label: 'Present',      val: count('Present'),  meta: 'full shifts logged',   icon: 'check',  bg: 'var(--ok-soft)',   fg: 'var(--ok)' },
+      { label: 'Absent',       val: count('Absent'),   meta: 'no punch, no leave',   icon: 'x',      bg: 'var(--err-soft)',  fg: 'var(--err-text)' },
+      { label: 'Half days',    val: count('Half Day'), meta: 'part shift worked',    icon: 'clock',  bg: 'var(--warn-soft)', fg: 'var(--warn)' },
+      { label: 'WFH',          val: count('WFH'),      meta: 'worked off site',      icon: 'home',   bg: 'var(--accent-soft)', fg: 'var(--accent)' },
+      { label: 'Late marks',   val: recs.filter(function (r) { return r.late; }).length, meta: 'in after 19:05', icon: 'alert', bg: 'var(--warn-soft)', fg: 'var(--warn)' }
+    ];
+    $('stats').innerHTML = tiles.map(function (t) {
+      return '<div class="card" style="box-shadow:none"><div class="stat">' +
+        '<div class="row row--between"><span class="stat__label">' + t.label + '</span>' +
+        '<span class="stat__icon" style="width:1.75rem;height:1.75rem;background:' + t.bg + ';color:' + t.fg + '">' +
+        VHR.icon(t.icon, 14) + '</span></div>' +
+        '<p class="stat__val num">' + t.val + '</p>' +
+        '<p class="stat__meta">' + t.meta + '</p></div></div>';
+    }).join('');
+  }
+
+  function cell(rec) {
+    var future = rec.status === 'Future';
+    var unmarked = rec.status === null;
+    var s = ST[rec.status];
+    var bg, fg, bd, line = 'solid';
+
+    if (future)        { bg = 'var(--bg)';      fg = 'var(--faint)'; bd = 'var(--line)'; line = 'dashed'; }
+    else if (unmarked) { bg = 'var(--raised)';  fg = 'var(--muted)'; bd = 'var(--line-strong)'; }
+    else               { bg = s.bg; fg = s.fg; bd = s.fg; line = s.line; }
+
+    var label = rec.day + (rec.day === 1 ? ' <span class="faint" style="font-weight:400">' + SHORT[state.month] + '</span>' : '');
+    var body = '';
+    if (future)        body = '<span style="font-size:.6875rem;font-style:italic">Locked</span>';
+    else if (unmarked) body = '<span class="faint" style="font-size:.6875rem">Not marked</span>';
+    else               body = '<span style="font-size:.6875rem;font-weight:600">' + esc(rec.status) + '</span>';
+
+    if (rec.holiday) body += '<span class="faint" style="font-size:.625rem;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">' + esc(rec.holiday) + '</span>';
+    if (rec.inT) body += '<span class="mono" style="font-size:.625rem;opacity:.85">' + rec.inT + (rec.outT ? ' – ' + rec.outT : '') + '</span>';
+    if (rec.late) body += '<span style="font-size:.625rem;color:var(--err-text);font-weight:600">Late</span>';
+
+    var title = rec.holiday ? rec.holiday : future ? 'Future date (locked)' : (rec.status || 'Not marked');
+    var aria = longDate(rec.date) + ' — ' + title + (future ? '' : '. Bulk-mark attendance for this date');
+
+    return '<button type="button" data-date="' + rec.date + '"' + (future ? ' disabled' : '') +
+      ' title="' + esc(title) + '" aria-label="' + esc(aria) + '"' +
+      ' style="display:grid;align-content:start;gap:1px;text-align:left;min-height:4.5rem;padding:var(--s2);' +
+      'border-radius:var(--r-sm);border:1px ' + line + ' ' + bd + ';background:' + bg + ';color:' + fg + ';' +
+      (future ? 'cursor:default;opacity:.85;' : '') + 'overflow:hidden">' +
+      '<span class="mono" style="font-size:.75rem;font-weight:700;color:' + (future ? 'var(--faint)' : 'var(--fg)') + '">' + label + '</span>' +
+      body + '</button>';
+  }
+
+  function renderCalendar(recs) {
+    var tpl = 'display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:var(--s2)';
+    var head = '<div style="' + tpl + ';margin-bottom:var(--s2)">' + DOW.map(function (d) {
+      return '<p class="eyebrow eyebrow--plain" style="justify-content:center;font-size:10px">' + d + '</p>';
+    }).join('') + '</div>';
+
+    var offset = weekday(recs[0].date), pads = '';
+    for (var i = 0; i < offset; i++) pads += '<div></div>';
+
+    $('calgrid').innerHTML = head + '<div style="' + tpl + '" id="days">' + pads +
+      recs.map(cell).join('') + '</div>';
+
+    Array.prototype.forEach.call($('days').querySelectorAll('button[data-date]'), function (b) {
+      b.addEventListener('click', function () { openBulk(b.getAttribute('data-date')); });
+    });
+
+    $('calhead').textContent = 'Calendar — ' + state.emp.name + ' (' + state.emp.code + ')';
+  }
+
+  function renderLegend() {
+    $('legend').innerHTML = LEGEND.map(function (k) {
+      return '<span class="badge" style="background:' + ST[k].bg + ';color:' + ST[k].fg +
+        ';border:1px ' + ST[k].line + ' currentColor">' + k + '</span>';
+    }).join('') +
+      '<span class="badge badge--neutral" style="border:1px dashed var(--line-strong)">Not marked</span>';
+  }
+
+  /* The month fetch blanks the tiles and the calendar in the real
+     screen; the skeletons stand in for that round trip. */
+  function loadMonth() {
+    $('monthname').textContent = MONTHS[state.month] + ' ' + state.year;
+    $('exportbtn').innerHTML = VHR.icon('download', 15) + 'Export CSV (' + (state.month + 1) + '/' + state.year + ')';
+    $('stats').innerHTML = '<div class="skel" style="height:7rem"></div><div class="skel" style="height:7rem"></div>' +
+      '<div class="skel" style="height:7rem"></div><div class="skel" style="height:7rem"></div>' +
+      '<div class="skel" style="height:7rem"></div><div class="skel" style="height:7rem"></div>';
+    $('calgrid').innerHTML = '<div class="skel" style="height:22rem"></div>';
+    setTimeout(function () {
+      var recs = monthRecords();
+      renderStats(recs);
+      renderCalendar(recs);
+    }, 320);
+  }
+
+  /* ---- day overview ---------------------------------------------------- */
+  function renderDay() {
+    var date = state.day;
+    $('dayhead').textContent = 'Day Overview — ' + dmy(date);
+
+    if (!ROSTER.length) {
+      $('daybody').innerHTML = '';
+      $('dayempty').innerHTML = '<div class="empty"><span class="empty__icon">' + VHR.icon('users', 22) +
+        '</span><h3>No employees on the roster</h3><p>Once employees are added they will each appear here with that day\'s status.</p></div>';
+      return;
+    }
+    $('dayempty').innerHTML = '';
+
+    $('daybody').innerHTML = ROSTER.map(function (e, i) {
+      var r = record(e, date);
+      var status = r.status === 'Future' ? 'Not marked' : (r.status || 'Not marked');
+      var ini = e.name.split(' ').map(function (w) { return w[0]; }).join('').toUpperCase();
+      return '<tr>' +
+        '<td class="mono" style="font-weight:600">' + e.code + '</td>' +
+        '<td><span class="person"><span class="avatar avatar--sm">' + ini + '</span>' +
+          '<span class="person__name">' + esc(e.name) + '</span></span></td>' +
+        '<td class="muted">' + esc(e.department || '—') + '</td>' +
+        '<td>' + badge(status) + '</td>' +
+        '<td class="mono">' + (r.inT || '—') + '</td>' +
+        '<td class="mono">' + (r.outT || '—') + '</td>' +
+        '<td>' + (r.late ? '<span class="badge badge--err">Yes</span>' : '<span class="faint">—</span>') + '</td>' +
+        '<td class="num"><button class="iconbtn" type="button" data-edit="' + i + '" ' +
+          'aria-label="Edit attendance for ' + esc(e.name) + ' on ' + dmy(date) + '">' + VHR.icon('filePlus', 16) + '</button></td>' +
+        '</tr>';
+    }).join('');
+
+    Array.prototype.forEach.call($('daybody').querySelectorAll('button[data-edit]'), function (b) {
+      b.addEventListener('click', function () { openEdit(ROSTER[+b.getAttribute('data-edit')], date); });
+    });
+  }
+
+  $('daydate').addEventListener('change', function () {
+    if (!this.value) return;
+    if (this.value > TODAY) {
+      banner('err', 'Cannot mark attendance for a future date');
+      this.value = state.day;
+      return;
+    }
+    state.day = this.value;
+    renderDay();
+  });
+
+  /* ---- edit attendance modal -------------------------------------------
+     The system being replicated builds this modal but never opens it.
+     Here it hangs off the Day Overview row action, which is where an
+     HR user reaches for it anyway. */
+  var EDIT_STATUSES = ['Present','Absent','Half Day','WFH','Leave','Holiday','Weekend','Loss of Pay','Sick Leave','Earned Leave'];
+  var SHORT_LABEL = { 'Loss of Pay': 'LOP', 'Sick Leave': 'SL', 'Earned Leave': 'EL' };
+
+  function options(list, selected) {
+    return list.map(function (s) {
+      return '<option value="' + esc(s) + '"' + (s === selected ? ' selected' : '') + '>' +
+        esc(SHORT_LABEL[s] || s) + '</option>';
+    }).join('');
+  }
+
+  function openEdit(emp, date) {
+    var r = record(emp, date);
+    var cur = r.status === 'Future' || !r.status ? 'Present' : r.status;
+    var close = VHR.modal({
+      title: 'Edit Attendance — ' + dmy(date),
+      sub: emp.name + ' · ' + emp.code + ' · ' + (emp.department || 'Unassigned'),
+      foot: null,
+      body:
+        '<form id="editform" class="stack" style="gap:var(--s4)">' +
+          '<div class="field">' +
+            '<label class="label" for="editstatus">Status <span class="req">*</span></label>' +
+            '<select class="select" id="editstatus" required>' + options(EDIT_STATUSES, cur) + '</select>' +
+            '<p class="help">Saving stamps the record with the remark “Regularized by admin”.</p>' +
+          '</div>' +
+          '<label class="checkline" for="editlate">' +
+            '<input type="checkbox" id="editlate"' + (r.late ? ' checked' : '') + '>' +
+            '<span>Late mark<span class="help" style="display:block">Shift starts 19:00 IST; a punch after 19:05 counts as late.</span></span>' +
+          '</label>' +
+          '<div class="row" style="justify-content:flex-end;gap:var(--s3);padding-top:var(--s2)">' +
+            '<button class="btn btn--ghost" type="button" data-close>Cancel</button>' +
+            '<button class="btn btn--primary" type="submit">Save / Regularize</button>' +
+          '</div>' +
+        '</form>'
+    });
+
+    var form = $('editform');
+    VHR.fakeSubmit(form, 'Attendance updated');
+    form.addEventListener('submit', function () {
+      setTimeout(function () {
+        close();
+        banner('ok', 'Attendance updated');
+        if (emp.code === state.emp.code) loadMonth();
+        renderDay();
+      }, 760);
+    });
+  }
+
+  /* ---- bulk attendance modal -------------------------------------------- */
+  var BULK_STATUSES = ['Present','Absent','Half Day','WFH','Leave','Holiday','Loss of Pay','Sick Leave','Earned Leave'];
+  var bulk = null;
+
+  function openBulk(date) {
+    var locked = !!HOLIDAY[date] || weekday(date) === 0 || weekday(date) === 6;
+    var lockedAs = HOLIDAY[date] ? 'Holiday' : 'Weekend';
+
+    bulk = {
+      date: date,
+      locked: locked,
+      lockedAs: lockedAs,
+      rows: ROSTER.map(function (e) {
+        var r = record(e, date);
+        /* Unmarked working days are pre-filled Present — that is the
+           baseline, not a change. */
+        var start = locked ? lockedAs : (r.status && r.status !== 'Future' ? r.status : 'Present');
+        return { emp: e, dept: e.department || 'Unassigned', was: start, now: start };
+      })
+    };
+
+    /* Department groups, A→Z, employees by code inside each. */
+    bulk.rows.sort(function (a, b) {
+      if (a.dept !== b.dept) return a.dept < b.dept ? -1 : 1;
+      return a.emp.code < b.emp.code ? -1 : 1;
+    });
+
+    var depts = [];
+    bulk.rows.forEach(function (r) { if (depts.indexOf(r.dept) === -1) depts.push(r.dept); });
+
+    var close = VHR.modal({
+      wide: true,
+      title: 'Bulk Attendance — ' + dmy(date),
+      sub: DOW[weekday(date)] + ', ' + longDate(date) + (locked ? ' · ' + lockedAs.toLowerCase() + ', every row is locked' : ''),
+      foot: null,
+      body:
+        '<div class="row row--wrap" style="gap:var(--s3);align-items:flex-end">' +
+          '<div class="field" style="flex:1;min-width:13rem">' +
+            '<label class="label" for="bulksearch">Search employee</label>' +
+            '<span class="search">' + VHR.icon('search', 16) +
+              '<input class="input" type="search" id="bulksearch" placeholder="Name or code…" autocomplete="off">' +
+            '</span>' +
+          '</div>' +
+          '<div class="field" style="min-width:11rem">' +
+            '<label class="label" for="bulkdept">Department</label>' +
+            '<select class="select" id="bulkdept"><option value="">All Departments</option>' +
+              depts.map(function (d) { return '<option value="' + esc(d) + '">' + esc(d) + '</option>'; }).join('') +
+            '</select>' +
+          '</div>' +
+          '<button class="btn btn--ghost btn--sm" type="button" id="markall">' + VHR.icon('check', 14) + 'Mark All Present</button>' +
+        '</div>' +
+
+        '<div class="row row--wrap" style="gap:var(--s4);font-size:.75rem">' +
+          '<span class="faint row" style="gap:var(--s2)">' + VHR.icon('users', 14) + '<span id="bulkcount"></span></span>' +
+          '<span id="bulkpending" style="color:var(--warn);font-weight:600"></span>' +
+        '</div>' +
+
+        '<form id="bulkform" class="stack" style="gap:var(--s4)">' +
+          '<div style="max-height:50vh;overflow:auto;border:1px solid var(--line);border-radius:var(--r-sm)">' +
+            '<table class="table">' +
+              '<thead><tr><th>Code</th><th>Employee Name</th><th>Department</th><th>Status</th></tr></thead>' +
+              '<tbody id="bulkbody"></tbody>' +
+            '</table>' +
+            '<div id="bulkempty"></div>' +
+          '</div>' +
+          '<div class="row row--between" style="gap:var(--s4);padding-top:var(--s2);border-top:1px solid var(--line)">' +
+            '<span class="faint" style="font-size:.75rem" id="bulkfoot"></span>' +
+            '<span class="row" style="gap:var(--s3)">' +
+              '<button class="btn btn--ghost" type="button" data-close>Cancel</button>' +
+              '<button class="btn btn--primary" type="submit" id="bulksave">Save All (0)</button>' +
+            '</span>' +
+          '</div>' +
+        '</form>'
+    });
+
+    function dirty() { return bulk.rows.filter(function (r) { return !bulk.locked && r.now !== r.was; }).length; }
+
+    function visible() {
+      var q = $('bulksearch').value.trim().toLowerCase(), dept = $('bulkdept').value;
+      return bulk.rows.filter(function (r) {
+        if (dept && r.dept !== dept) return false;
+        if (!q) return true;
+        return r.emp.name.toLowerCase().indexOf(q) !== -1 || r.emp.code.toLowerCase().indexOf(q) !== -1;
+      });
+    }
+
+    function paint() {
+      var rows = visible(), seen = {};
+      $('bulkbody').innerHTML = rows.map(function (r) {
+        var first = !seen[r.dept]; seen[r.dept] = true;
+        var isDirty = !bulk.locked && r.now !== r.was;
+        var id = 'bs-' + r.emp.code;
+        var cellStatus = bulk.locked
+          ? badge(bulk.lockedAs)
+          : '<label class="sr" for="' + id + '">Status for ' + esc(r.emp.name) + '</label>' +
+            '<select class="select" id="' + id + '" data-code="' + r.emp.code + '" ' +
+            'style="width:auto;min-width:8.5rem;height:2rem;min-height:2rem;font-size:.8125rem' +
+            (isDirty ? ';border-color:var(--warn);box-shadow:0 0 0 2px var(--warn-soft)' : '') + '">' +
+            options(BULK_STATUSES, r.now) + '</select>';
+
+        return '<tr style="' + (isDirty ? 'background:var(--warn-soft);' : '') + (bulk.locked ? 'opacity:.6;' : '') + '">' +
+          '<td class="mono" style="font-weight:600;font-size:.8125rem">' + r.emp.code + '</td>' +
+          '<td>' + esc(r.emp.name) + '</td>' +
+          '<td>' + (first ? '<span class="chip">' + esc(r.dept) + '</span>'
+                          : '<span class="faint" style="font-size:.75rem">' + esc(r.dept) + '</span>') + '</td>' +
+          '<td>' + cellStatus + '</td></tr>';
+      }).join('');
+
+      $('bulkempty').innerHTML = rows.length ? '' :
+        '<div class="empty"><span class="empty__icon">' + VHR.icon('search', 22) + '</span>' +
+        '<h3>No employees match the current filter</h3>' +
+        '<p>Clear the search box or pick All Departments to bring the roster back.</p></div>';
+
+      Array.prototype.forEach.call($('bulkbody').querySelectorAll('select[data-code]'), function (sel) {
+        sel.addEventListener('change', function () {
+          var code = sel.getAttribute('data-code');
+          bulk.rows.forEach(function (r) { if (r.emp.code === code) r.now = sel.value; });
+          paint();
+        });
+      });
+
+      var n = dirty();
+      $('bulkcount').innerHTML = 'Showing <strong>' + rows.length + '</strong> of ' + bulk.rows.length + ' employees';
+      $('bulkpending').textContent = n ? n + ' change' + (n === 1 ? '' : 's') + ' pending' : '';
+      $('bulkfoot').textContent = n ? n + ' change' + (n === 1 ? '' : 's') + ' will be saved' : 'No changes made yet';
+      $('bulksave').textContent = 'Save All (' + n + ')';
+      $('bulksave').disabled = n === 0;
+    }
+
+    $('bulksearch').addEventListener('input', paint);
+    $('bulkdept').addEventListener('change', paint);
+    $('markall').addEventListener('click', function () {
+      if (bulk.locked) { VHR.toast('Every row is locked on a ' + bulk.lockedAs.toLowerCase()); return; }
+      var shown = visible();
+      shown.forEach(function (r) { r.now = 'Present'; });
+      paint();
+      VHR.toast(shown.length + ' visible row' + (shown.length === 1 ? '' : 's') + ' set to Present');
+    });
+
+    var form = $('bulkform');
+    VHR.fakeSubmit(form, 'Bulk attendance saved');
+    form.addEventListener('submit', function () {
+      var n = dirty();
+      setTimeout(function () {
+        close();
+        banner(n ? 'ok' : 'err', n
+          ? 'Bulk attendance saved (' + n + ' employee' + (n === 1 ? '' : 's') + ')'
+          : 'No changes to save');
+        loadMonth();
+        renderDay();
+      }, 760);
+    });
+
+    paint();
+  }
+
+  /* ---- device mapping ---------------------------------------------------- */
+  function renderDevices() {
+    $('devices').innerHTML = D.devices.map(function (d) {
+      return '<span class="chip">' +
+        '<span class="mono" style="font-weight:600">' + esc(d.device) + '</span>' +
+        '<span class="faint" style="font-size:.75rem">' + esc(d.location) + '</span>' +
+        '<span class="badge badge--' + (d.status === 'Online' ? 'ok' : 'warn') + '">' + esc(d.status) + '</span>' +
+        '<span class="faint mono" style="font-size:.6875rem">sync ' + esc(d.lastSync) + '</span>' +
+        '<span class="faint num" style="font-size:.6875rem">' + d.mapped + ' mapped</span>' +
+        '</span>';
+    }).join('');
+  }
+
+  function renderMap() {
+    /* deviceMap carries one row per machine plus rows for people who
+       have no machine at all; only the former belong in the table. */
+    var machines = D.deviceMap.filter(function (m) { return m.deviceId && m.deviceId !== '-'; })
+      .sort(function (a, b) {
+        var na = /^\d+$/.test(a.deviceId), nb = /^\d+$/.test(b.deviceId);
+        if (na && nb) return +a.deviceId - +b.deviceId;
+        return a.deviceId < b.deviceId ? -1 : 1;
+      });
+
+    if (!machines.length) {
+      $('mapbody').innerHTML = '';
+      $('mapempty').innerHTML = '<div class="empty"><span class="empty__icon">' + VHR.icon('inbox', 22) +
+        '</span><h3>No device roster yet</h3><p>The machine list appears after the first sync from a BioMax reader.</p></div>';
+    } else {
+      $('mapempty').innerHTML = '';
+      $('mapbody').innerHTML = machines.map(function (m) {
+        var dev = D.devices.filter(function (d) { return d.device === m.device; })[0];
+        var id = 'map-' + m.deviceId;
+        /* BioMax stores a short name typed at enrolment, not the HR record. */
+        var onDevice = m.employee ? m.employee.split(' ')[0].toUpperCase() : '—';
+        return '<tr>' +
+          '<td><span class="mono" style="font-weight:600">' + esc(m.deviceId) + '</span>' +
+            '<span class="person__meta" style="display:block">' + esc(m.device) +
+            (dev ? ' · ' + esc(dev.location) : '') + '</span></td>' +
+          '<td class="mono">' + esc(onDevice) + '</td>' +
+          '<td><label class="sr" for="' + id + '">Mapped employee for machine ' + esc(m.deviceId) + '</label>' +
+            '<select class="select" id="' + id + '" data-machine="' + esc(m.deviceId) + '" ' +
+            'style="width:auto;min-width:15rem;height:2rem;min-height:2rem;font-size:.8125rem">' +
+            '<option value="">— not mapped —</option>' +
+            ROSTER.map(function (e) {
+              return '<option value="' + e.code + '"' + (e.name === m.employee ? ' selected' : '') + '>' +
+                esc(e.code + ' — ' + e.name) + '</option>';
+            }).join('') +
+            '</select></td>' +
+          '</tr>';
+      }).join('');
+
+      Array.prototype.forEach.call($('mapbody').querySelectorAll('select[data-machine]'), function (sel) {
+        /* No Save button on this table — the real screen writes on change. */
+        sel.addEventListener('change', function () {
+          var machine = sel.getAttribute('data-machine');
+          D.deviceMap.forEach(function (m) {
+            if (m.deviceId !== machine) return;
+            var picked = ROSTER.filter(function (e) { return e.code === sel.value; })[0];
+            m.employee = picked ? picked.name : null;
+            m.code = picked ? picked.code : '-';
+          });
+          banner('ok', 'Device mapping saved — punches arrive on the next sync');
+          renderUnlinked();
+        });
+      });
+    }
+    renderUnlinked();
+  }
+
+  function renderUnlinked() {
+    var mapped = {};
+    D.deviceMap.forEach(function (m) {
+      if (m.deviceId && m.deviceId !== '-' && m.employee) mapped[m.employee] = true;
+    });
+    var loose = ROSTER.filter(function (e) { return !mapped[e.name]; });
+    $('unlinked').innerHTML = loose.length
+      ? 'Employees with no device link: ' + loose.map(function (e) {
+          return esc(e.name) + ' (' + e.code + ')';
+        }).join(', ')
+      : 'Every employee is linked to a machine.';
+  }
+
+  /* ---- boot -------------------------------------------------------------- */
+  loadMonth();
+  renderDay();
+  renderLegend();
+  renderDevices();
+  renderMap();
+})();
+</script>
+</body>
+</html>

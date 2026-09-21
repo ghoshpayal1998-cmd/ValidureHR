@@ -1,0 +1,162 @@
+<!doctype html>
+<html lang="en">
+<head><meta charset="utf-8"><title>VHR audit harness</title></head>
+<body style="margin:0;font:13px ui-monospace,monospace">
+<div id="out">loading…</div>
+
+<script>
+/* Audit harness — dev only, not part of the mockup.
+   Loads every page in a same-origin iframe and inspects the RENDERED
+   DOM, which is the only way to judge markup this app builds in JS:
+   labels, buttons and table rows mostly do not exist until shell.js
+   and the page script have run. */
+
+const PAGES = [
+  'index.html', 'change-password.html',
+  'employee/index.html', 'employee/profile.html', 'employee/attendance.html',
+  'employee/leave/balance.html', 'employee/leave/apply.html',
+  'employee/leave/history.html', 'employee/leave/approvals.html',
+  'employee/documents/salary-slips.html', 'employee/documents/offer-letter.html',
+  'employee/documents/policies.html',
+  'admin/index.html', 'admin/employees.html', 'admin/attendance.html',
+  'admin/leaves.html', 'admin/balances.html', 'admin/payroll.html',
+  'admin/documents.html', 'admin/reports.html', 'admin/analytics.html',
+  'admin/settings.html', 'admin/emails.html', 'admin/access.html',
+  'platform/index.html'
+];
+
+function accName(el) {
+  if (el.getAttribute('aria-label')) return el.getAttribute('aria-label').trim();
+  const lb = el.getAttribute('aria-labelledby');
+  if (lb) {
+    const t = lb.split(/\s+/).map(id => {
+      const n = el.ownerDocument.getElementById(id);
+      return n ? n.textContent : '';
+    }).join(' ').trim();
+    if (t) return t;
+  }
+  if (el.id) {
+    const l = el.ownerDocument.querySelector('label[for="' + CSS.escape(el.id) + '"]');
+    if (l && l.textContent.trim()) return l.textContent.trim();
+  }
+  const wrap = el.closest('label');
+  if (wrap && wrap.textContent.trim()) return wrap.textContent.trim();
+  if (el.title) return el.title.trim();
+  return (el.textContent || '').trim();
+}
+
+function audit(doc, win) {
+  const bad = [];
+  const add = (m) => bad.push(m);
+
+  // --- form controls need an accessible name ---
+  doc.querySelectorAll('input,select,textarea').forEach(el => {
+    if (el.type === 'hidden') return;
+    if (el.closest('[hidden]')) return;
+    if (!accName(el)) add('unlabelled ' + el.tagName.toLowerCase() +
+      (el.id ? '#' + el.id : el.name ? '[name=' + el.name + ']' : '[type=' + el.type + ']'));
+  });
+
+  // --- interactive elements need an accessible name ---
+  doc.querySelectorAll('button,a[href]').forEach(el => {
+    if (el.offsetParent === null && !el.closest('.sr,.skip')) return; // not rendered
+    if (!accName(el)) add('no accessible name: <' + el.tagName.toLowerCase() + '> ' +
+      (el.className || el.id || '').toString().slice(0, 40));
+  });
+
+  // --- images ---
+  doc.querySelectorAll('img').forEach(el => {
+    if (!el.hasAttribute('alt')) add('img without alt: ' + (el.getAttribute('src') || '').slice(-38));
+  });
+
+  // --- tables ---
+  doc.querySelectorAll('table').forEach((t, i) => {
+    if (!t.querySelector('thead th')) add('table #' + i + ' has no <thead><th>');
+  });
+
+  // --- heading order ---
+  const shown = (el) => !el.closest('[hidden]') && el.offsetParent !== null;
+  const hs = [...doc.querySelectorAll('h1,h2,h3,h4,h5,h6')].filter(shown).map(h => +h.tagName[1]);
+  if (hs.length && hs[0] !== 1) add('first heading is h' + hs[0] + ', not h1');
+  for (let i = 1; i < hs.length; i++) {
+    if (hs[i] - hs[i - 1] > 1) add('heading jumps h' + hs[i - 1] + '→h' + hs[i]);
+  }
+  if (hs.filter(h => h === 1).length > 1) add('more than one h1');
+
+  // --- classes that match no CSS rule anywhere ---
+  const known = new Set();
+  for (const sheet of doc.styleSheets) {
+    let rules; try { rules = sheet.cssRules; } catch (e) { continue; }
+    const walk = (rs) => {
+      for (const r of rs) {
+        if (r.selectorText) for (const m of r.selectorText.matchAll(/\.([\w-]+)/g)) known.add(m[1]);
+        if (r.cssRules) walk(r.cssRules);
+      }
+    };
+    walk(rules);
+  }
+  const unstyled = new Set();
+  doc.querySelectorAll('[class]').forEach(el => {
+    el.classList.forEach(c => { if (!known.has(c)) unstyled.add(c); });
+  });
+  unstyled.forEach(c => add('class with no CSS rule: .' + c));
+
+  // --- raw colour left in an inline style ---
+  doc.querySelectorAll('[style]').forEach(el => {
+    const s = el.getAttribute('style');
+    const m = s.match(/(#[0-9a-fA-F]{3,8}\b|rgba?\([\d\s,.%]+\))/);
+    if (m && !/var\(--/.test(m.input.slice(Math.max(0, m.index - 30), m.index))) {
+      add('inline raw colour: ' + m[1] + ' in ' + s.slice(0, 44));
+    }
+  });
+
+  // --- shell contract ---
+  if (doc.body.getAttribute('data-root') !== null) {
+    if (!doc.querySelector('.rail')) add('shell did not render (.rail missing)');
+    if (!doc.querySelector('.topbar')) add('shell did not render (.topbar missing)');
+    if (!doc.querySelector('main[data-page]')) add('no <main data-page>');
+  }
+
+  // --- empty renders: a card body that ended up with nothing in it ---
+  doc.querySelectorAll('.card__body, tbody').forEach(el => {
+    if (!el.children.length && !(el.textContent || '').trim()) {
+      const head = el.closest('.card')?.querySelector('h2,h3');
+      add('empty container' + (head ? ' under "' + head.textContent.trim().slice(0, 30) + '"' : ''));
+    }
+  });
+
+  return bad;
+}
+
+(async function () {
+  const results = {};
+  for (const p of PAGES) {
+    const errs = [];
+    const fr = document.createElement('iframe');
+    fr.style.cssText = 'width:1440px;height:900px;position:absolute;left:-9999px';
+    document.body.appendChild(fr);
+    try {
+      await new Promise((res, rej) => {
+        fr.onload = res; fr.onerror = () => rej(new Error('load failed'));
+        fr.src = '/' + p + (p.includes('?') ? '&' : '?') + 'v=' + Date.now();  // root-relative: this file now lives in /docs
+        setTimeout(res, 6000);
+      });
+      fr.contentWindow.addEventListener('error', e => errs.push('JS error: ' + e.message));
+      await new Promise(r => setTimeout(r, 450)); // let page scripts paint
+      const d = fr.contentDocument;
+      if (!d) { results[p] = ['could not access document']; continue; }
+      if (!d.querySelector('body')) { results[p] = ['no body — page failed to load']; continue; }
+      results[p] = errs.concat(audit(d, fr.contentWindow));
+    } catch (e) {
+      results[p] = ['harness error: ' + e.message];
+    } finally {
+      fr.remove();
+    }
+  }
+  window.__AUDIT = results;
+  document.getElementById('out').textContent =
+    'done — ' + Object.keys(results).length + ' pages audited';
+})();
+</script>
+</body>
+</html>

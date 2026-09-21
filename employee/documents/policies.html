@@ -1,0 +1,170 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Company Policies — ValidureHR</title>
+<link rel="icon" href="../../assets/brand/validure-mark.svg">
+<link rel="stylesheet" href="../../assets/css/vhr.css">
+<script>try{var t=localStorage.getItem('vhr.theme');if(t)document.documentElement.setAttribute('data-theme',t);}catch(e){}</script>
+</head>
+<body data-root="../../">
+
+<main class="page" data-page>
+
+  <div class="page__head">
+    <div>
+      <p class="eyebrow">Documents</p>
+      <h1 style="margin-top:var(--s2)">Company Policies</h1>
+      <p class="muted" style="font-size:.875rem;margin-top:.25rem">Official company policy documents</p>
+    </div>
+    <div class="row" style="gap:var(--s3)">
+      <!-- Read-only screen: uploading, replacing and deleting a policy
+           live on the admin Documents page behind documents.manage. -->
+    </div>
+  </div>
+
+  <div class="stack" style="gap:var(--s5)">
+
+    <!-- ------------------------------------------------ policy grid -->
+    <h2 class="sr">Policy library</h2>
+    <div class="grid grid--3" id="cards"></div>
+
+    <!-- The real screen shows a bare gap with nothing published; the
+         mockup contract asks every list to say what belongs in it. -->
+    <section class="card" id="emptycard" hidden>
+      <div class="empty">
+        <span class="empty__icon" id="emptyicon"></span>
+        <h3>No policies published yet</h3>
+        <p>Handbooks, leave rules and the code of conduct appear here once the People team publishes them.</p>
+      </div>
+    </section>
+
+  </div>
+</main>
+
+<script src="../../assets/js/data.js"></script>
+<script src="../../assets/js/shell.js"></script>
+<script>
+(function () {
+  'use strict';
+  var D = window.VHR_DATA, $ = function (id) { return document.getElementById(id); };
+
+  /* A policy carries no category of its own — upstream it is a free
+     text field on the admin upload form ("e.g. HR, Leave, IT"), so the
+     mockup derives it from the title rather than editing data.js.
+     Order matters: the first pattern that matches wins. */
+  var CATEGORIES = [
+    [/posh|harass/i, 'Compliance'],
+    [/security|\bit\b|data/i, 'IT'],
+    [/leave/i, 'Leave'],
+    [/travel|reimburse|expense/i, 'Finance']
+  ];
+  function categoryOf(name) {
+    for (var i = 0; i < CATEGORIES.length; i++) {
+      if (CATEGORIES[i][0].test(name)) return CATEGORIES[i][1];
+    }
+    return 'HR';
+  }
+
+  /* The documents section prints dates as DD/MM/YYYY; a policy with no
+     upload date renders as an em dash rather than an empty cell. */
+  function fmt(iso) {
+    if (!iso) return '—';
+    var p = iso.split('-');
+    return p[2] + '/' + p[1] + '/' + p[0];
+  }
+
+  /* The PDF behind a policy lives in the document vault, keyed by file
+     name. Travel & Reimbursement has no file there yet, so every read
+     of this join has to survive a null. */
+  function fileFor(name) {
+    return D.documents.filter(function (d) {
+      return d.type === 'Policy' && d.name.indexOf(name) === 0;
+    })[0] || null;
+  }
+
+  /* Sorted A–Z by title, the way the list arrives from the server —
+     the category pills end up scattered, not grouped. */
+  var policies = D.policies.slice().sort(function (a, b) {
+    return a.name.localeCompare(b.name);
+  });
+
+  /* ---- cards ---- */
+  $('cards').innerHTML = policies.map(function (p, i) {
+    return '<article class="card" style="display:flex;flex-direction:column">' +
+      '<div class="card__body" style="display:flex;flex-direction:column;flex:1">' +
+        '<div class="row row--between" style="align-items:flex-start">' +
+          '<span class="stat__icon">' + VHR.icon('book', 20) + '</span>' +
+          '<span class="badge badge--info">' + categoryOf(p.name) + '</span>' +
+        '</div>' +
+        '<h3 style="font-size:1rem;margin-top:var(--s3)">' + p.name + '</h3>' +
+        /* flex:1 on the summary is what keeps the meta line and the
+           buttons aligned across a row of uneven descriptions. */
+        '<p class="muted" style="font-size:.875rem;margin-top:.25rem;flex:1">' + p.summary + '</p>' +
+        '<div class="row row--wrap" style="gap:var(--s2);margin-top:var(--s4)">' +
+          '<span class="chip mono">' + p.version + '</span>' +
+          '<span class="chip"><span class="num mono">' + p.pages + '</span>&nbsp;pages</span>' +
+        '</div>' +
+        '<p class="faint" style="font-size:.75rem;margin-top:var(--s2)">Updated: <span class="mono">' +
+          fmt(p.updated) + '</span></p>' +
+        '<div class="row" style="gap:var(--s2);margin-top:var(--s4)">' +
+          '<button class="btn btn--ghost btn--sm" style="flex:1" data-act="view" data-i="' + i +
+            '" aria-label="View ' + p.name + '">' + VHR.icon('eye', 15) + 'View</button>' +
+          '<button class="btn btn--ghost btn--sm" style="flex:1" data-act="get" data-i="' + i +
+            '" aria-label="Download ' + p.name + '">' + VHR.icon('download', 15) + 'Download</button>' +
+        '</div>' +
+      '</div>' +
+    '</article>';
+  }).join('');
+
+  $('emptycard').hidden = policies.length > 0;
+  $('emptyicon').innerHTML = VHR.icon('book', 22);
+
+  /* ---- actions ---- */
+  function download(p) {
+    VHR.toast(p.name + '.pdf — not in this mockup');
+  }
+
+  function view(p) {
+    var f = fileFor(p.name);
+    var meta = [
+      ['Category', categoryOf(p.name)],
+      ['Version', '<span class="mono">' + p.version + '</span>'],
+      ['Last updated', '<span class="mono">' + fmt(p.updated) + '</span>'],
+      ['Length', '<span class="num mono">' + p.pages + '</span> pages'],
+      ['File size', f ? '<span class="mono">' + f.size + '</span>' : 'Not in the vault yet'],
+      ['Published by', f ? f.by : 'People team']
+    ];
+    var close = VHR.modal({
+      title: p.name,
+      sub: categoryOf(p.name) + ' · ' + p.version + ' · updated ' + fmt(p.updated),
+      body:
+        '<p class="muted" style="font-size:.875rem">' + p.summary + '</p>' +
+        '<div class="grid grid--2" style="gap:var(--s4)">' + meta.map(function (m) {
+          return '<div><p class="stat__label">' + m[0] + '</p>' +
+            '<p style="font-size:.875rem;margin-top:var(--s1)">' + m[1] + '</p></div>';
+        }).join('') + '</div>' +
+        '<div class="row" style="gap:var(--s3);padding:var(--s4);border:1px solid var(--line);' +
+          'border-radius:var(--r-sm);background:var(--bg)">' +
+          '<span class="stat__icon">' + VHR.icon('fileText', 18) + '</span>' +
+          '<p class="faint" style="font-size:.75rem">The PDF reader is not part of this mockup. In the ' +
+          'live system this opens the signed copy in a new tab and writes an audit entry against your ' +
+          'employee code.</p>' +
+        '</div>',
+      foot: '<button class="btn btn--ghost" data-close>Close</button>' +
+        '<button class="btn btn--primary" data-ok>' + VHR.icon('download', 16) + 'Download</button>',
+      onOk: function () { close(); download(p); }
+    });
+  }
+
+  $('cards').addEventListener('click', function (e) {
+    var btn = e.target.closest('[data-act]');
+    if (!btn) return;
+    var p = policies[+btn.getAttribute('data-i')];
+    if (btn.getAttribute('data-act') === 'view') view(p); else download(p);
+  });
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,411 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Leave Balance — ValidureHR</title>
+<link rel="icon" href="../../assets/brand/validure-mark.svg">
+<link rel="stylesheet" href="../../assets/css/vhr.css">
+<script>try{var t=localStorage.getItem('vhr.theme');if(t)document.documentElement.setAttribute('data-theme',t);}catch(e){}</script>
+</head>
+<body data-root="../../">
+
+<main class="page" data-page>
+
+  <div class="page__head">
+    <div>
+      <p class="eyebrow">Attendance &amp; Leave</p>
+      <h1 style="margin-top:var(--s2)">Leave balance</h1>
+      <p class="muted" style="font-size:.875rem;margin-top:.25rem">
+        Balances accrue monthly and carry over — decimals included.
+      </p>
+    </div>
+    <div class="row" style="gap:var(--s3)">
+      <a class="btn btn--primary" href="apply.html">Apply leave</a>
+    </div>
+  </div>
+
+  <div class="stack" style="gap:var(--s5)">
+
+    <!-- ------------------------------------------------ probation notice
+         Only rendered when the signed-in employee is still on
+         probation; nothing accrues and nothing is deducted until
+         it ends, so every card and row below locks. -->
+    <div class="chip" id="probationnote" hidden
+         style="width:100%;align-items:flex-start;gap:var(--s3);font-size:.8125rem;
+                background:var(--info-soft);border-color:transparent;color:var(--info)"></div>
+
+    <!-- ------------------------------------------------ per-type cards -->
+    <div class="grid grid--3" id="cards"></div>
+
+    <!-- ------------------------------------------------ summary table -->
+    <section class="card">
+      <div class="card__head">
+        <div>
+          <h2 style="font-size:1.0625rem;font-family:var(--font-body);font-weight:600">Balance summary</h2>
+          <p class="faint" style="font-size:.75rem" id="summarysub">Leave year 2026</p>
+        </div>
+        <a class="btn btn--quiet btn--sm" href="history.html">Leave history →</a>
+      </div>
+      <div class="card__body card__body--flush">
+        <div class="tablewrap">
+          <table class="table">
+            <thead>
+              <tr>
+                <th scope="col">Leave type</th>
+                <th scope="col" class="num">Monthly accrual</th>
+                <th scope="col" class="num">Accrued (total)</th>
+                <th scope="col" class="num">Used</th>
+                <th scope="col" class="num">Balance</th>
+              </tr>
+            </thead>
+            <tbody id="summary"></tbody>
+          </table>
+        </div>
+      </div>
+      <div class="card__foot" id="lopfoot" hidden>
+        <p class="faint" style="font-size:.75rem" id="lopnote"></p>
+      </div>
+    </section>
+
+    <!-- ------------------------------------------------ ledger -->
+    <section class="card">
+      <div class="card__head">
+        <div>
+          <h2 style="font-size:1.0625rem;font-family:var(--font-body);font-weight:600">How your balance was calculated</h2>
+          <p class="faint" style="font-size:.75rem">Every credit and deduction, most recent first.</p>
+        </div>
+        <button class="btn btn--quiet btn--sm" id="policybtn" type="button">Accrual rules</button>
+      </div>
+
+      <div class="filterbar">
+        <label class="label" for="ledgertype">Leave type</label>
+        <select class="select" id="ledgertype">
+          <option value="all">All types</option>
+        </select>
+        <span class="spacer"></span>
+        <p class="faint" style="font-size:.75rem" id="ledgercount"></p>
+      </div>
+
+      <div class="card__body card__body--flush">
+        <div class="tablewrap">
+          <table class="table">
+            <thead>
+              <tr>
+                <th scope="col">When</th>
+                <th scope="col">Type</th>
+                <th scope="col" class="num">Change</th>
+                <th scope="col">What</th>
+                <th scope="col">Details</th>
+              </tr>
+            </thead>
+            <tbody id="ledger"></tbody>
+          </table>
+        </div>
+      </div>
+      <div class="card__foot">
+        <p class="faint" style="font-size:.75rem" id="ledgerfoot"></p>
+      </div>
+    </section>
+
+  </div>
+</main>
+
+<script src="../../assets/js/data.js"></script>
+<script src="../../assets/js/shell.js"></script>
+<script>
+(function () {
+  'use strict';
+  var D = window.VHR_DATA, $ = function (id) { return document.getElementById(id); };
+
+  /* The mockup states the date it is presenting rather than reading
+     the visitor's clock — the screen has to read the same on every
+     machine, and the server this mirrors does not run on IST. */
+  var YEAR = 2026;
+  var MONTHS_CREDITED = 9;            /* Jan–Sep 2026 posted; the 1 Oct run adds the next */
+  var LEDGER_LIMIT = 15;              /* what the API returns for this screen */
+
+  /* How a type earns its days is policy, not data: data.js carries
+     the entitlement and what has been used, and this page derives
+     the rest so the two never disagree.
+       accrual   — one twelfth of the entitlement lands on the 1st
+       credit    — HR credits it once it is earned (comp off)
+       statutory — granted in full on approval (maternity)
+       none      — never a balance, only ever a count (loss of pay) */
+  var MODE = { CL: 'accrual', SL: 'accrual', EL: 'accrual', CO: 'credit', ML: 'statutory', LOP: 'none' };
+  var MODE_WORD = { credit: 'credited by HR', statutory: 'granted on approval', none: 'no accrual' };
+
+  var MONTHNAME = ['January','February','March','April','May','June',
+                   'July','August','September','October','November','December'];
+
+  function pad(n) { return String(n).padStart(2, '0'); }
+  function r2(n) { return Math.round(n * 100) / 100; }
+  function d2(n) { return r2(n).toFixed(2); }          /* 9 → "9.00" */
+  function raw(n) { return String(r2(n)); }            /* 6.5 → "6.5", 3 → "3" */
+  function dmy(iso) { var p = iso.split('-'); return p[2] + '/' + p[1] + '/' + p[0]; }
+
+  /* Probation runs six months from the joining date. Done on the
+     date string, never on Date's local getters — this server is not
+     on UTC and a month must not slip across a timezone. */
+  function plusMonths(iso, n) {
+    var p = iso.split('-'), y = +p[0], m = +p[1] + n;
+    y += Math.floor((m - 1) / 12); m = ((m - 1) % 12) + 1;
+    return p[2] + '/' + pad(m) + '/' + y;
+  }
+
+  var meRec = D.employees.filter(function (e) { return e.name === D.me.name; })[0] || {};
+  var onProbation = meRec.status === 'Probation';
+
+  /* ---------------------------------------------------------- balances */
+  var types = D.leaveTypes.map(function (t) {
+    var mode = MODE[t.code] || (t.entitled > 0 ? 'accrual' : 'none');
+    var rate = mode === 'accrual' ? r2(t.entitled / 12) : 0;
+    var accrued = mode === 'accrual' ? r2(Math.min(t.entitled, rate * MONTHS_CREDITED))
+                : mode === 'none' ? 0
+                : t.entitled;
+    return {
+      code: t.code, name: t.name, mode: mode, rate: rate,
+      entitled: t.entitled, accrued: accrued, used: t.used,
+      balance: r2(Math.max(0, accrued - t.used)),
+      /* Unpaid leave never locks — it is the one thing a probationer
+         can still take, and it is already unpaid. */
+      locked: onProbation && t.code !== 'LOP'
+    };
+  });
+
+  function pctOf(t) { return t.accrued > 0 ? Math.min(100, Math.round(t.balance / t.accrued * 100)) : 0; }
+  function fillMod(t) {
+    if (!t.accrued) return '';
+    var p = pctOf(t);
+    return p <= 20 ? ' meter__fill--err' : p <= 40 ? ' meter__fill--warn' : '';
+  }
+  function rateText(t) { return t.rate ? '+' + raw(t.rate) + '/month' : MODE_WORD[t.mode]; }
+  function accrualCell(t) {
+    if (!t.rate) return '<span class="faint">0 days/month</span>';
+    return raw(t.rate) + (t.rate === 1 ? ' day' : ' days') + '/month';
+  }
+
+  /* ---- probation banner ---- */
+  if (onProbation && meRec.joined) {
+    $('probationnote').innerHTML = VHR.icon('alert', 15) +
+      '<span>You are on probation until <strong>' + plusMonths(meRec.joined, 6) + '</strong>. ' +
+      'Your leave balance is <strong>locked</strong> — nothing accrues and nothing is deducted; ' +
+      'any leave you take is unpaid.</span>';
+    $('probationnote').hidden = false;
+  }
+
+  $('summarysub').textContent = 'Leave year ' + YEAR + ' · ' + MONTHS_CREDITED + ' of 12 months credited · ' +
+    D.me.name + ' (' + D.me.code + ')';
+
+  /* ---- balance cards ---- */
+  $('cards').innerHTML = types.map(function (t) {
+    var pct = pctOf(t);
+    var lock = t.locked
+      ? VHR.icon('key', 13) + '<span class="sr">Locked during probation</span>'
+      : '';
+    var value = t.locked
+      ? '<p class="stat__val" style="color:var(--faint);text-decoration:line-through">' + d2(t.balance) +
+        ' <span style="font-size:1rem;font-weight:500">days</span></p>'
+      : '<p class="stat__val">' + d2(t.balance) +
+        ' <span style="font-size:1rem;font-weight:500;color:var(--faint)">days</span></p>';
+    var bar = t.locked
+      ? '<p style="font-size:.6875rem;font-weight:600;color:var(--warn)">Locked during probation</p>'
+      : '<div class="meter" role="img" aria-label="' + d2(t.balance) + ' of ' + d2(t.accrued) +
+        ' accrued days remaining">' +
+        '<div class="meter__fill' + fillMod(t) + '" style="width:' + pct + '%"></div></div>';
+    var meta = t.locked ? 'Balance inactive'
+      : 'accrued ' + d2(t.accrued) + ' · used ' + raw(t.used) + ' · ' + rateText(t);
+
+    return '<div class="card"' +
+      (t.locked ? ' style="background:var(--bg);opacity:.6;user-select:none"' : '') + '>' +
+      '<div class="stat">' +
+        '<span class="stat__label row" style="gap:var(--s2)">' + t.name + ' · ' + t.code + lock + '</span>' +
+        value + bar +
+        '<p class="faint" style="font-size:.75rem">' + meta + '</p>' +
+      '</div></div>';
+  }).join('');
+
+  /* ---- summary table ---- */
+  $('summary').innerHTML = types.map(function (t) {
+    var name = '<span style="font-weight:600">' + t.name + '</span> ' +
+      '<span class="faint mono" style="font-size:.75rem">(' + t.code + ')</span>' +
+      (t.locked ? ' <span class="badge badge--warn">Locked</span>' : '');
+    var balance = t.locked
+      ? '<span class="faint" style="text-decoration:line-through">' + d2(t.balance) + '</span>'
+      : '<span style="font-weight:600;color:var(--accent-strong)">' + d2(t.balance) + '</span>';
+    return '<tr' + (t.locked ? ' style="opacity:.5;user-select:none"' : '') + '>' +
+      '<td>' + name + '</td>' +
+      '<td class="num mono">' + accrualCell(t) + '</td>' +
+      '<td class="num mono">' + d2(t.accrued) + '</td>' +
+      '<td class="num mono">' + raw(t.used) + '</td>' +
+      '<td class="num mono">' + balance + '</td></tr>';
+  }).join('');
+
+  /* ---- what the unpaid days actually cost ----
+     The rest of this screen is in days, but a loss-of-pay day is the
+     one line on it that shows up in the bank account, so the summary
+     foots with the rupee figure the payslips already recorded. */
+  var lopDays = 0, lopCost = 0, lopMonths = [];
+  D.payslips.forEach(function (p) {
+    if (!p.lop) return;
+    var ref = D.payslips.filter(function (q) { return q.lop === 0 && q.gross === p.gross; })[0];
+    if (!ref) return;
+    lopDays += p.lop;
+    lopCost += ref.net - p.net;
+    lopMonths.push(p.month);
+  });
+  if (lopDays) {
+    $('lopnote').innerHTML = raw(lopDays) + (lopDays === 1 ? ' unpaid day' : ' unpaid days') +
+      ' so far this leave year — <span class="mono">' + VHR.money(lopCost) + '</span> withheld on the ' +
+      lopMonths.join(' and ') + ' payslip' + (lopMonths.length === 1 ? '' : 's') + '.';
+    $('lopfoot').hidden = false;
+  }
+
+  /* ---------------------------------------------------------- ledger
+     Built from the same data the balances came from: the monthly
+     accrual runs, the approved requests that drew the days down, and
+     the comp-off credit HR posted by hand. Newest first, capped the
+     way the API caps it. */
+  var CODE_OF = {};
+  D.leaveTypes.forEach(function (t) { CODE_OF[t.name] = t.code; });
+
+  var WHAT = {
+    accrual:         { label: 'Monthly accrual',  tone: 'info' },
+    adjustment:      { label: 'HR adjustment',    tone: 'neutral' },
+    leave_taken:     { label: 'Leave taken',      tone: 'err' },
+    leave_cancelled: { label: 'Leave cancelled',  tone: 'ok' }
+  };
+
+  var ledger = [];
+
+  /* monthly accrual runs — they post just after midnight on the 1st */
+  var accruing = types.filter(function (t) { return t.mode === 'accrual'; });
+  for (var m = 1; m <= MONTHS_CREDITED; m++) {
+    accruing.forEach(function (t, i) {
+      var upto = YEAR + '-' + pad(m);
+      ledger.push({
+        ts: upto + '-01 00:05:' + pad(10 + i),
+        when: dmy(upto + '-01') + ' 00:05:' + pad(10 + i),
+        code: t.code, delta: t.rate, kind: 'accrual',
+        note: 'Monthly accrual ' + t.code + ': 1 month(s) × ' + raw(t.rate) + ' (up to ' + upto + ')'
+      });
+    });
+  }
+
+  /* approved requests — the deduction is posted when the request is
+     actioned, so it can sit earlier than the leave itself. The mock
+     data keeps the date but not the minute; derive a stable one from
+     the request id so the order never shuffles between reloads. */
+  D.leaveRequests.filter(function (q) {
+    return q.code === D.me.code && q.status === 'Approved';
+  }).forEach(function (q) {
+    var time = pad(20 + q.id % 4) + ':' + pad(q.id * 7 % 60) + ':' + pad(q.id * 13 % 60);
+    ledger.push({
+      ts: q.applied + ' ' + time,
+      when: dmy(q.applied) + ' ' + time,
+      code: CODE_OF[q.type] || '—', delta: -q.days, kind: 'leave_taken',
+      note: 'Leave #' + q.id + ' approved (' + q.from + ' to ' + q.to + ')'
+    });
+  });
+
+  /* comp off is credited by hand, for the holiday that was worked */
+  var pastHolidays = D.holidays.filter(function (h) { return h.date < '2026-09-21'; });
+  var lastHoliday = pastHolidays[pastHolidays.length - 1];
+  types.filter(function (t) { return t.mode === 'credit' && t.accrued > 0; }).forEach(function (t) {
+    var on = lastHoliday ? plusMonths(lastHoliday.date, 0).split('/').reverse().join('-') : YEAR + '-08-17';
+    ledger.push({
+      ts: on + ' 20:41:12',
+      when: dmy(on) + ' 20:41:12',
+      code: t.code, delta: t.accrued, kind: 'adjustment',
+      note: 'Comp-off credited for release support over ' +
+        (lastHoliday ? lastHoliday.name : 'the holiday weekend') + ' and the weekends around it'
+    });
+  });
+
+  ledger.sort(function (a, b) { return a.ts < b.ts ? 1 : a.ts > b.ts ? -1 : 0; });
+
+  /* ---- type filter ---- */
+  var sel = $('ledgertype');
+  sel.innerHTML = '<option value="all">All types</option>' + types.map(function (t) {
+    return '<option value="' + t.code + '">' + t.name + ' (' + t.code + ')</option>';
+  }).join('');
+
+  function renderLedger() {
+    var pick = sel.value;
+    var rows = pick === 'all' ? ledger : ledger.filter(function (e) { return e.code === pick; });
+    var shown = rows.slice(0, LEDGER_LIMIT);
+    var picked = types.filter(function (t) { return t.code === pick; })[0];
+
+    if (!shown.length) {
+      $('ledger').innerHTML = '<tr><td colspan="5">' +
+        '<div class="empty"><span class="empty__icon">' + VHR.icon('history', 22) + '</span>' +
+        '<h3>' + (picked ? 'Nothing posted against ' + picked.name : 'No balance activity yet') + '</h3>' +
+        '<p>' + (picked
+          ? 'No credit or deduction has been posted against ' + picked.name + ' in this leave year.'
+          : 'HR grants leave via monthly accrual or manual credits — the first entry appears the moment one is posted.') +
+        '</p></div></td></tr>';
+    } else {
+      $('ledger').innerHTML = shown.map(function (e) {
+        var w = WHAT[e.kind];
+        var sign = e.delta > 0 ? '+' : '';
+        var colour = e.delta >= 0 ? 'var(--ok)' : 'var(--err-text)';
+        return '<tr>' +
+          '<td class="mono" style="font-size:.75rem;white-space:nowrap">' + e.when + '</td>' +
+          '<td class="mono">' + e.code + '</td>' +
+          '<td class="num mono" style="font-weight:600;color:' + colour + '">' + sign + raw(e.delta) + '</td>' +
+          '<td><span class="badge badge--' + w.tone + '">' + w.label + '</span></td>' +
+          '<td class="muted" style="font-size:.75rem;max-width:20rem">' + e.note + '</td>' +
+          '</tr>';
+      }).join('');
+    }
+
+    $('ledgercount').textContent = shown.length
+      ? 'Showing ' + shown.length + ' of ' + rows.length + ' entries, newest first'
+      : 'No entries';
+  }
+  sel.addEventListener('change', renderLedger);
+  renderLedger();
+
+  $('ledgerfoot').textContent =
+    'The ledger returns the ' + LEDGER_LIMIT + ' most recent entries. Requests archived from earlier in the ' +
+    'leave year are already counted in the balances above, and statutory grants such as maternity leave are ' +
+    'issued on approval rather than accrued, so they never post here.';
+
+  /* ---------------------------------------------------------- rules */
+  $('policybtn').addEventListener('click', function () {
+    var rows = types.map(function (t) {
+      var how = t.mode === 'accrual'
+          ? 'One twelfth of the yearly entitlement on the 1st'
+        : t.mode === 'credit'
+          ? 'Credited by HR when the extra day is worked'
+        : t.mode === 'statutory'
+          ? 'Granted in full on approval, under statute'
+        : 'Never credited — unpaid days are only counted';
+      return '<tr><td><span style="font-weight:600">' + t.name + '</span> ' +
+        '<span class="faint mono" style="font-size:.75rem">(' + t.code + ')</span></td>' +
+        '<td class="muted">' + how + '</td>' +
+        '<td class="num mono">' + (t.rate ? raw(t.rate) : '—') + '</td>' +
+        '<td class="num mono">' + d2(t.accrued) + '</td>' +
+        '<td class="num mono">' + (t.entitled ? raw(t.entitled) : '—') + '</td></tr>';
+    }).join('');
+
+    VHR.modal({
+      title: 'Accrual rules',
+      sub: 'Leave year ' + YEAR + ' · ' + MONTHS_CREDITED + ' of 12 months credited',
+      wide: true,
+      body:
+        '<div class="tablewrap"><table class="table"><thead><tr>' +
+          '<th scope="col">Leave type</th><th scope="col">How it is earned</th>' +
+          '<th scope="col" class="num">Per month</th><th scope="col" class="num">Credited</th>' +
+          '<th scope="col" class="num">Yearly cap</th>' +
+        '</tr></thead><tbody>' + rows + '</tbody></table></div>' +
+        '<p class="help">Accrual posts on the first of each month and is capped at the yearly ' +
+        'entitlement. Unused casual and sick days lapse at the end of the leave year; earned leave ' +
+        'carries over. Comp off expires 90 days after it is credited.</p>',
+      foot: '<button class="btn btn--primary" data-close>Close</button>'
+    });
+  });
+})();
+</script>
+</body>
+</html>

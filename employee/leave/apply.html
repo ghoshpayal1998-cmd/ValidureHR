@@ -1,0 +1,474 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Apply Leave — ValidureHR</title>
+<link rel="icon" href="../../assets/brand/validure-mark.svg">
+<link rel="stylesheet" href="../../assets/css/vhr.css">
+<script>try{var t=localStorage.getItem('vhr.theme');if(t)document.documentElement.setAttribute('data-theme',t);}catch(e){}</script>
+</head>
+<body data-root="../../">
+
+<main class="page" data-page>
+
+  <div class="page__head">
+    <div>
+      <p class="eyebrow">Leave</p>
+      <h1 style="margin-top:var(--s2)">Apply Leave</h1>
+      <p class="muted" style="font-size:.875rem;margin-top:.25rem">Submit a new leave request for approval</p>
+    </div>
+    <div class="row" style="gap:var(--s3)"><!-- page actions: none on this screen --></div>
+  </div>
+
+  <div class="grid grid--sidebar">
+
+    <!-- ------------------------------------------------ the request -->
+    <section class="card">
+      <div class="card__head">
+        <div>
+          <h2 style="font-size:1.0625rem;font-family:var(--font-body);font-weight:600">New leave request</h2>
+          <p class="faint" style="font-size:.75rem">Fields marked * are required</p>
+        </div>
+        <span class="person" id="who"></span>
+      </div>
+
+      <div class="card__body">
+
+        <!-- Probation notice stays up for the whole visit; the
+             outcome alert below it is replaced on every submit. -->
+        <div id="probation" style="margin-bottom:var(--s4)" hidden></div>
+        <div id="alerts" aria-live="polite" style="margin-bottom:var(--s4)"></div>
+
+        <!-- The leave-type and balance lookups happen on load and fail
+             quietly in F1HR: no spinner, just an unusable select. The
+             empty block below stands in for that. -->
+        <div class="empty" id="notypes" hidden>
+          <span class="empty__icon" id="notypesicon"></span>
+          <h3>Leave types could not be loaded</h3>
+          <p>Your entitlements and balances would be listed here. Try again in a minute.</p>
+        </div>
+
+        <!-- novalidate: the screen paints the service's own refusal
+             copy in the alert above rather than letting the browser
+             bubble it, so the real messages stay visible. The required
+             attributes are kept for semantics. -->
+        <form id="applyform" novalidate>
+          <div class="stack" style="gap:var(--s5)">
+
+            <div class="field">
+              <label class="label" for="type">Leave type <span class="req" aria-hidden="true">*</span></label>
+              <select class="select" id="type" name="leave_type" required aria-describedby="typehelp"></select>
+              <p class="help" id="typehelp" hidden></p>
+              <div id="balwrap" hidden>
+                <div class="row row--between" style="margin-bottom:var(--s2)">
+                  <span class="faint" style="font-size:.75rem" id="ballabel"></span>
+                  <span class="faint mono" style="font-size:.75rem" id="balpct"></span>
+                </div>
+                <div class="meter"><div class="meter__fill" id="balfill" style="width:0%"></div></div>
+              </div>
+            </div>
+
+            <div class="checkline">
+              <input type="checkbox" id="singleday" name="single_day">
+              <label for="singleday" style="font-size:.8125rem;font-weight:600">Single day leave</label>
+            </div>
+
+            <!-- Two dates by default; the toggle above collapses them
+                 into the one field below and carries the value over. -->
+            <div class="fieldrow" id="rangewrap">
+              <div class="field">
+                <label class="label" for="from">From date <span class="req" aria-hidden="true">*</span></label>
+                <input class="input" type="date" id="from" name="from_date" required>
+              </div>
+              <div class="field">
+                <label class="label" for="to">To date <span class="req" aria-hidden="true">*</span></label>
+                <input class="input" type="date" id="to" name="to_date" required>
+              </div>
+            </div>
+
+            <div class="field" id="singlewrap" hidden>
+              <label class="label" for="day">Date <span class="req" aria-hidden="true">*</span></label>
+              <input class="input" type="date" id="day" name="single_date">
+            </div>
+
+            <div class="row row--wrap" id="daysline" hidden
+                 style="gap:var(--s3);padding:var(--s3) var(--s4);border:1px solid var(--line);border-radius:var(--r-sm);background:var(--bg)"></div>
+
+            <div class="field">
+              <label class="label" for="reason">Reason <span class="req" aria-hidden="true">*</span></label>
+              <textarea class="textarea" id="reason" name="reason" rows="3" required
+                        placeholder="Reason for leave…"></textarea>
+              <p class="help">Your approver and your manager both read this line.</p>
+            </div>
+
+            <div class="field">
+              <label class="row" id="drop" for="doc"
+                     style="align-items:flex-start;gap:var(--s3);padding:var(--s4);cursor:pointer;background:var(--bg);border:2px dashed var(--line-strong);border-radius:var(--r-sm)">
+                <span class="faint" id="dropicon" style="margin-top:.1rem"></span>
+                <span class="stack" style="gap:.15rem">
+                  <span class="label">Supporting document <span class="faint" style="font-weight:400">(optional)</span></span>
+                  <span class="muted" id="droptext" style="font-size:.875rem">Click to attach a file (e.g. medical certificate) — PDF or image, max 10 MB</span>
+                </span>
+              </label>
+              <input class="sr" type="file" id="doc" name="document" accept=".pdf,.png,.jpg,.jpeg,.doc,.docx">
+              <div class="row" id="droprow" hidden style="gap:var(--s3)">
+                <button class="btn btn--quiet btn--sm" type="button" id="dropclear">Remove file</button>
+              </div>
+              <p class="help">Weekends and company holidays are excluded automatically from the day count.</p>
+            </div>
+
+            <div class="row" style="gap:var(--s4)">
+              <button class="btn btn--primary" type="submit">Submit Request</button>
+              <span class="faint" style="font-size:.75rem">Nothing is sent — this is a mockup.</span>
+            </div>
+
+          </div>
+        </form>
+      </div>
+    </section>
+
+    <!-- ------------------------------------------------ approval path -->
+    <section class="card" style="align-self:start">
+      <div class="card__head">
+        <div>
+          <h2 style="font-size:1.0625rem;font-family:var(--font-body);font-weight:600">How approval works</h2>
+          <p class="faint" style="font-size:.75rem">Four steps, one decision</p>
+        </div>
+      </div>
+      <div class="card__body">
+        <ol class="stack" id="steps"
+            style="gap:var(--s5);list-style:none;padding:0;margin-left:var(--s4);border-left:2px solid var(--line)"></ol>
+        <p class="faint" style="font-size:.75rem;margin-top:var(--s5)">
+          A single approval from HR or the Director fully approves the leave.
+          Your reporting manager receives an intimation only.
+        </p>
+        <hr class="rule" style="margin:var(--s5) 0">
+        <div class="stack" style="gap:var(--s2)">
+          <p class="stat__label">Upcoming company holidays</p>
+          <div class="stack" style="gap:var(--s2)" id="holidays"></div>
+        </div>
+      </div>
+    </section>
+
+  </div>
+</main>
+
+<script src="../../assets/js/data.js"></script>
+<script src="../../assets/js/shell.js"></script>
+<script>
+(function () {
+  'use strict';
+  var D = window.VHR_DATA, $ = function (id) { return document.getElementById(id); };
+
+  /* The server clock is not IST, so the mockup states the date it is
+     presenting rather than reading the visitor's clock. */
+  var TODAY = '2026-09-21';
+  var DAY = 86400000;
+  var UNPAID = 'LOP';            /* the one type that needs no balance */
+
+  /* me.code is the payroll code and does not line up with the
+     generated employee codes, so the roster row is matched on name. */
+  var meRec = D.employees.filter(function (e) { return e.name === D.me.name; })[0];
+  var onProbation = !!(meRec && meRec.status === 'Probation');
+
+  /* ---- dates ---- */
+  function pad(n) { return String(n).padStart(2, '0'); }
+  function utc(s) { var p = s.split('-'); return Date.UTC(+p[0], +p[1] - 1, +p[2]); }
+  function iso(t) { var d = new Date(t); return d.getUTCFullYear() + '-' + pad(d.getUTCMonth() + 1) + '-' + pad(d.getUTCDate()); }
+  function fmt(s) { var p = s.split('-'); return p[2] + '/' + p[1] + '/' + p[0]; }
+  function plus(s, months) {
+    var d = new Date(utc(s));
+    return iso(Date.UTC(d.getUTCFullYear(), d.getUTCMonth() + months, d.getUTCDate()));
+  }
+
+  var holidayOn = {};
+  D.holidays.forEach(function (h) { holidayOn[h.date] = h.name; });
+
+  /* A leave day is a working day unless it is a weekend or a declared
+     holiday — the same rule the payroll run applies, so the count the
+     employee sees here is the count that gets deducted. Dates are
+     walked in UTC: the local getters would shift the day on a server
+     that is not on IST. */
+  function workdays(from, to) {
+    var out = { days: 0, weekend: 0, holidays: [] }, end = utc(to), n = 0;
+    for (var t = utc(from); t <= end && n < 400; t += DAY, n++) {
+      var wd = new Date(t).getUTCDay(), key = iso(t);
+      if (wd === 0 || wd === 6) { out.weekend++; continue; }
+      if (holidayOn[key]) { if (out.holidays.indexOf(holidayOn[key]) === -1) out.holidays.push(holidayOn[key]); continue; }
+      out.days++;
+    }
+    return out;
+  }
+
+  /* ---- who is applying ---- */
+  $('who').innerHTML =
+    '<span class="avatar">' + D.me.name.split(' ').map(function (w) { return w[0]; }).join('').toUpperCase() + '</span>' +
+    '<span><span class="person__name" style="display:block">' + D.me.name + '</span>' +
+    '<span class="person__meta">' + D.me.code + ' · ' + D.me.department + '</span></span>';
+
+  /* ---- alerts ---- */
+  function alertBox(tone, ink, icon, msg, sub) {
+    return '<div class="card" style="box-shadow:none;border-color:var(--' + tone + ');background:var(--' + tone + '-soft)">' +
+      '<div class="row" style="align-items:flex-start;gap:var(--s3);padding:var(--s3) var(--s4);color:var(--' + ink + ')">' +
+      '<span style="margin-top:.15rem">' + VHR.icon(icon, 16) + '</span>' +
+      '<span><span style="font-size:.875rem;font-weight:600;display:block">' + msg + '</span>' +
+      (sub ? '<span class="muted" style="font-size:.75rem">' + sub + '</span>' : '') + '</span></div></div>';
+  }
+  function notice(kind, msg, sub) {
+    $('alerts').innerHTML = kind === 'ok'
+      ? alertBox('ok', 'ok', 'check', msg, sub)
+      : alertBox('err', 'err-text', 'alert', msg, sub);
+  }
+  function clearNotice() { $('alerts').innerHTML = ''; }
+
+  if (onProbation) {
+    var until = plus(meRec.joined, 6);
+    $('probation').innerHTML = alertBox('info', 'info', 'alert',
+      'You are on probation until ' + fmt(until) + '.',
+      'Leave you take is unpaid — your leave balance is locked and will not be affected.');
+    $('probation').hidden = false;
+  }
+
+  /* ---- leave types ---- */
+  var typeByCode = {};
+  D.leaveTypes.forEach(function (t) { typeByCode[t.code] = t; });
+
+  if (!D.leaveTypes.length) {
+    $('notypesicon').innerHTML = VHR.icon('scale', 24);
+    $('notypes').hidden = false;
+    $('applyform').hidden = true;
+  }
+
+  /* On probation every paid type is offered but unusable, exactly as
+     the service returns it, and Loss of Pay is pre-selected. */
+  $('type').innerHTML = '<option value="">Select leave type…</option>' +
+    D.leaveTypes.map(function (t) {
+      var off = onProbation && t.code !== UNPAID;
+      return '<option value="' + t.code + '"' + (off ? ' disabled' : '') +
+        (onProbation && t.code === UNPAID ? ' selected' : '') + '>' +
+        t.name + (off ? ' — (Disabled during probation)' : '') + '</option>';
+    }).join('');
+
+  function balanceOf(t) { return t.entitled - t.used; }
+
+  function syncType() {
+    var t = typeByCode[$('type').value], help = $('typehelp'), bal = $('balwrap');
+
+    if (onProbation) {
+      help.innerHTML = '<span class="row" style="gap:var(--s2);color:var(--warn);font-weight:600">' +
+        VHR.icon('alert', 13) + 'You are on probation. During probationary periods, an employee can only take unpaid leaves.</span>';
+      help.hidden = false; bal.hidden = true; return;
+    }
+    if (!t) { help.hidden = true; bal.hidden = true; return; }
+    if (t.code === UNPAID) {
+      help.innerHTML = '<span style="color:var(--accent-strong);font-weight:600">' + t.name +
+        ' — no balance is required or deducted.</span>';
+      help.hidden = false; bal.hidden = true; return;
+    }
+
+    var left = balanceOf(t);
+    help.innerHTML = 'Balance: <span class="num" style="color:var(--accent-strong);font-weight:600">' +
+      left.toFixed(2) + '</span> day(s) available this year.';
+    help.hidden = false;
+
+    var pct = t.entitled ? Math.min(100, Math.round(t.used / t.entitled * 100)) : 0;
+    $('ballabel').textContent = t.used + ' of ' + t.entitled + ' ' + t.name.toLowerCase() + ' days used';
+    $('balpct').textContent = pct + '%';
+    $('balfill').className = 'meter__fill' + (pct >= 100 ? ' meter__fill--err' : pct >= 75 ? ' meter__fill--warn' : '');
+    $('balfill').style.width = pct + '%';
+    bal.hidden = false;
+  }
+
+  /* ---- date fields ---- */
+  function single() { return $('singleday').checked; }
+  function fromVal() { return single() ? $('day').value : $('from').value; }
+  function toVal() { return single() ? $('day').value : $('to').value; }
+
+  function syncDays() {
+    var from = fromVal(), to = toVal(), line = $('daysline');
+    if (!from || !to || to < from) { line.hidden = true; return; }
+
+    var w = workdays(from, to), skipped = [];
+    if (w.weekend) skipped.push(w.weekend + (w.weekend === 1 ? ' weekend day' : ' weekend days'));
+    if (w.holidays.length) skipped.push(w.holidays.join(' and '));
+
+    line.innerHTML = '<span class="badge badge--' + (w.days ? 'info' : 'warn') + '">' +
+      '<span class="num">' + w.days + '</span>' + (w.days === 1 ? ' working day' : ' working days') + '</span>' +
+      '<span class="faint" style="font-size:.75rem"><span class="mono">' + fmt(from) + ' → ' + fmt(to) + '</span>' +
+      (skipped.length ? ' · ' + skipped.join(', ') + ' excluded' : '') + '</span>';
+    line.hidden = false;
+  }
+
+  $('singleday').addEventListener('change', function () {
+    var on = this.checked;
+    if (on) $('day').value = $('from').value || $('to').value || '';
+    else if ($('day').value) {
+      $('from').value = $('day').value;
+      if (!$('to').value || $('to').value < $('day').value) $('to').value = $('day').value;
+    }
+    $('singlewrap').hidden = !on;
+    $('rangewrap').hidden = on;
+    $('day').required = on;
+    $('from').required = !on;
+    $('to').required = !on;
+    syncDays();
+    (on ? $('day') : $('from')).focus();
+  });
+
+  /* A to-date earlier than the from-date is never a real intention,
+     so it is pushed forward instead of being reported as an error. */
+  $('from').addEventListener('change', function () {
+    $('to').min = this.value;
+    if ($('to').value && $('to').value < this.value) $('to').value = this.value;
+    syncDays();
+  });
+  $('to').addEventListener('change', syncDays);
+  $('day').addEventListener('change', syncDays);
+  $('type').addEventListener('change', syncType);
+
+  /* ---- supporting document ---- */
+  var drop = $('drop'), doc = $('doc');
+  var dropDefault = 'Click to attach a file (e.g. medical certificate) — PDF or image, max 10 MB';
+  $('dropicon').innerHTML = VHR.icon('upload', 18);
+
+  function showFile(name) {
+    $('droptext').innerHTML = name
+      ? '<span style="color:var(--accent-strong);font-weight:600">' + name + '</span>'
+      : dropDefault;
+    $('droprow').hidden = !name;
+  }
+  doc.addEventListener('change', function () {
+    showFile(this.files && this.files[0] ? this.files[0].name : '');
+  });
+  $('dropclear').addEventListener('click', function () {
+    doc.value = '';
+    showFile('');
+    doc.focus();
+  });
+
+  /* The real input is off-screen, so the dropzone has to carry its
+     focus ring or keyboard users cannot see where they are. */
+  doc.addEventListener('focus', function () {
+    drop.style.borderColor = 'var(--accent)';
+    drop.style.boxShadow = '0 0 0 3px var(--accent-soft)';
+  });
+  doc.addEventListener('blur', function () {
+    drop.style.borderColor = 'var(--line-strong)';
+    drop.style.boxShadow = 'none';
+  });
+
+  /* ---- approval path ---- */
+  var steps = [
+    { label: 'You submit the request', note: 'Filed as ' + D.me.name + ' (' + D.me.code + ') on ' + fmt(TODAY) + '.' },
+    { label: 'HR and the Director are emailed', note: 'The leave_approval_request template goes out the moment you submit.' },
+    { label: 'Any ONE of them approves or rejects', note: 'Whoever acts first settles it — the request then leaves the other inbox.' },
+    { label: 'You and your manager are notified', note: D.me.manager + ' is copied for planning, not for approval.' }
+  ];
+  $('steps').innerHTML = steps.map(function (s, i) {
+    var first = i === 0;
+    return '<li style="position:relative;padding-left:var(--s6)">' +
+      '<span class="mono" style="position:absolute;left:-.8125rem;top:0;width:1.5rem;height:1.5rem;' +
+        'border-radius:var(--r-full);display:grid;place-items:center;font-size:10px;font-weight:600;' +
+        'border:2px solid var(--accent);background:var(--' + (first ? 'accent' : 'raised') + ');' +
+        'color:var(--' + (first ? 'accent-ink' : 'accent') + ')">' + (i + 1) + '</span>' +
+      '<p style="font-size:.875rem;font-weight:600">' + s.label + '</p>' +
+      '<p class="faint" style="font-size:.75rem;margin-top:.15rem">' + s.note + '</p>' +
+      '</li>';
+  }).join('');
+
+  /* Holidays inside a requested range are not deducted, so the three
+     that are coming up are worth listing next to the form. */
+  var soon = D.holidays.filter(function (h) { return h.date >= TODAY; }).slice(0, 3);
+  $('holidays').innerHTML = soon.length ? soon.map(function (h) {
+    return '<div class="row row--between" style="gap:var(--s3)">' +
+      '<span style="font-size:.8125rem">' + h.name + '</span>' +
+      '<span class="chip mono" style="font-size:.75rem">' + fmt(h.date) + '</span></div>';
+  }).join('') : '<p class="faint" style="font-size:.75rem">No declared holidays left this year.</p>';
+
+  /* ---- validation ----
+     Every message below is the one the service itself returns, so the
+     screen shows the copy the employee would really read. */
+  var mine = D.leaveRequests.filter(function (r) {
+    return r.code === D.me.code && (r.status === 'Pending' || r.status === 'Approved');
+  });
+  var nextId = D.leaveRequests.reduce(function (m, r) { return Math.max(m, r.id); }, 0) + 1;
+
+  function validate() {
+    var code = $('type').value, from = fromVal(), to = toVal(), reason = $('reason').value.trim();
+    var dateField = single() ? 'day' : 'from';
+
+    if (!code || !from || !to || !reason) {
+      return { msg: 'Leave type, dates and reason are required',
+               focus: !code ? 'type' : !from ? dateField : !to ? 'to' : 'reason' };
+    }
+    if (to < from) return { msg: 'To date cannot be before from date', focus: 'to' };
+
+    var w = workdays(from, to);
+    if (!w.days) return { msg: 'Selected range has no working days', focus: dateField };
+
+    var clash = mine.filter(function (r) { return from <= r.to && to >= r.from; })[0];
+    if (clash) {
+      return { msg: 'You already have a pending/approved leave overlapping those dates (#' +
+               clash.id + ': ' + clash.from + ' to ' + clash.to + ')', focus: dateField };
+    }
+    if (onProbation && code !== UNPAID) {
+      return { msg: 'During probationary periods, you can only apply for unpaid leaves.', focus: 'type' };
+    }
+
+    var t = typeByCode[code];
+    if (code !== UNPAID && balanceOf(t) < w.days) {
+      return { msg: 'Insufficient balance: ' + balanceOf(t).toFixed(2) + ' day(s) available, ' + w.days + ' requested',
+               focus: 'type' };
+    }
+    return null;
+  }
+
+  /* ---- submit ----
+     Registered before fakeSubmit, so a refused request stops here and
+     never reaches the success path. */
+  var form = $('applyform');
+
+  form.addEventListener('submit', function (ev) {
+    var bad = validate();
+    clearNotice();
+    if (!bad) return;
+    ev.preventDefault();
+    ev.stopImmediatePropagation();
+    notice('err', bad.msg, 'The form has been left as you filled it in.');
+    var el = $(bad.focus);
+    if (el) el.focus();
+  });
+
+  VHR.fakeSubmit(form, 'Leave request submitted');
+
+  form.addEventListener('submit', function () {
+    var w = workdays(fromVal(), toVal());
+    var unpaid = $('type').value === UNPAID || onProbation;
+    var id = nextId++;
+
+    setTimeout(function () {
+      notice('ok',
+        'Leave application submitted' + (unpaid ? ' as UNPAID (your balance is not affected)' : '') +
+        ' (' + w.days + ' working ' + (w.days === 1 ? 'day' : 'days') + '). HR and the Director have been notified.',
+        'Request #' + id + ' now sits in your leave history and in the approver’s inbox. Nothing left this browser.');
+
+      form.reset();
+      if (onProbation) $('type').value = UNPAID;
+      $('singlewrap').hidden = true;
+      $('rangewrap').hidden = false;
+      $('day').required = false;
+      $('from').required = true;
+      $('to').required = true;
+      $('to').removeAttribute('min');
+      showFile('');
+      syncType();
+      syncDays();
+    }, 750);
+  });
+
+  syncType();
+})();
+</script>
+</body>
+</html>

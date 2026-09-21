@@ -1,0 +1,802 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Leave Balances — ValidureHR</title>
+<link rel="icon" href="../assets/brand/validure-mark.svg">
+<link rel="stylesheet" href="../assets/css/vhr.css">
+<script>try{var t=localStorage.getItem('vhr.theme');if(t)document.documentElement.setAttribute('data-theme',t);}catch(e){}</script>
+</head>
+<body data-root="../">
+
+<main class="page" data-page>
+
+  <div class="page__head">
+    <div>
+      <p class="eyebrow">Management</p>
+      <h1 style="margin-top:var(--s2)">Leave Balances</h1>
+      <p class="muted" style="font-size:.875rem;margin-top:.25rem">Monthly accrual rates, accumulated balances and manual adjustments (decimals supported)</p>
+    </div>
+    <div class="row" style="gap:var(--s3)">
+      <span class="badge badge--info">balances.manage</span>
+      <button class="btn btn--ghost" id="runaccrual">Run Accrual Now</button>
+    </div>
+  </div>
+
+  <div class="stack" style="gap:var(--s5)">
+
+    <!-- ------------------------------------------------ outcome banners -->
+    <div class="stack" style="gap:var(--s3)" id="alerts" aria-live="polite"></div>
+
+    <!-- ------------------------------------------------ accrual rates -->
+    <section class="card">
+      <div class="card__head">
+        <div class="row" style="gap:var(--s3)">
+          <span class="stat__icon" style="width:1.75rem;height:1.75rem" id="calcicon" aria-hidden="true"></span>
+          <h2 style="font-size:1.0625rem;font-family:var(--font-body);font-weight:600">Monthly Accrual Rates</h2>
+        </div>
+        <button class="btn btn--ghost btn--sm" id="addtype">Add Leave Type</button>
+      </div>
+      <div class="card__body">
+
+        <p class="muted" style="font-size:.875rem" id="accrualnote"></p>
+
+        <!-- the day of the month the accrual job runs: badge, or inline editor -->
+        <div id="daystrip" style="margin-top:var(--s4);padding:var(--s3);border:1px solid var(--line);border-radius:var(--r-sm);background:var(--bg);max-width:42rem"></div>
+
+        <!-- one editor per leave type -->
+        <div class="grid grid--4" id="tiles" style="margin-top:var(--s5);gap:var(--s3)"></div>
+        <div id="tilesempty" hidden>
+          <div class="empty">
+            <span class="empty__icon" id="tilesemptyicon"></span>
+            <h3>No leave types yet</h3>
+            <p>Add one and every employee gets a balance row opened at zero.</p>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- ------------------------------------------------ balance grid -->
+    <section class="card">
+      <div class="card__head">
+        <div>
+          <h2 style="font-size:1.0625rem;font-family:var(--font-body);font-weight:600">Balance Grid</h2>
+          <p class="faint" style="font-size:.75rem">accrued − used = balance · click a cell to adjust manually</p>
+        </div>
+        <span class="chip" id="rollcount">—</span>
+      </div>
+      <div class="card__body card__body--flush">
+        <div class="tablewrap">
+          <table class="table">
+            <thead><tr id="gridhead"></tr></thead>
+            <tbody id="gridbody"></tbody>
+          </table>
+        </div>
+      </div>
+      <div class="card__foot">
+        <p class="faint" style="font-size:.75rem" id="gridfoot"></p>
+      </div>
+    </section>
+
+  </div>
+</main>
+
+<script src="../assets/js/data.js"></script>
+<script src="../assets/js/shell.js"></script>
+<script>
+(function () {
+  'use strict';
+  var D = window.VHR_DATA, $ = function (id) { return document.getElementById(id); };
+
+  /* The server clock is not IST, so the mockup states the date it is
+     presenting rather than reading the visitor's clock. Nothing on
+     this screen is money — every figure is days, often fractional. */
+  var TODAY = '2026-09-21', PERIOD = '2026-09';
+
+  /* Accrual runs on the 24th. January to August have been credited;
+     September is still owed, which is exactly what "Run Accrual Now"
+     is for. Past runs in the ledger keep the day they actually ran,
+     so changing the setting never rewrites history. */
+  var CREDITED = 8, RUN_DAY = 24;
+  var accrualDay = RUN_DAY;
+  var accrualPending = true;
+
+  /* Who is signing the ledger entries this session. */
+  var ACTOR = user(VHR.role() === 'platform' ? 'Rahul Paul' : D.me.name);
+
+  /* ---- small helpers ------------------------------------------------ */
+  function esc(s) {
+    return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+  }
+  function pad(n) { return ('0' + n).slice(-2); }
+  function dmy(iso) { var p = iso.split('-'); return p[2] + '/' + p[1] + '/' + p[0]; }
+  function days(n) { return String(Math.round(n * 100) / 100); }
+  function signed(n) { return (n >= 0 ? '+' : '') + days(n); }
+  function initials(n) { return n.split(' ').map(function (w) { return w[0]; }).join('').toUpperCase(); }
+  function user(n) { return n.toLowerCase().replace(/\s+/g, '.'); }
+  function ordinal(n) {
+    var s = ['th', 'st', 'nd', 'rd'], v = n % 100;
+    return n + (s[(v - 20) % 10] || s[v] || s[0]);
+  }
+  /* A stable pseudo-random, so the grid never reshuffles between
+     renders and two people reading the mockup see the same numbers. */
+  function seed(i, j) {
+    var x = Math.sin((i + 1) * 12.9898 + (j + 1) * 78.233) * 43758.5453;
+    return x - Math.floor(x);
+  }
+  /* Night shift: an HR action lands between 19:00 and 04:00, so the
+     ledger timestamps are derived inside that window. */
+  function attime(id) {
+    return pad(19 + (id % 5)) + ':' + pad((id * 7) % 60) + ':' + pad((id * 13) % 60);
+  }
+
+  /* ---- leave types --------------------------------------------------
+     data.js carries an annual entitlement, not a monthly rate, so the
+     rate is derived. Loss of pay, maternity and comp off are granted
+     or banked rather than accrued, so they sit at zero and are moved
+     by hand. The list is copied because this screen can add, rename
+     and delete types for the length of the session. */
+  var GRANTED = { LOP: 1, ML: 1, CO: 1 };
+  var types = D.leaveTypes.map(function (t) {
+    return {
+      code: t.code,
+      name: t.name,
+      entitled: t.entitled,
+      rate: GRANTED[t.code] ? 0 : Math.round((t.entitled / 12) * 100) / 100
+    };
+  });
+
+  /* ---- the roll ------------------------------------------------------
+     Ordered by employee code, the way the balance report is read.
+     Probationers are on the roll — their balances are locked at zero
+     rather than hidden, so HR can see the lock. */
+  var roll = D.employees.slice().sort(function (a, b) { return a.code < b.code ? -1 : 1; });
+
+  /* Days already taken, from the real applications in data.js. */
+  var taken = {};
+  D.leaveRequests.forEach(function (r) {
+    if (r.status !== 'Approved') return;
+    var k = r.emp + '|' + r.type;
+    taken[k] = (taken[k] || 0) + r.days;
+  });
+
+  /* ---- opening balances ---------------------------------------------
+     'VS-0101|CL' -> { acc, used }, or null where no balance row has
+     been opened at all (the em-dash cell). */
+  var bal = {}, ledger = {};
+  var mine = {};
+  D.leaveTypes.forEach(function (t) { mine[t.code] = t; });
+
+  roll.forEach(function (e, i) {
+    types.forEach(function (t, j) {
+      bal[e.code + '|' + t.code] = opening(e, t, i, j);
+    });
+  });
+
+  function opening(e, t, i, j) {
+    var used = taken[e.name + '|' + t.name] || 0;
+
+    /* Probation: no accrual at all, unpaid leave only. */
+    if (e.status === 'Probation') return t.code === 'CO' ? null : { acc: 0, used: 0 };
+
+    /* The signed-in user's own figures come straight from data.js, so
+       this grid and her own Leave Balance screen cannot disagree. */
+    if (e.name === D.me.name && mine[t.code]) {
+      return {
+        acc: t.rate ? t.rate * CREDITED : (t.code === 'CO' ? mine[t.code].entitled : 0),
+        used: mine[t.code].used
+      };
+    }
+
+    if (t.rate > 0) {
+      var acc = Math.min(t.entitled, t.rate * CREDITED);
+      return { acc: acc, used: Math.min(acc, used + Math.round(seed(i, j) * 0.6 * acc * 2) / 2) };
+    }
+
+    /* Comp off is banked a day at a time; until someone banks one
+       there is no row to adjust. */
+    if (t.code === 'CO') {
+      var banked = [0, 0, 1, 2, 0, 1, 0][i % 7];
+      return (banked || used) ? { acc: Math.max(banked, used), used: used } : null;
+    }
+
+    return { acc: 0, used: used };   /* granted on application, never accrued */
+  }
+
+  /* ---- outcome banner ------------------------------------------------
+     Green clears itself after four seconds; red stays until the next
+     outcome replaces it. */
+  function notice(msg, tone) {
+    var ink = tone === 'ok' ? 'ok' : 'err-text';
+    $('alerts').innerHTML = '';
+    var el = document.createElement('div');
+    el.className = 'card';
+    el.style.cssText = 'box-shadow:none;border-color:var(--' + tone + ');background:var(--' + tone + '-soft)';
+    el.innerHTML = '<div class="row" style="gap:var(--s3);padding:var(--s3) var(--s4);color:var(--' + ink + ')">' +
+      VHR.icon(tone === 'ok' ? 'check' : 'alert', 16) +
+      '<span style="font-size:.875rem;font-weight:600">' + esc(msg) + '</span></div>';
+    $('alerts').appendChild(el);
+    if (tone === 'ok') setTimeout(function () { el.remove(); }, 4000);
+  }
+
+  /* ---- accrual-day strip ---------------------------------------------
+     Two mutually exclusive states: the saved badge, or the inline
+     editor. 1–28 so the run never falls off the end of February. */
+  function renderStrip(editing) {
+    if (!editing) {
+      $('daystrip').innerHTML =
+        '<div class="row row--wrap" style="gap:var(--s3)">' +
+          '<p class="eyebrow eyebrow--plain">Monthly accrual day:</p>' +
+          '<span class="badge badge--info">Day ' + accrualDay + ' of the month</span>' +
+          '<button class="btn btn--quiet btn--sm" id="changeday">Change accrual day</button>' +
+        '</div>';
+      $('changeday').addEventListener('click', function () { renderStrip(true); });
+      return;
+    }
+
+    $('daystrip').innerHTML =
+      '<form class="row row--wrap" id="dayform" style="gap:var(--s3)">' +
+        '<label class="eyebrow eyebrow--plain" for="dayinput">Monthly accrual day:</label>' +
+        '<input class="input num" id="dayinput" name="day" type="number" min="1" max="28" required ' +
+          'value="' + accrualDay + '" aria-describedby="dayhelp" ' +
+          'style="width:4.75rem;min-width:4.75rem;text-align:center;font-weight:600;height:2.25rem;min-height:2.25rem">' +
+        '<button class="btn btn--primary btn--sm" type="submit">Save</button>' +
+        '<button class="btn btn--ghost btn--sm" type="button" id="daycancel">Cancel</button>' +
+        '<p class="help" id="dayhelp" style="flex-basis:100%">Any day from 1 to 28, so the run never falls off the end of February.</p>' +
+      '</form>';
+
+    var form = $('dayform'), input = $('dayinput');
+    $('daycancel').addEventListener('click', function () { renderStrip(false); });
+
+    /* Registered before fakeSubmit, so an out-of-range day stops here
+       and never reaches the success path. */
+    form.addEventListener('submit', function (ev) {
+      var v = parseInt(input.value, 10);
+      if (v >= 1 && v <= 28) { input.removeAttribute('aria-invalid'); return; }
+      ev.preventDefault();
+      ev.stopImmediatePropagation();
+      input.setAttribute('aria-invalid', 'true');
+      input.focus();
+      notice('Accrual day must be a number between 1 and 28', 'err');
+    });
+    VHR.fakeSubmit(form, 'Accrual day saved');
+    form.addEventListener('submit', function () {
+      var v = parseInt(input.value, 10);
+      setTimeout(function () {
+        accrualDay = v;
+        renderStrip(false);
+        notice('Accrual day updated to the ' + ordinal(v) + ' of every month', 'ok');
+      }, 750);
+    });
+  }
+
+  /* ---- leave type tiles ----------------------------------------------
+     The input edits locally; nothing moves until Save is clicked, so
+     each tile is its own little form. */
+  function renderTiles() {
+    $('tiles').hidden = types.length === 0;
+    $('tilesempty').hidden = types.length > 0;
+
+    $('tiles').innerHTML = types.map(function (t, j) {
+      return '<form class="card" data-i="' + j + '" style="box-shadow:none">' +
+        '<div class="card__body" style="padding:var(--s3)">' +
+
+          '<div class="row" style="gap:var(--s2)">' +
+            '<span style="font-size:.875rem;font-weight:600;min-width:0">' + esc(t.name) +
+              ' <span class="mono faint" style="font-weight:400">(' + esc(t.code) + ')</span></span>' +
+            '<button type="button" class="iconbtn" data-edit="' + j + '" title="Edit type" ' +
+              'aria-label="Edit ' + esc(t.name) + '" style="width:1.75rem;height:1.75rem">' +
+              VHR.icon('settings', 13) + '</button>' +
+            '<span class="spacer"></span>' +
+            '<button type="button" class="iconbtn" data-del="' + j + '" title="Delete type" ' +
+              'aria-label="Delete ' + esc(t.name) + '" style="width:1.75rem;height:1.75rem">' +
+              VHR.icon('x', 14) + '</button>' +
+          '</div>' +
+
+          '<div class="row" style="gap:var(--s2);margin-top:var(--s2)">' +
+            '<label class="sr" for="rate-' + j + '">Monthly accrual for ' + esc(t.name) + ', in days</label>' +
+            '<input class="input num" id="rate-' + j + '" name="rate" type="number" step="0.01" min="0" ' +
+              'value="' + t.rate + '" style="width:6rem;min-width:6rem;height:2.25rem;min-height:2.25rem">' +
+            '<span class="faint" style="font-size:.75rem">days / month</span>' +
+            '<span class="spacer"></span>' +
+            '<button class="btn btn--ghost btn--sm" type="submit" title="Save rate">' +
+              VHR.icon('check', 14) + 'Save</button>' +
+          '</div>' +
+
+        '</div></form>';
+    }).join('');
+
+    Array.prototype.forEach.call($('tiles').querySelectorAll('form'), function (form) {
+      var t = types[+form.getAttribute('data-i')], input = form.querySelector('input');
+
+      form.addEventListener('submit', function (ev) {
+        var v = parseFloat(input.value);
+        if (isFinite(v) && v >= 0) { input.removeAttribute('aria-invalid'); return; }
+        ev.preventDefault();
+        ev.stopImmediatePropagation();
+        input.setAttribute('aria-invalid', 'true');
+        input.focus();
+        notice('Monthly accrual must be a non-negative number (decimals allowed)', 'err');
+      });
+      VHR.fakeSubmit(form, 'Accrual rate saved');
+      form.addEventListener('submit', function () {
+        var v = Math.round(parseFloat(input.value) * 100) / 100;
+        setTimeout(function () {
+          t.rate = v;
+          input.value = v;
+          notice(t.name + ': ' + days(v) + ' day(s) will accrue per month', 'ok');
+        }, 750);
+      });
+    });
+
+    Array.prototype.forEach.call($('tiles').querySelectorAll('[data-edit]'), function (b) {
+      b.addEventListener('click', function () { editType(+b.getAttribute('data-edit')); });
+    });
+    Array.prototype.forEach.call($('tiles').querySelectorAll('[data-del]'), function (b) {
+      b.addEventListener('click', function () { deleteType(+b.getAttribute('data-del')); });
+    });
+  }
+
+  /* ---- balance grid ---------------------------------------------------
+     One column per leave type, so the header grows with the list. */
+  function renderGrid() {
+    $('gridhead').innerHTML = '<th scope="col">Employee</th>' + types.map(function (t) {
+      return '<th class="num" scope="col"><abbr title="' + esc(t.name) + '" style="text-decoration:none">' +
+        esc(t.code) + '</abbr></th>';
+    }).join('');
+
+    if (!roll.length) {
+      $('gridbody').innerHTML = '<tr><td colspan="' + (types.length + 1) +
+        '" class="muted" style="text-align:center;padding:var(--s8) var(--s4)">No active employees yet.</td></tr>';
+    } else {
+      $('gridbody').innerHTML = roll.map(function (e, i) {
+        return '<tr>' + employeeCell(e, i) +
+          types.map(function (t) { return balanceCell(e, t, i); }).join('') + '</tr>';
+      }).join('');
+    }
+
+    $('rollcount').textContent = roll.length + ' employees on the roll · ' + types.length + ' leave types';
+    $('gridfoot').innerHTML = 'Loss of Pay and Maternity Leave are granted on application rather than accrued, so their columns stay at zero until a request is approved. ' +
+      'Comp Off shows a dash until the employee banks one — there is no balance row to adjust yet.';
+
+    Array.prototype.forEach.call($('gridbody').querySelectorAll('[data-ledger]'), function (b) {
+      b.addEventListener('click', function () { showLedger(roll[+b.getAttribute('data-ledger')]); });
+    });
+    Array.prototype.forEach.call($('gridbody').querySelectorAll('[data-adj]'), function (b) {
+      var p = b.getAttribute('data-adj').split('|');
+      b.addEventListener('click', function () { adjust(roll[+p[0]], types[+p[1]]); });
+    });
+  }
+
+  function employeeCell(e, i) {
+    return '<td><span class="person">' +
+      '<span class="avatar avatar--sm">' + initials(e.name) + '</span>' +
+      '<span style="min-width:0">' +
+        '<span class="person__name" style="display:block">' + esc(e.name) +
+          (e.status === 'Probation' ? ' <span class="badge badge--warn">Probation</span>' : '') + '</span>' +
+        '<span class="person__meta">' + esc(e.code) + '</span>' +
+        '<button class="btn btn--quiet btn--sm" data-ledger="' + i + '" ' +
+          'style="display:flex;height:auto;padding:0;gap:var(--s1);font-size:.75rem;color:var(--accent-strong)">' +
+          VHR.icon('fileText', 12) + 'Ledger</button>' +
+      '</span></span></td>';
+  }
+
+  function balanceCell(e, t, i) {
+    var b = bal[e.code + '|' + t.code];
+    if (!b) {
+      return '<td class="num"><span class="faint" title="No balance row opened yet">—</span></td>';
+    }
+    var left = Math.round((b.acc - b.used) * 100) / 100;
+    return '<td class="num">' +
+      '<button class="btn btn--quiet" data-adj="' + i + '|' + types.indexOf(t) + '" title="Adjust balance" ' +
+        'aria-label="Adjust ' + esc(t.name) + ' for ' + esc(e.name) + ', ' + days(left) + ' days left" ' +
+        'style="display:block;width:100%;height:auto;text-align:right;padding:var(--s1) var(--s2);' +
+        'border:1px solid transparent;border-radius:var(--r-sm)">' +
+        '<span class="num" style="display:block;font-size:.9375rem;font-weight:600;color:var(--' +
+          (left < 0 ? 'err-text' : 'accent-strong') + ')">' + days(left) + '</span>' +
+        '<span class="faint mono" style="display:block;font-size:.6875rem">' +
+          days(b.acc) + ' acc · ' + days(b.used) + ' used</span>' +
+      '</button></td>';
+  }
+
+  /* ---- ledger ----------------------------------------------------------
+     Every movement that made the balance what it is. Accrual rows are
+     replayed from the three completed runs; leave rows come from the
+     real applications — an approved one debits on approval, a rejected
+     one held the days on apply and gave them back on rejection. */
+  var KINDS = {
+    accrual: { label: 'Accrual', tone: 'info' },
+    adjustment: { label: 'Adjustment', tone: 'warn' },
+    leave_taken: { label: 'Leave taken', tone: 'err' },
+    leave_cancelled: { label: 'Leave cancelled', tone: 'ok' }
+  };
+
+  function typeByName(name) {
+    return types.filter(function (t) { return t.name === name; })[0];
+  }
+
+  function entries(e) {
+    var rows = [];
+
+    if (e.status !== 'Probation') {
+      ['2026-06', '2026-07', '2026-08'].forEach(function (p) {
+        types.forEach(function (t) {
+          if (!t.rate) return;
+          rows.push({
+            at: p + '-' + RUN_DAY + ' 00:05:12', code: t.code, delta: t.rate,
+            kind: 'accrual', note: 'Monthly accrual for ' + p, by: 'system'
+          });
+        });
+      });
+    }
+
+    D.leaveRequests.forEach(function (r) {
+      if (r.emp !== e.name) return;
+      var t = typeByName(r.type);
+      if (!t) return;
+      var at = r.applied + ' ' + attime(r.id);
+
+      if (r.status === 'Approved') {
+        rows.push({
+          at: at, code: t.code, delta: -r.days, kind: 'leave_taken',
+          note: 'Leave #' + r.id + ' approved — ' + dmy(r.from) + ' to ' + dmy(r.to),
+          by: user(r.approver)
+        });
+      } else if (r.status === 'Rejected') {
+        rows.push({
+          at: at, code: t.code, delta: -r.days, kind: 'leave_taken',
+          note: 'Leave #' + r.id + ' applied — days held pending approval', by: user(r.emp)
+        });
+        rows.push({
+          at: r.applied + ' ' + pad(Math.min(23, 19 + (r.id % 5) + 2)) + ':' + pad((r.id * 7) % 60) + ':09',
+          code: t.code, delta: r.days, kind: 'leave_cancelled',
+          note: 'Leave #' + r.id + ' rejected — balance restored', by: user(r.approver)
+        });
+      }
+    });
+
+    return rows.concat(ledger[e.code] || [])
+      .sort(function (a, b) { return a.at < b.at ? 1 : -1; })
+      .slice(0, 200);
+  }
+
+  /* data.js flags two people as probationers but carries no end date,
+     so one is derived: six months from joining, or — where that has
+     passed and the flag is still set — the end of the current quarter,
+     which is how an extension is recorded. */
+  function probationUntil(e) {
+    var p = e.joined.split('-'), m = +p[1] + 6, y = +p[0];
+    if (m > 12) { m -= 12; y += 1; }
+    var iso = y + '-' + pad(m) + '-' + p[2];
+    return iso > TODAY ? iso : '2026-12-31';
+  }
+
+  function showLedger(e) {
+    var rows = entries(e), body;
+
+    if (!rows.length) {
+      body = '<div class="empty" style="padding:var(--s6) var(--s5)">' +
+        '<span class="empty__icon">' + VHR.icon('history', 22) + '</span>' +
+        '<h3>No balance changes recorded yet</h3>' +
+        '<p>Accruals, approved leave and manual adjustments all land here with the day and the actor.</p></div>';
+    } else {
+      body = '<div class="tablewrap" style="max-height:26rem;overflow-y:auto">' +
+        '<table class="table"><thead><tr>' +
+          '<th scope="col">When</th><th scope="col">Type</th><th class="num" scope="col">Change</th>' +
+          '<th scope="col">Kind</th><th scope="col">Note</th><th scope="col">By</th>' +
+        '</tr></thead><tbody>' +
+        rows.map(function (r) {
+          var k = KINDS[r.kind] || { label: r.kind, tone: 'neutral' };
+          return '<tr>' +
+            '<td class="mono faint" style="font-size:.75rem;white-space:nowrap">' + esc(r.at) + '</td>' +
+            '<td class="mono">' + esc(r.code) + '</td>' +
+            '<td class="num" style="font-weight:600;color:var(--' + (r.delta >= 0 ? 'ok' : 'err-text') + ')">' +
+              signed(r.delta) + '</td>' +
+            '<td><span class="badge badge--' + k.tone + '">' + esc(k.label) + '</span></td>' +
+            '<td class="muted" style="font-size:.75rem;max-width:16rem">' + esc(r.note) + '</td>' +
+            '<td class="mono faint" style="font-size:.75rem">' + esc(r.by) + '</td>' +
+          '</tr>';
+        }).join('') +
+        '</tbody></table></div>';
+    }
+
+    /* The probation note only makes sense while the window is open. */
+    var until = e.status === 'Probation' ? probationUntil(e) : null;
+    var alert = until
+      ? '<div class="card" style="box-shadow:none;border-color:var(--info);background:var(--info-soft);margin-bottom:var(--s4)">' +
+        '<div class="row" style="gap:var(--s3);padding:var(--s3) var(--s4);color:var(--info)">' +
+        VHR.icon('alert', 16) + '<span style="font-size:.8125rem;font-weight:600">On probation until ' + until +
+        ' — balance locked (no accrual, unpaid leave only).</span></div></div>'
+      : '';
+
+    VHR.modal({
+      wide: true,
+      title: 'Leave Ledger — ' + esc(e.name) + ' (' + esc(e.code) + ')',
+      sub: esc(e.designation) + ' · ' + esc(e.department) + ' · newest first, 200 most recent movements',
+      body: alert + body,
+      foot: '<button class="btn btn--ghost" data-close>Close</button>'
+    });
+  }
+
+  /* ---- manual adjustment ------------------------------------------- */
+  var stampCount = 0;
+
+  function adjust(e, t) {
+    var b = bal[e.code + '|' + t.code];
+    if (!b) return;
+    var left = Math.round((b.acc - b.used) * 100) / 100;
+
+    var close = VHR.modal({
+      title: 'Adjust ' + esc(t.code) + ' — ' + esc(e.name),
+      sub: esc(t.name) + ' · ' + esc(e.code) + ' · ' + days(b.acc) + ' accrued, ' +
+           days(b.used) + ' used, ' + days(left) + ' left',
+      foot: null,
+      body:
+        '<form id="adjform" class="stack" style="gap:var(--s4)">' +
+          '<div class="field">' +
+            '<label class="label" for="adjdelta">Adjustment (days — decimals allowed, negative to deduct)<span class="req">*</span></label>' +
+            '<input class="input num" id="adjdelta" name="delta" type="number" step="0.01" required ' +
+              'placeholder="e.g. 2.5 or -1" aria-describedby="adjhelp">' +
+            '<p class="help" id="adjhelp">The figure is added to the accrued days, so −1 takes a day back.</p>' +
+            '<p class="err" id="adjerr" hidden>' + VHR.icon('alert', 14) +
+              'Employee, leave type and a non-zero adjustment are required.</p>' +
+          '</div>' +
+          '<div class="field">' +
+            '<label class="label" for="adjnote">Note</label>' +
+            '<input class="input" id="adjnote" name="note" type="text" ' +
+              'placeholder="e.g. comp-off credit for weekend release" aria-describedby="adjnotehelp">' +
+            '<p class="help" id="adjnotehelp">Shown in the ledger beside your username (' + esc(ACTOR) + ').</p>' +
+          '</div>' +
+          '<div class="row" style="justify-content:flex-end;gap:var(--s3)">' +
+            '<button type="button" class="btn btn--ghost" data-close>Cancel</button>' +
+            '<button type="submit" class="btn btn--primary">Apply Adjustment</button>' +
+          '</div>' +
+        '</form>'
+    });
+
+    var form = $('adjform'), delta = $('adjdelta'), err = $('adjerr');
+
+    form.addEventListener('submit', function (ev) {
+      var v = parseFloat(delta.value);
+      if (isFinite(v) && v !== 0) { delta.removeAttribute('aria-invalid'); err.hidden = true; return; }
+      ev.preventDefault();
+      ev.stopImmediatePropagation();
+      delta.setAttribute('aria-invalid', 'true');
+      err.hidden = false;
+      delta.focus();
+    });
+    VHR.fakeSubmit(form, 'Balance adjusted');
+    form.addEventListener('submit', function () {
+      var v = Math.round(parseFloat(delta.value) * 100) / 100, note = $('adjnote').value.trim();
+      setTimeout(function () {
+        b.acc = Math.round((b.acc + v) * 100) / 100;
+        (ledger[e.code] = ledger[e.code] || []).push({
+          at: TODAY + ' ' + pad(21 + Math.floor(stampCount / 60)) + ':' + pad(stampCount++ % 60) + ':44',
+          code: t.code, delta: v, kind: 'adjustment',
+          note: note || 'Manual correction by HR', by: ACTOR
+        });
+        close();
+        renderGrid();
+        notice('Balance adjusted by ' + signed(v) + ' day(s)', 'ok');
+      }, 750);
+    });
+  }
+
+  /* ---- add / edit / delete a leave type ------------------------------ */
+  function clashes(name, code, skip) {
+    return types.some(function (t, i) {
+      return i !== skip && (t.name.toLowerCase() === name.toLowerCase() || t.code === code);
+    });
+  }
+
+  function addType() {
+    var close = VHR.modal({
+      title: 'Add Leave Type',
+      sub: 'Every employee gets a balance row opened at zero',
+      foot: null,
+      body:
+        '<form id="addform" class="stack" style="gap:var(--s4)">' +
+          '<div class="field">' +
+            '<label class="label" for="addname">Name<span class="req">*</span></label>' +
+            '<input class="input" id="addname" name="name" type="text" required placeholder="Paternity Leave">' +
+          '</div>' +
+          '<div class="fieldrow">' +
+            '<div class="field">' +
+              '<label class="label" for="addcode">Code<span class="req">*</span></label>' +
+              '<input class="input mono" id="addcode" name="code" type="text" required placeholder="PL" ' +
+                'aria-describedby="addcodehelp">' +
+              '<p class="help" id="addcodehelp">Trimmed and upper-cased on save.</p>' +
+            '</div>' +
+            '<div class="field">' +
+              '<label class="label" for="addrate">Monthly accrual<span class="req">*</span></label>' +
+              '<input class="input num" id="addrate" name="rate" type="number" step="0.01" min="0" required value="1">' +
+              '<p class="help">Days credited per month. Zero for a granted type.</p>' +
+            '</div>' +
+          '</div>' +
+          '<p class="err" id="adderr" hidden>' + VHR.icon('alert', 14) +
+            'A leave type with that name or code already exists.</p>' +
+          '<div class="row" style="justify-content:flex-end;gap:var(--s3)">' +
+            '<button type="button" class="btn btn--ghost" data-close>Cancel</button>' +
+            '<button type="submit" class="btn btn--primary">Add Type</button>' +
+          '</div>' +
+        '</form>'
+    });
+
+    var form = $('addform'), err = $('adderr');
+
+    form.addEventListener('submit', function (ev) {
+      var name = $('addname').value.trim(), code = $('addcode').value.trim().toUpperCase(),
+          rate = parseFloat($('addrate').value);
+      if (!name || !code) return;                     /* required stops the browser first */
+      if (!isFinite(rate) || rate < 0) {
+        ev.preventDefault(); ev.stopImmediatePropagation();
+        notice('Monthly accrual must be a non-negative number (decimals allowed)', 'err');
+        return;
+      }
+      if (clashes(name, code, -1)) {
+        ev.preventDefault(); ev.stopImmediatePropagation();
+        err.hidden = false;
+        notice('A leave type with that name or code already exists', 'err');
+        return;
+      }
+      err.hidden = true;
+    });
+    VHR.fakeSubmit(form, 'Leave type added');
+    form.addEventListener('submit', function () {
+      var name = $('addname').value.trim(), code = $('addcode').value.trim().toUpperCase(),
+          rate = Math.round(parseFloat($('addrate').value) * 100) / 100;
+      setTimeout(function () {
+        types.push({ code: code, name: name, entitled: Math.round(rate * 12 * 100) / 100, rate: rate });
+        roll.forEach(function (e) { bal[e.code + '|' + code] = { acc: 0, used: 0 }; });
+        close();
+        renderTiles();
+        renderGrid();
+        notice('Leave type added — balances opened at 0 for all employees', 'ok');
+      }, 750);
+    });
+  }
+
+  function editType(j) {
+    var t = types[j];
+    var close = VHR.modal({
+      title: 'Edit Leave Type',
+      sub: 'The accrual rate is edited on the tile itself',
+      foot: null,
+      body:
+        '<form id="editform" class="stack" style="gap:var(--s4)">' +
+          '<div class="field">' +
+            '<label class="label" for="editname">Name<span class="req">*</span></label>' +
+            '<input class="input" id="editname" name="name" type="text" required value="' + esc(t.name) + '">' +
+          '</div>' +
+          '<div class="field">' +
+            '<label class="label" for="editcode">Code<span class="req">*</span></label>' +
+            '<input class="input mono" id="editcode" name="code" type="text" required value="' + esc(t.code) + '" ' +
+              'aria-describedby="editcodehelp">' +
+            '<p class="help" id="editcodehelp">Trimmed and upper-cased on save. The grid column follows it.</p>' +
+          '</div>' +
+          '<p class="err" id="editerr" hidden>' + VHR.icon('alert', 14) +
+            'A leave type with that name or code already exists.</p>' +
+          '<div class="row" style="justify-content:flex-end;gap:var(--s3)">' +
+            '<button type="button" class="btn btn--ghost" data-close>Cancel</button>' +
+            '<button type="submit" class="btn btn--primary">Save Changes</button>' +
+          '</div>' +
+        '</form>'
+    });
+
+    var form = $('editform'), err = $('editerr');
+
+    form.addEventListener('submit', function (ev) {
+      var name = $('editname').value.trim(), code = $('editcode').value.trim().toUpperCase();
+      if (!name || !code) return;
+      if (clashes(name, code, j)) {
+        ev.preventDefault(); ev.stopImmediatePropagation();
+        err.hidden = false;
+        notice('A leave type with that name or code already exists', 'err');
+        return;
+      }
+      err.hidden = true;
+    });
+    VHR.fakeSubmit(form, 'Leave type updated');
+    form.addEventListener('submit', function () {
+      var name = $('editname').value.trim(), code = $('editcode').value.trim().toUpperCase(), old = t.code;
+      setTimeout(function () {
+        if (code !== old) {                      /* the balance rows move with the code */
+          roll.forEach(function (e) {
+            bal[e.code + '|' + code] = bal[e.code + '|' + old];
+            delete bal[e.code + '|' + old];
+          });
+          Object.keys(ledger).forEach(function (k) {
+            ledger[k].forEach(function (r) { if (r.code === old) r.code = code; });
+          });
+        }
+        t.name = name;
+        t.code = code;
+        close();
+        renderTiles();
+        renderGrid();
+        notice('Leave type updated', 'ok');
+      }, 750);
+    });
+  }
+
+  /* The spec asks for a native confirm() here; the contract does not
+     allow one, so the same question is asked in a modal. */
+  function deleteType(j) {
+    var t = types[j];
+    var used = D.leaveRequests.filter(function (r) { return r.type === t.name; }).length;
+
+    var close = VHR.modal({
+      title: 'Delete leave type',
+      sub: esc(t.name) + ' (' + esc(t.code) + ')',
+      body: '<p style="font-size:.875rem">Delete leave type “' + esc(t.name) +
+        '”? Only possible if it was never used — the column and every employee’s balance row go with it.</p>' +
+        (used
+          ? '<p class="err">' + VHR.icon('alert', 14) + used +
+            ' application(s) already reference this type.</p>'
+          : '<p class="help">No leave application references this type.</p>'),
+      foot: '<button class="btn btn--ghost" data-close>Cancel</button>' +
+        '<button class="btn btn--danger" id="delok">Delete type</button>'
+    });
+
+    $('delok').addEventListener('click', function () {
+      close();
+      if (used) {
+        notice('Cannot delete: ' + used + ' application(s) reference this type', 'err');
+        return;
+      }
+      roll.forEach(function (e) { delete bal[e.code + '|' + t.code]; });
+      types.splice(j, 1);
+      renderTiles();
+      renderGrid();
+      notice('Leave type deleted', 'ok');
+    });
+  }
+
+  /* ---- run accrual now -------------------------------------------------
+     Credits the month still owed to every row that accrues. Probation
+     rows are skipped — that is what "balance locked" means. */
+  function runAccrual() {
+    if (!accrualPending) {
+      notice('All balances already up to date for this month', 'ok');
+      return;
+    }
+    var n = 0;
+    roll.forEach(function (e) {
+      if (e.status === 'Probation') return;
+      types.forEach(function (t) {
+        var b = bal[e.code + '|' + t.code];
+        if (!b || !t.rate) return;
+        b.acc = Math.round((b.acc + t.rate) * 100) / 100;
+        (ledger[e.code] = ledger[e.code] || []).push({
+          at: TODAY + ' 20:18:03', code: t.code, delta: t.rate,
+          kind: 'accrual', note: 'Monthly accrual for ' + PERIOD, by: 'system'
+        });
+        n++;
+      });
+    });
+    accrualPending = false;
+    renderGrid();
+    notice(n ? 'Accrual credited on ' + n + ' balance row(s)' : 'All balances already up to date for this month', 'ok');
+  }
+
+  /* ---- wiring ---------------------------------------------------------- */
+  $('calcicon').innerHTML = VHR.icon('calculator', 15);
+  $('tilesemptyicon').innerHTML = VHR.icon('calculator', 22);
+  $('runaccrual').innerHTML = VHR.icon('history', 16) + '<span>Run Accrual Now</span>';
+  $('addtype').innerHTML = VHR.icon('plus', 15) + '<span>Add Leave Type</span>';
+  $('accrualnote').textContent = 'Days credited to every employee at the start of each month. ' +
+    'Balances accumulate and carry over — accrual also runs automatically every day (current period: ' + PERIOD + ').';
+
+  $('runaccrual').addEventListener('click', runAccrual);
+  $('addtype').addEventListener('click', addType);
+
+  renderStrip(false);
+  renderTiles();
+  renderGrid();
+})();
+</script>
+</body>
+</html>

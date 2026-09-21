@@ -1,0 +1,800 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Settings — ValidureHR</title>
+<link rel="icon" href="../assets/brand/validure-mark.svg">
+<link rel="stylesheet" href="../assets/css/vhr.css">
+<script>try{var t=localStorage.getItem('vhr.theme');if(t)document.documentElement.setAttribute('data-theme',t);}catch(e){}</script>
+</head>
+<body data-root="../">
+
+<main class="page" data-page>
+
+  <div class="page__head">
+    <div>
+      <p class="eyebrow">Management</p>
+      <h1 style="margin-top:var(--s2)">Settings</h1>
+      <p class="muted" style="font-size:.875rem;margin-top:.25rem">Company-wide policy, the lists every employee form reads from, and the audit trail</p>
+    </div>
+    <div class="row" style="gap:var(--s3)">
+      <!-- The cycle is the highest-impact control on the page, so the
+           header keeps the current one in view while you scroll. -->
+      <span class="chip mono" id="cyclechip" aria-live="polite">—</span>
+    </div>
+  </div>
+
+  <div class="stack" style="gap:var(--s5)">
+
+    <!-- ------------------------------------------------ result banner -->
+    <!-- One banner for six data sets, exactly like the real screen:
+         success clears itself after four seconds, an error stays until
+         the next action succeeds. -->
+    <div class="row" id="banner" hidden aria-live="polite"
+         style="gap:var(--s3);padding:var(--s3) var(--s4);border:1px solid var(--line);border-radius:var(--r);font-size:.875rem;font-weight:500"></div>
+
+    <!-- ------------------------------------------------ company policy -->
+    <section class="card">
+      <div class="card__head">
+        <div class="row" style="gap:var(--s3)">
+          <span class="stat__icon" id="policyicon" style="width:2rem;height:2rem"></span>
+          <div>
+            <h2 style="font-size:1.0625rem;font-family:var(--font-body);font-weight:600">Company policy settings</h2>
+            <p class="faint" style="font-size:.75rem">Configure company-wide policies for employee probation and leave accrual</p>
+          </div>
+        </div>
+      </div>
+      <div class="card__body">
+        <div class="grid grid--2">
+
+          <div class="field">
+            <label class="label" for="probation">Default probation period</label>
+            <select class="select" id="probation"></select>
+            <p class="help">New employees will have their probation end date calculated automatically from their joining date. There is no Save button — the choice is written the moment you make it.</p>
+          </div>
+
+          <div class="field">
+            <label class="label" for="cycle">Payslip &amp; attendance cycle</label>
+            <select class="select" id="cycle"></select>
+            <div class="stack" style="gap:var(--s2)" id="cyclehelp"></div>
+          </div>
+
+        </div>
+      </div>
+    </section>
+
+    <!-- ------------------------------------------------ appearance
+         The palette itself already ships in vhr.css and the topbar has
+         a toggle; this is the explicit three-way preference (the
+         toggle only flips between two), and it is per-person, so it is
+         the one card a read-only role keeps. -->
+    <section class="card">
+      <div class="card__head">
+        <div class="row" style="gap:var(--s3)">
+          <span class="stat__icon" id="themeicon" style="width:2rem;height:2rem"></span>
+          <div>
+            <h2 style="font-size:1.0625rem;font-family:var(--font-body);font-weight:600">Appearance</h2>
+            <p class="faint" style="font-size:.75rem">Dark mode for the night shift — stored on this device, not on your employee record</p>
+          </div>
+        </div>
+        <span class="badge badge--neutral" id="themestate">—</span>
+      </div>
+      <div class="card__body">
+        <fieldset>
+          <legend>Theme</legend>
+          <div class="row row--wrap" style="gap:var(--s5)" id="themeopts"></div>
+        </fieldset>
+        <p class="help" style="margin-top:var(--s4)">“Match system” follows your operating system, so the portal turns dark when your desktop does. The moon in the top bar flips between light and dark without changing this preference.</p>
+      </div>
+    </section>
+
+    <!-- ------------------------------------------------ org lists -->
+    <div class="grid grid--2">
+
+      <section class="card">
+        <div class="card__head">
+          <div>
+            <h2 style="font-size:1.0625rem;font-family:var(--font-body);font-weight:600">Departments</h2>
+            <p class="faint" style="font-size:.75rem">Offered by every employee form · sorted A–Z</p>
+          </div>
+          <span class="chip mono" id="deptcount">—</span>
+        </div>
+        <div class="card__body">
+          <form class="row row--wrap" id="deptform" style="gap:var(--s3);align-items:flex-end">
+            <div class="field" style="flex:1;min-width:11rem">
+              <label class="label" for="deptname">New department<span class="req">*</span></label>
+              <input class="input" id="deptname" name="name" type="text" placeholder="e.g. Engineering" required autocomplete="off">
+            </div>
+            <button class="btn btn--primary" type="submit" id="deptadd">Add</button>
+          </form>
+        </div>
+        <div class="card__body card__body--flush" id="deptlist"></div>
+      </section>
+
+      <section class="card">
+        <div class="card__head">
+          <div>
+            <h2 style="font-size:1.0625rem;font-family:var(--font-body);font-weight:600">Designations</h2>
+            <p class="faint" style="font-size:.75rem">Job titles available on the employee record · sorted A–Z</p>
+          </div>
+          <span class="chip mono" id="desigcount">—</span>
+        </div>
+        <div class="card__body">
+          <form class="row row--wrap" id="desigform" style="gap:var(--s3);align-items:flex-end">
+            <div class="field" style="flex:1;min-width:11rem">
+              <label class="label" for="desigtitle">New designation<span class="req">*</span></label>
+              <input class="input" id="desigtitle" name="title" type="text" placeholder="e.g. Software Engineer" required autocomplete="off">
+            </div>
+            <button class="btn btn--primary" type="submit" id="desigadd">Add</button>
+          </form>
+        </div>
+        <div class="card__body card__body--flush" id="desiglist"></div>
+      </section>
+
+    </div>
+
+    <!-- ------------------------------------------------ holidays + announcements -->
+    <div class="grid grid--2">
+
+      <section class="card">
+        <div class="card__head">
+          <div>
+            <h2 style="font-size:1.0625rem;font-family:var(--font-body);font-weight:600">Holiday calendar</h2>
+            <p class="faint" style="font-size:.75rem">Excluded from leave-day counts · sorted by date</p>
+          </div>
+          <span class="chip mono" id="holcount">—</span>
+        </div>
+        <div class="card__body">
+          <form class="row row--wrap" id="holform" style="gap:var(--s3);align-items:flex-end">
+            <div class="field" style="width:11rem">
+              <label class="label" for="holdate">Date<span class="req">*</span></label>
+              <input class="input mono" id="holdate" name="date" type="date" min="2026-01-01" max="2027-12-31" required>
+            </div>
+            <div class="field" style="flex:1;min-width:11rem">
+              <label class="label" for="holname">Holiday name<span class="req">*</span></label>
+              <input class="input" id="holname" name="name" type="text" placeholder="Holiday name" required autocomplete="off">
+            </div>
+            <button class="btn btn--primary" type="submit" id="holadd">Add</button>
+          </form>
+        </div>
+        <div class="card__body card__body--flush" id="hollist"></div>
+      </section>
+
+      <section class="card">
+        <div class="card__head">
+          <div>
+            <h2 style="font-size:1.0625rem;font-family:var(--font-body);font-weight:600">Company announcements</h2>
+            <p class="faint" style="font-size:.75rem">Posted to the home page and pushed as an in-app notification</p>
+          </div>
+          <span class="chip mono" id="anncount">—</span>
+        </div>
+        <div class="card__body">
+          <form class="stack" id="annform" style="gap:var(--s4)">
+            <div class="field">
+              <label class="label" for="anntitle">Title<span class="req">*</span></label>
+              <input class="input" id="anntitle" name="title" type="text" placeholder="Title" required autocomplete="off">
+            </div>
+            <div class="field">
+              <label class="label" for="annbody">Announcement<span class="req">*</span></label>
+              <textarea class="textarea" id="annbody" name="body" rows="2" placeholder="Announcement text…" required></textarea>
+              <p class="help">The date is stamped for you. Everyone gets a notification, so keep it to what the whole company needs.</p>
+            </div>
+            <div class="row" style="justify-content:flex-end">
+              <button class="btn btn--primary" type="submit" id="annadd">Post announcement</button>
+            </div>
+          </form>
+        </div>
+        <div class="card__body card__body--flush" id="annlist"></div>
+      </section>
+
+    </div>
+
+    <!-- ------------------------------------------------ audit log -->
+    <section class="card">
+      <div class="card__head">
+        <div class="row" style="gap:var(--s3)">
+          <span class="stat__icon" id="auditicon" style="width:2rem;height:2rem"></span>
+          <div>
+            <h2 style="font-size:1.0625rem;font-family:var(--font-body);font-weight:600">Audit log</h2>
+            <p class="faint" style="font-size:.75rem">Latest 50 events · newest first · read-only</p>
+          </div>
+        </div>
+        <span class="chip mono" id="auditcount" aria-live="polite">—</span>
+      </div>
+      <div class="card__body card__body--flush">
+        <!-- Its own 420px pane, as on the real screen: the log scrolls,
+             the rest of the page does not move. -->
+        <div class="tablewrap" id="auditpane" style="max-height:26rem;overflow-y:auto">
+          <table class="table">
+            <thead>
+              <tr><th>When</th><th>Action</th><th>Target</th><th>By</th><th class="num">IP</th></tr>
+            </thead>
+            <tbody id="auditrows"></tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+  </div>
+</main>
+
+<script src="../assets/js/data.js"></script>
+<script src="../assets/js/shell.js"></script>
+<script>
+(function () {
+  'use strict';
+  var D = window.VHR_DATA, $ = function (id) { return document.getElementById(id); };
+
+  /* The real page is gated on settings.manage. In the mockup the topbar
+     role picker stands in for the permission set: an employee can read
+     the lists but writes nothing. */
+  var canManage = VHR.role() !== 'employee';
+
+  /* Whoever is signed in signs the audit row — the same name the
+     topbar is already showing. */
+  var ACTOR = VHR.role() === 'platform' ? 'Rahul Paul (platform admin)' : D.me.name;
+  var ACTOR_IP = VHR.role() === 'platform' ? '49.36.180.204' : '103.21.58.7';
+
+  /* The mockup states the date it is presenting rather than reading the
+     visitor's clock — the server this will run on is not on IST. */
+  var TODAY = '2026-09-21';
+  var MON = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+
+  function esc(s) {
+    return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+  }
+  function pad(n) { return String(n).length < 2 ? '0' + n : String(n); }
+  function ordinal(n) {
+    var s = ['th', 'st', 'nd', 'rd'], v = n % 100;
+    return n + (s[(v - 20) % 10] || s[v] || s[0]);
+  }
+  /* Month lengths are arithmetic — never ask the host clock. */
+  function daysIn(y, m) {
+    var leap = (y % 4 === 0 && y % 100 !== 0) || y % 400 === 0;
+    return [31, leap ? 29 : 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31][m - 1];
+  }
+  function pretty(y, m, d) { return d + ' ' + MON[m - 1] + ' ' + y; }
+
+  /* ---- working copies ----------------------------------------------
+     Six lists the page mutates. They are copies so adding a department
+     here does not rewrite the sample data every other screen reads. */
+  var deptCount = {}, desigCount = {};
+  D.employees.forEach(function (e) {
+    deptCount[e.department] = (deptCount[e.department] || 0) + 1;
+    desigCount[e.designation] = (desigCount[e.designation] || 0) + 1;
+  });
+
+  var departments = D.departments.map(function (d) {
+    return { name: d.name, head: d.head, count: deptCount[d.name] || 0 };
+  });
+  var designations = D.designations.map(function (t) {
+    return { title: t, count: desigCount[t] || 0 };
+  });
+  var holidays = D.holidays.map(function (h) {
+    return { date: h.date, name: h.name, type: h.type };
+  });
+  var announcements = D.announcements.map(function (a) {
+    return { title: a.title, body: a.body, at: a.at, by: a.by, pinned: a.pinned };
+  });
+  var audit = D.audit.map(function (a) {
+    return { at: a.at, who: a.who, action: a.action, target: a.target, ip: a.ip };
+  });
+
+  var settings = { probation: 3, cycleStart: 25 };
+  var bannerTimer = null;
+  /* Audit timestamps for actions taken on this screen carry on from the
+     newest sample row rather than from the visitor's clock. */
+  var stampMin = 20 * 60 + 40;
+
+  function nextStamp() {
+    stampMin += 7;
+    return TODAY + ' ' + pad(Math.floor(stampMin / 60) % 24) + ':' + pad(stampMin % 60) + ':00';
+  }
+
+  /* ---- banner ---- */
+  function banner(kind, msg) {
+    var el = $('banner');
+    el.style.background = 'var(--' + kind + '-soft)';
+    el.style.color = kind === 'err' ? 'var(--err-text)' : 'var(--' + kind + ')';
+    el.innerHTML = VHR.icon(kind === 'ok' ? 'check' : 'alert', 16) + '<span>' + esc(msg) + '</span>';
+    el.hidden = false;
+    clearTimeout(bannerTimer);
+    if (kind === 'ok') bannerTimer = setTimeout(function () { el.hidden = true; }, 4000);
+  }
+
+  /* ---- audit ---- */
+  /* data.js writes its actions in dotted lower case, so rows added here
+     follow the same vocabulary rather than the server's SCREAMING_SNAKE
+     constants — one convention per table. */
+  function logAudit(action, target) {
+    audit.unshift({ at: nextStamp(), who: ACTOR, action: action, target: target, ip: ACTOR_IP });
+    renderAudit();
+  }
+
+  function renderAudit() {
+    var list = audit.slice(0, 50);
+    $('auditcount').textContent = list.length + (list.length === 1 ? ' event' : ' events');
+    $('auditrows').innerHTML = list.length ? list.map(function (a) {
+      return '<tr>' +
+        '<td class="mono faint" style="white-space:nowrap">' + esc(a.at) + '</td>' +
+        '<td class="mono" style="font-weight:600">' + esc(a.action) + '</td>' +
+        '<td class="muted">' + esc(a.target) + '</td>' +
+        '<td>' + (a.who === 'system'
+          ? '<span class="badge badge--neutral">system</span>'
+          : esc(a.who)) + '</td>' +
+        '<td class="num mono faint">' + esc(a.ip) + '</td>' +
+        '</tr>';
+    }).join('') :
+      '<tr><td colspan="5"><div class="empty">' +
+        '<span class="empty__icon">' + VHR.icon('history', 22) + '</span>' +
+        '<h3>Nothing logged yet</h3>' +
+        '<p>Every approval, upload, payroll export and settings change lands here with the person who made it.</p>' +
+      '</div></td></tr>';
+  }
+
+  /* ---- company policy ----------------------------------------------- */
+  var PROBATION = [
+    { v: 0, label: 'No probation (disabled)' },
+    { v: 1, label: '1 month' },
+    { v: 2, label: '2 months' },
+    { v: 3, label: '3 months' },
+    { v: 6, label: '6 months' },
+    { v: 9, label: '9 months' },
+    { v: 12, label: '1 year (12 months)' }
+  ];
+
+  function cycleLabel(d) {
+    if (d === 1) return 'Calendar month (1st to the end of the month)';
+    var t = ordinal(d) + ' of the previous month to the ' + ordinal(d - 1) + ' of the current month';
+    /* 29, 30 and 31 cannot start February, so those cycles are clamped
+       to the month's last day — the label says so up front. */
+    return d > 28 ? t + ' (short months end on their last day)' : t;
+  }
+
+  /* The cycle that contains TODAY, for the worked example. */
+  function cycleExample(start) {
+    var p = TODAY.split('-'), y = +p[0], m = +p[1], day = +p[2];
+    if (start === 1) return pretty(y, m, 1) + ' – ' + pretty(y, m, daysIn(y, m));
+    var sy = y, sm = m;
+    if (day < Math.min(start, daysIn(y, m))) { sm -= 1; if (sm < 1) { sm = 12; sy -= 1; } }
+    var ey = sy, em = sm + 1;
+    if (em > 12) { em = 1; ey += 1; }
+    return pretty(sy, sm, Math.min(start, daysIn(sy, sm))) + ' – ' +
+           pretty(ey, em, Math.min(start - 1, daysIn(ey, em)));
+  }
+
+  function renderPolicy() {
+    var start = settings.cycleStart, endDay = start === 1 ? null : start - 1;
+    var strong = ' style="color:var(--muted)"';
+
+    var accrual = endDay === null
+      /* Calendar-month mode drops the derived sentence and falls back to
+         the platform default accrual day — the real screen does the
+         same, so the mockup keeps the quirk rather than tidying it. */
+      ? 'Leave accrues on the 24th.'
+      : 'Leave accrues on the <strong' + strong + '>' + ordinal(endDay) + '</strong>, the last day of each cycle' +
+        (start > 28 ? ' — a day earlier in months that are too short, so no day is ever counted in two cycles' : '') + '.';
+
+    $('cyclehelp').innerHTML =
+      '<p class="help">Sets what “a month” means everywhere: attendance grids and summaries, the attendance export, ' +
+        'dashboard counters, payslip periods and leave accrual. A cycle is named for the month it <strong' + strong + '>ends</strong> in. ' +
+        'This month is <strong' + strong + '>' + cycleExample(start) + '</strong>.</p>' +
+      '<p class="help">' + accrual + '</p>' +
+      '<p class="help" style="color:var(--warn)">Changing this re-groups past months too, so previously reviewed ' +
+        'attendance totals will shift. No attendance record is altered.</p>';
+
+    $('cyclechip').textContent = (start === 1 ? 'Calendar month' : ordinal(start) + ' → ' + ordinal(endDay)) +
+      ' · ' + (settings.probation === 0 ? 'no probation' : settings.probation + '-month probation');
+  }
+
+  function buildPolicy() {
+    $('policyicon').innerHTML = VHR.icon('settings', 17);
+
+    $('probation').innerHTML = PROBATION.map(function (o) {
+      return '<option value="' + o.v + '"' + (o.v === settings.probation ? ' selected' : '') + '>' +
+        o.label + '</option>';
+    }).join('');
+
+    var opts = '';
+    for (var d = 1; d <= 31; d++) {
+      opts += '<option value="' + d + '"' + (d === settings.cycleStart ? ' selected' : '') + '>' +
+        esc(cycleLabel(d)) + '</option>';
+    }
+    $('cycle').innerHTML = opts;
+
+    /* No Save button on either control — the real screen PUTs on change
+       and re-reads, so the derived text below refreshes immediately. */
+    $('probation').addEventListener('change', function () {
+      settings.probation = +this.value;
+      renderPolicy();
+      logAudit('settings.probation', 'Default probation period set to ' + settings.probation + ' month(s)');
+      banner('ok', 'Organisation settings updated successfully');
+      VHR.toast('Probation default saved', 'ok');
+    });
+
+    $('cycle').addEventListener('change', function () {
+      settings.cycleStart = +this.value;
+      renderPolicy();
+      logAudit('settings.cycle', 'Month cycle set to ' + cycleLabel(settings.cycleStart));
+      banner('ok', 'Organisation settings updated successfully');
+      VHR.toast('Attendance and payslip cycle saved', 'ok');
+    });
+
+    renderPolicy();
+  }
+
+  /* ---- appearance ---------------------------------------------------- */
+  var THEMES = [
+    { v: 'light', label: 'Light', icon: 'sun' },
+    { v: 'dark', label: 'Dark', icon: 'moon' },
+    { v: 'system', label: 'Match system', icon: 'settings' }
+  ];
+
+  function pinnedTheme() {
+    try { return localStorage.getItem('vhr.theme') || 'system'; } catch (e) { return 'system'; }
+  }
+
+  function syncTheme() {
+    var pin = pinnedTheme(), live = VHR.theme.current();
+    Array.prototype.forEach.call(document.querySelectorAll('[name=theme]'), function (r) {
+      r.checked = r.value === pin;
+    });
+    $('themestate').textContent = (live === 'dark' ? 'Dark' : 'Light') + ' in effect';
+  }
+
+  function buildTheme() {
+    $('themeicon').innerHTML = VHR.icon('moon', 17);
+    $('themeopts').innerHTML = THEMES.map(function (t) {
+      return '<label class="checkline" style="align-items:center">' +
+        '<input type="radio" name="theme" value="' + t.v + '">' +
+        '<span class="row" style="gap:var(--s2)">' + VHR.icon(t.icon, 16) + t.label + '</span></label>';
+    }).join('');
+
+    $('themeopts').addEventListener('change', function (e) {
+      if (!e.target.name || e.target.name !== 'theme') return;
+      VHR.theme.apply(e.target.value);
+      syncTheme();
+      VHR.toast('Theme set to ' + THEMES.filter(function (t) { return t.v === e.target.value; })[0].label);
+    });
+
+    /* The topbar toggle writes the same attribute, so watch it rather
+       than letting the two controls drift apart. */
+    if (window.MutationObserver) {
+      new MutationObserver(syncTheme).observe(document.documentElement, { attributes: true, attributeFilter: ['data-theme'] });
+    }
+    syncTheme();
+  }
+
+  /* ---- shared list plumbing ------------------------------------------ */
+  function removeBtn(act, key, label) {
+    if (!canManage) return '';
+    return '<button class="iconbtn" style="width:2rem;height:2rem;color:var(--err-text)" ' +
+      'data-act="' + act + '" data-key="' + esc(key) + '" title="Remove" ' +
+      'aria-label="Remove ' + esc(label) + '">' + VHR.icon('x', 16) + '</button>';
+  }
+
+  function listShell(rows) {
+    return '<ul style="list-style:none;margin:0;padding:0">' + rows.join('') + '</ul>';
+  }
+
+  function li(inner) {
+    return '<li class="row row--between" style="gap:var(--s3);padding:var(--s3) var(--s5);border-top:1px solid var(--line)">' +
+      inner + '</li>';
+  }
+
+  function emptyBlock(icon, head, body) {
+    return '<div class="empty"><span class="empty__icon">' + VHR.icon(icon, 22) + '</span>' +
+      '<h3>' + head + '</h3><p>' + body + '</p></div>';
+  }
+
+  function skeleton(n) {
+    var out = '';
+    for (var i = 0; i < n; i++) {
+      out += '<div style="padding:var(--s3) var(--s5);border-top:1px solid var(--line)">' +
+        '<span class="skel" style="display:block;height:1.25rem"></span></div>';
+    }
+    return out;
+  }
+
+  /* Blank strings pass HTML's `required`, and a duplicate is a 409 from
+     the server, so both are caught here. Stopping propagation keeps
+     VHR.fakeSubmit — registered next — from cheering a failed write. */
+  function wireForm(form, okToast, validate, commit) {
+    form.addEventListener('submit', function (e) {
+      var problem = validate();
+      if (!problem) return;
+      e.preventDefault();
+      e.stopImmediatePropagation();
+      banner('err', problem);
+      VHR.toast(problem, 'err');
+    });
+    VHR.fakeSubmit(form, okToast);
+    form.addEventListener('submit', function () {
+      setTimeout(commit, 700);
+    });
+  }
+
+  /* ---- departments --------------------------------------------------- */
+  function renderDepts(loading) {
+    var el = $('deptlist');
+    if (loading) { el.innerHTML = skeleton(4); return; }
+
+    departments.sort(function (a, b) { return a.name < b.name ? -1 : a.name > b.name ? 1 : 0; });
+    $('deptcount').textContent = departments.length + ' departments';
+
+    el.innerHTML = departments.length ? listShell(departments.map(function (d) {
+      return li('<span><span style="font-size:.875rem;font-weight:600;display:block">' + esc(d.name) + '</span>' +
+        '<span class="person__meta">Head: ' + esc(d.head || '—') + '</span></span>' +
+        '<span class="row" style="gap:var(--s3)">' +
+        '<span class="chip num">' + d.count + '</span>' +
+        removeBtn('dept', d.name, 'department ' + d.name) + '</span>');
+    })) : emptyBlock('users', 'No departments yet',
+      'Add your first one above — the employee form offers this list, so nobody can be filed without it.');
+  }
+
+  function findDept(name) {
+    for (var i = 0; i < departments.length; i++) if (departments[i].name === name) return departments[i];
+    return null;
+  }
+
+  wireForm($('deptform'), 'Department added — the employee form offers it immediately.',
+    function () {
+      var v = $('deptname').value.trim();
+      if (!v) return 'Department name is required';
+      var clash = departments.some(function (d) { return d.name.toLowerCase() === v.toLowerCase(); });
+      return clash ? 'That department already exists' : null;
+    },
+    function () {
+      var v = $('deptname').value.trim();
+      departments.push({ name: v, head: '—', count: 0 });
+      $('deptform').reset();
+      renderDepts();
+      logAudit('department.add', v);
+      banner('ok', 'Department added');
+    });
+
+  /* ---- designations -------------------------------------------------- */
+  function renderDesigs(loading) {
+    var el = $('desiglist');
+    if (loading) { el.innerHTML = skeleton(4); return; }
+
+    designations.sort(function (a, b) { return a.title < b.title ? -1 : a.title > b.title ? 1 : 0; });
+    $('desigcount').textContent = designations.length + ' titles';
+
+    el.innerHTML = designations.length ? listShell(designations.map(function (t) {
+      return li('<span style="font-size:.875rem;font-weight:600">' + esc(t.title) + '</span>' +
+        '<span class="row" style="gap:var(--s3)">' +
+        '<span class="chip num">' + t.count + '</span>' +
+        removeBtn('desig', t.title, 'designation ' + t.title) + '</span>');
+    })) : emptyBlock('badge', 'No designations yet',
+      'Add your first one above — job titles on the employee record are chosen from this list.');
+  }
+
+  function findDesig(title) {
+    for (var i = 0; i < designations.length; i++) if (designations[i].title === title) return designations[i];
+    return null;
+  }
+
+  wireForm($('desigform'), 'Designation added — available on the employee record now.',
+    function () {
+      var v = $('desigtitle').value.trim();
+      if (!v) return 'Designation title is required';
+      var clash = designations.some(function (t) { return t.title.toLowerCase() === v.toLowerCase(); });
+      return clash ? 'That designation already exists' : null;
+    },
+    function () {
+      var v = $('desigtitle').value.trim();
+      designations.push({ title: v, count: 0 });
+      $('desigform').reset();
+      renderDesigs();
+      logAudit('designation.add', v);
+      banner('ok', 'Designation added');
+    });
+
+  /* ---- holidays ------------------------------------------------------ */
+  function renderHolidays(loading) {
+    var el = $('hollist');
+    if (loading) { el.innerHTML = skeleton(4); return; }
+
+    holidays.sort(function (a, b) { return a.date < b.date ? -1 : a.date > b.date ? 1 : 0; });
+    $('holcount').textContent = holidays.length + ' holidays';
+
+    el.innerHTML = holidays.length ? listShell(holidays.map(function (h) {
+      return li('<span><span style="font-size:.875rem;font-weight:600;display:block">' + esc(h.name) + '</span>' +
+        '<span class="person__meta">' + esc(h.type || 'Declared') + '</span></span>' +
+        '<span class="row" style="gap:var(--s3)">' +
+        /* The badge prints the stored date verbatim — this list is the
+           one place the app does not reformat it to DD/MM/YYYY. */
+        '<span class="badge badge--info mono">' + h.date + '</span>' +
+        removeBtn('hol', h.date, 'holiday ' + h.name) + '</span>');
+    })) : emptyBlock('calendarCheck', 'No holidays configured',
+      'Holidays are excluded from leave-day counts, so add them before the first leave request of the year.');
+  }
+
+  function findHoliday(date) {
+    for (var i = 0; i < holidays.length; i++) if (holidays[i].date === date) return holidays[i];
+    return null;
+  }
+
+  wireForm($('holform'), 'Holiday added — everyone has been notified.',
+    function () {
+      var d = $('holdate').value, n = $('holname').value.trim();
+      if (!d || !n) return 'Date and name are required';
+      return findHoliday(d) ? 'A holiday already exists on that date' : null;
+    },
+    function () {
+      var d = $('holdate').value, n = $('holname').value.trim();
+      holidays.push({ date: d, name: n, type: 'Declared' });
+      $('holform').reset();
+      renderHolidays();
+      logAudit('holiday.add', n + ' (' + d + ')');
+      banner('ok', 'Holiday added');
+    });
+
+  /* ---- announcements -------------------------------------------------- */
+  function renderAnnouncements(loading) {
+    var el = $('annlist');
+    if (loading) { el.innerHTML = skeleton(3); return; }
+
+    announcements.sort(function (a, b) { return a.at < b.at ? 1 : a.at > b.at ? -1 : 0; });
+    $('anncount').textContent = announcements.length + ' posted';
+
+    el.innerHTML = announcements.length ? listShell(announcements.map(function (a) {
+      return '<li class="row" style="gap:var(--s3);align-items:flex-start;padding:var(--s3) var(--s5);border-top:1px solid var(--line)">' +
+        '<span style="flex:1;min-width:0">' +
+          '<span class="row row--wrap" style="gap:var(--s2)">' +
+            '<span style="font-size:.875rem;font-weight:600">' + esc(a.title) + '</span>' +
+            (a.pinned ? '<span class="badge badge--info">Pinned</span>' : '') +
+          '</span>' +
+          '<span class="muted" style="display:block;font-size:.75rem;margin-top:.15rem">' + esc(a.body) + '</span>' +
+          '<span class="faint mono" style="display:block;font-size:.6875rem;margin-top:.25rem">' +
+            a.at + ' · ' + esc(a.by) + '</span>' +
+        '</span>' +
+        removeBtn('ann', a.title, 'announcement ' + a.title) + '</li>';
+    })) : emptyBlock('bell', 'Nothing announced yet',
+      'Posts appear on every employee’s home page and arrive as an in-app notification.');
+  }
+
+  function findAnnouncement(title) {
+    for (var i = 0; i < announcements.length; i++) if (announcements[i].title === title) return announcements[i];
+    return null;
+  }
+
+  wireForm($('annform'), 'Announcement posted — everyone has been notified.',
+    function () {
+      var t = $('anntitle').value.trim(), b = $('annbody').value.trim();
+      if (!t || !b) return 'Title and body are required';
+      return findAnnouncement(t) ? 'An announcement with that title is already posted' : null;
+    },
+    function () {
+      var t = $('anntitle').value.trim(), b = $('annbody').value.trim();
+      announcements.push({ title: t, body: b, at: TODAY, by: ACTOR, pinned: false });
+      $('annform').reset();
+      renderAnnouncements();
+      logAudit('announcement.post', t);
+      banner('ok', 'Announcement posted');
+    });
+
+  /* ---- removals -------------------------------------------------------
+     The real screen uses the browser's own confirm(); this mockup owes
+     every dialog to VHR.modal, so the same four questions are asked in
+     a focus-trapped one. */
+  function confirmRemove(kind, label, note, onYes) {
+    var close = VHR.modal({
+      title: 'Remove ' + kind,
+      sub: label,
+      body: '<p style="font-size:.875rem">Remove ' + kind + ' “' + esc(label) + '”?</p>' +
+            '<p class="help">' + note + '</p>',
+      foot: '<button class="btn btn--ghost" data-close>Keep it</button>' +
+            '<button class="btn btn--danger" data-ok>Remove</button>',
+      onOk: function () { close(); onYes(); }
+    });
+  }
+
+  function drop(list, match) {
+    for (var i = 0; i < list.length; i++) if (match(list[i])) { list.splice(i, 1); return; }
+  }
+
+  document.addEventListener('click', function (e) {
+    var b = e.target.closest ? e.target.closest('[data-act]') : null;
+    if (!b) return;
+    var act = b.getAttribute('data-act'), key = b.getAttribute('data-key');
+
+    if (act === 'dept') {
+      var d = findDept(key);
+      if (!d) return;
+      confirmRemove('department', d.name,
+        'Departments in use cannot be removed — reassign the people first.', function () {
+        if (d.count) {
+          banner('err', 'Cannot delete: ' + d.count + ' employee(s) are assigned to this department');
+          VHR.toast('Department still in use', 'err');
+          return;
+        }
+        drop(departments, function (x) { return x.name === d.name; });
+        renderDepts();
+        logAudit('department.delete', d.name);
+        banner('ok', 'Department removed');
+      });
+      return;
+    }
+
+    if (act === 'desig') {
+      var t = findDesig(key);
+      if (!t) return;
+      confirmRemove('designation', t.title,
+        'Designations held by somebody cannot be removed — retitle those people first.', function () {
+        if (t.count) {
+          banner('err', 'Cannot delete: ' + t.count + ' employee(s) hold this designation');
+          VHR.toast('Designation still in use', 'err');
+          return;
+        }
+        drop(designations, function (x) { return x.title === t.title; });
+        renderDesigs();
+        logAudit('designation.delete', t.title);
+        banner('ok', 'Designation removed');
+      });
+      return;
+    }
+
+    if (act === 'hol') {
+      var h = findHoliday(key);
+      if (!h) return;
+      confirmRemove('holiday', h.name,
+        'The day goes back to being a working day and is counted in leave again.', function () {
+        drop(holidays, function (x) { return x.date === h.date; });
+        renderHolidays();
+        logAudit('holiday.delete', h.name + ' (' + h.date + ')');
+        banner('ok', 'Holiday removed');
+      });
+      return;
+    }
+
+    if (act === 'ann') {
+      var a = findAnnouncement(key);
+      if (!a) return;
+      confirmRemove('announcement', a.title,
+        'It disappears from every home page. The notification already sent is not recalled.', function () {
+        drop(announcements, function (x) { return x.title === a.title; });
+        renderAnnouncements();
+        logAudit('announcement.delete', a.title);
+        banner('ok', 'Announcement removed');
+      });
+    }
+  });
+
+  /* ---- first paint ----------------------------------------------------
+     The five lists load in parallel on the real screen, each with its
+     own spinner, while the policy card renders straight away. */
+  ['deptadd', 'desigadd', 'holadd'].forEach(function (id) {
+    $(id).innerHTML = VHR.icon('plus', 16) + 'Add';
+  });
+  $('annadd').innerHTML = VHR.icon('plus', 16) + 'Post announcement';
+  $('auditicon').innerHTML = VHR.icon('history', 17);
+
+  buildPolicy();
+  buildTheme();
+  renderDepts(true); renderDesigs(true); renderHolidays(true); renderAnnouncements(true);
+  $('auditrows').innerHTML = '<tr><td colspan="5"><span class="skel" style="display:block;height:1.5rem"></span></td></tr>';
+
+  setTimeout(function () {
+    renderDepts(); renderDesigs(); renderHolidays(); renderAnnouncements(); renderAudit();
+
+    if (!canManage) {
+      /* PERMISSION DENIED, softened: without settings.manage the real
+         menu never shows this route at all, so the mockup keeps the
+         lists readable and freezes every write. */
+      Array.prototype.forEach.call(
+        document.querySelectorAll('#probation,#cycle,#deptform input,#deptform button,#desigform input,' +
+          '#desigform button,#holform input,#holform button,#annform input,#annform textarea,#annform button'),
+        function (el) { el.disabled = true; }
+      );
+      banner('warn', 'Read-only view — this role does not hold settings.manage, so nothing here can be changed. ' +
+        'Switch the role picker to HR Manager to edit. Appearance is a personal preference and stays available.');
+    }
+  }, 320);
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,299 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Salary Slips — ValidureHR</title>
+<link rel="icon" href="../../assets/brand/validure-mark.svg">
+<link rel="stylesheet" href="../../assets/css/vhr.css">
+<script>try{var t=localStorage.getItem('vhr.theme');if(t)document.documentElement.setAttribute('data-theme',t);}catch(e){}</script>
+</head>
+<body data-root="../../">
+
+<main class="page" data-page>
+
+  <div class="page__head">
+    <div>
+      <p class="eyebrow">Documents</p>
+      <h1 style="margin-top:var(--s2)">Salary Slips</h1>
+      <p class="muted" style="font-size:.875rem;margin-top:.25rem">View, download or print your month-wise salary slips</p>
+    </div>
+    <!-- The source screen has no right-hand action slot on this page:
+         no year picker, no filter, no export. Kept deliberately bare. -->
+  </div>
+
+  <div class="stack" style="gap:var(--s5)">
+
+    <!-- ------------------------------------------------ slip grid
+         One card per slip, newest first. The grid starts as skeletons
+         so the loading state the real screen shows is visible here
+         too; the page script swaps in the cards. -->
+    <div class="grid grid--3" id="slips">
+      <p class="sr" role="status" id="loadingnote">Loading your salary slips…</p>
+      <div class="card" aria-hidden="true">
+        <div class="card__body" style="display:grid;gap:var(--s4)">
+          <div class="row" style="gap:var(--s3)">
+            <div class="skel" style="width:2.25rem;height:2.25rem;flex:none"></div>
+            <div style="flex:1">
+              <div class="skel" style="height:.9rem;width:55%"></div>
+              <div class="skel" style="height:.75rem;width:38%;margin-top:var(--s2)"></div>
+            </div>
+          </div>
+          <div class="skel" style="height:2rem"></div>
+        </div>
+      </div>
+      <div class="card" aria-hidden="true">
+        <div class="card__body" style="display:grid;gap:var(--s4)">
+          <div class="row" style="gap:var(--s3)">
+            <div class="skel" style="width:2.25rem;height:2.25rem;flex:none"></div>
+            <div style="flex:1">
+              <div class="skel" style="height:.9rem;width:48%"></div>
+              <div class="skel" style="height:.75rem;width:42%;margin-top:var(--s2)"></div>
+            </div>
+          </div>
+          <div class="skel" style="height:2rem"></div>
+        </div>
+      </div>
+      <div class="card" aria-hidden="true">
+        <div class="card__body" style="display:grid;gap:var(--s4)">
+          <div class="row" style="gap:var(--s3)">
+            <div class="skel" style="width:2.25rem;height:2.25rem;flex:none"></div>
+            <div style="flex:1">
+              <div class="skel" style="height:.9rem;width:52%"></div>
+              <div class="skel" style="height:.75rem;width:35%;margin-top:var(--s2)"></div>
+            </div>
+          </div>
+          <div class="skel" style="height:2rem"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Shown only when payroll has never issued a slip for this
+         employee — a new joiner in their first month, for instance. -->
+    <div class="empty" id="slipsempty" hidden>
+      <span class="empty__icon" id="emptyicon"></span>
+      <h2>No salary slips available yet.</h2>
+      <p>Each month’s slip appears here once the payroll run for that cycle has been approved and paid.</p>
+    </div>
+
+    <p class="faint" style="font-size:.75rem">
+      Slips are issued for the 25th-to-24th payroll cycle and stay available for as long as you are on the rolls.
+      Figures in this mockup are illustrative.
+    </p>
+
+  </div>
+</main>
+
+<script src="../../assets/js/data.js"></script>
+<script src="../../assets/js/shell.js"></script>
+<script>
+(function () {
+  'use strict';
+  var D = window.VHR_DATA, $ = function (id) { return document.getElementById(id); };
+
+  var MON = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+  function fmt(d) { var p = d.split('-'); return +p[2] + ' ' + MON[+p[1] - 1] + ' ' + p[0]; }
+  function total(rows) { return rows.reduce(function (t, r) { return t + r.amount; }, 0); }
+
+  /* Payroll runs the 25th of the previous month to the 24th of the
+     slip's own month, so a January slip reaches back into last year. */
+  function cycle(period) {
+    var p = period.split('-'), y = +p[0], m = +p[1];
+    var pm = m === 1 ? 12 : m - 1, py = m === 1 ? y - 1 : y;
+    return '25 ' + MON[pm - 1] + (py !== y ? ' ' + py : '') + ' – 24 ' + MON[m - 1] + ' ' + y;
+  }
+
+  /* Day counts come from the period string, never from the visitor's
+     clock — the server clock is not IST and a payslip must not change
+     shape depending on where it is opened. */
+  function daysIn(period) {
+    var p = period.split('-'), y = +p[0], m = +p[1];
+    var len = [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
+    if (m === 2 && ((y % 4 === 0 && y % 100 !== 0) || y % 400 === 0)) return 29;
+    return len[m - 1];
+  }
+
+  /* ---- breakdown ----
+     data.js carries one full breakdown (August 2026). Every other
+     month is derived from it so the modal always reconciles to the
+     gross and net printed on the card: earnings scale with the
+     month's gross, PF follows basic, LOP is one day of gross, and
+     TDS takes the balance. Nothing here is hard-coded per month. */
+  function detailFor(p) {
+    var base = D.payslipDetail, baseGross = total(base.earnings);
+    var f = p.gross / baseGross;
+
+    var earnings = base.earnings.map(function (e) {
+      return { head: e.head, amount: Math.round(e.amount * f) };
+    });
+    var drift = p.gross - total(earnings);
+    if (drift) {
+      var big = 0;
+      earnings.forEach(function (e, i) { if (e.amount > earnings[big].amount) big = i; });
+      earnings[big].amount += drift;             /* absorb rounding on the largest head */
+    }
+
+    var basic = earnings[0].amount;
+    var lopDays = p.lop || 0;
+    var lopAmount = lopDays ? Math.round(p.gross / daysIn(p.period) * lopDays) : 0;
+
+    var deductions = base.deductions.map(function (d) {
+      if (/Provident Fund/.test(d.head)) return { head: d.head, amount: Math.round(basic * 0.12) };
+      if (/Loss of Pay/.test(d.head)) return { head: 'Loss of Pay (' + lopDays + (lopDays === 1 ? ' day)' : ' days)'), amount: lopAmount };
+      if (/Income Tax/.test(d.head)) return { head: d.head, amount: 0 };
+      return { head: d.head, amount: d.amount };  /* professional tax and insurance are flat */
+    });
+    var tds = deductions.filter(function (d) { return /Income Tax/.test(d.head); })[0];
+    tds.amount = (p.gross - p.net) - total(deductions);
+
+    return {
+      earnings: earnings,
+      deductions: deductions,
+      gross: p.gross,
+      deducted: p.gross - p.net,
+      lopDays: lopDays,
+      worked: D.payslipDetail.workedDays,
+      paid: D.payslipDetail.paidDays - lopDays
+    };
+  }
+
+  /* ---- cards ---- */
+  function actionBtn(act, ic, label, i, month) {
+    var say = { view: 'View the ', pdf: 'Download the PDF of the ', print: 'Print the ' }[act];
+    return '<button class="btn btn--ghost btn--sm" style="flex:1;padding:0 var(--s2)" ' +
+      'data-act="' + act + '" data-i="' + i + '" aria-label="' + say + month + ' salary slip"' +
+      (act === 'print' ? ' title="Opens the slip — use your browser’s print option"' : '') + '>' +
+      VHR.icon(ic, 15) + label + '</button>';
+  }
+
+  function card(p, i) {
+    /* Slips uploaded as ready-made PDFs carry no amount, so the
+       sub-line falls back to a plain description. */
+    var sub = (p.net === null || p.net === undefined)
+      ? 'Salary slip document'
+      : 'Net Pay: <span class="mono" style="color:var(--muted);font-weight:600">' + VHR.money(p.net) + '</span>';
+
+    return '<article class="card" style="display:flex;flex-direction:column">' +
+      '<div class="card__body" style="display:flex;flex-direction:column;gap:var(--s4);flex:1">' +
+        '<div class="row" style="gap:var(--s3)">' +
+          '<span class="stat__icon">' + VHR.icon('fileText', 18) + '</span>' +
+          '<span style="min-width:0">' +
+            '<span style="display:block;font-size:.9375rem;font-weight:600">' + p.month + '</span>' +
+            '<span class="faint" style="display:block;font-size:.75rem">' + sub + '</span>' +
+          '</span>' +
+        '</div>' +
+        '<div class="row no-print" style="gap:var(--s2);margin-top:auto">' +
+          actionBtn('view', 'eye', 'View', i, p.month) +
+          actionBtn('pdf', 'download', 'PDF', i, p.month) +
+          actionBtn('print', 'fileText', 'Print', i, p.month) +
+        '</div>' +
+      '</div></article>';
+  }
+
+  /* ---- modal ---- */
+  function tile(label, value, meta) {
+    return '<div style="padding:var(--s4);border:1px solid var(--line);border-radius:var(--r-sm);background:var(--bg)">' +
+      '<p class="stat__label">' + label + '</p>' +
+      '<p class="mono" style="font-size:1.0625rem;font-weight:600;margin-top:var(--s1);line-height:1.2">' + value + '</p>' +
+      '<p class="faint" style="font-size:.6875rem">' + meta + '</p></div>';
+  }
+
+  function ledger(caption, headLabel, rows, footLabel, footAmount) {
+    var foot = 'style="border-bottom:0;font-weight:600;background:var(--bg)"';
+    return '<section>' +
+      '<p class="eyebrow eyebrow--plain" style="margin-bottom:var(--s2)">' + caption + '</p>' +
+      '<div class="tablewrap" style="border:1px solid var(--line);border-radius:var(--r-sm)">' +
+      '<table class="table"><thead><tr><th>' + headLabel + '</th><th class="num">Amount</th></tr></thead><tbody>' +
+      rows.map(function (r) {
+        return '<tr><td>' + r.head + '</td><td class="num mono">' + VHR.money(r.amount) + '</td></tr>';
+      }).join('') +
+      '</tbody><tfoot><tr><td ' + foot + '>' + footLabel + '</td>' +
+      '<td class="num mono" ' + foot + '>' + VHR.money(footAmount) + '</td></tr></tfoot>' +
+      '</table></div></section>';
+  }
+
+  function download(p) {
+    VHR.toast('Downloading salary-slip-' + p.month.replace(' ', '-') + '.pdf', 'ok');
+  }
+
+  function openSlip(i) {
+    var p = D.payslips[i], d = detailFor(p), me = D.me;
+    var ini = me.name.split(' ').map(function (w) { return w[0]; }).join('').toUpperCase();
+
+    var body =
+      '<div class="row row--between row--wrap" style="gap:var(--s4)">' +
+        '<span class="person">' +
+          '<span class="avatar avatar--lg">' + ini + '</span>' +
+          '<span><span class="person__name" style="display:block">' + me.name + '</span>' +
+          '<span class="person__meta">' + me.code + ' · ' + me.designation + '</span></span>' +
+        '</span>' +
+        '<div style="text-align:right">' +
+          '<p class="stat__label">Net pay</p>' +
+          '<p class="stat__val mono" style="font-size:1.75rem;margin-top:var(--s1)">' + VHR.money(p.net) + '</p>' +
+          '<p class="faint" style="font-size:.75rem">' +
+            (p.status === 'Paid' ? 'Credited ' + fmt(p.paidOn) : 'Not yet credited') +
+            ' · ' + me.bank + '</p>' +
+        '</div>' +
+      '</div>' +
+
+      '<div class="grid grid--4" style="gap:var(--s3)">' +
+        tile('Gross', VHR.money(d.gross), 'all earnings') +
+        tile('Deductions', VHR.money(d.deducted), 'statutory + tax') +
+        tile('Paid days', d.paid + ' / ' + d.worked, 'worked days in cycle') +
+        tile('Loss of pay', d.lopDays + (d.lopDays === 1 ? ' day' : ' days'), d.lopDays ? 'unpaid this cycle' : 'none this cycle') +
+      '</div>' +
+
+      '<div class="grid grid--2" style="gap:var(--s5)">' +
+        ledger('Earnings', 'Earning head', d.earnings, 'Gross earnings', d.gross) +
+        ledger('Deductions', 'Deduction head', d.deductions, 'Total deductions', d.deducted) +
+      '</div>' +
+
+      '<div class="row row--between row--wrap" style="gap:var(--s3);padding-top:var(--s3);border-top:1px solid var(--line)">' +
+        '<span class="faint mono" style="font-size:.6875rem">PAN ' + me.pan + ' · UAN ' + me.uan + ' · ' + me.department + '</span>' +
+        '<span class="badge badge--' + (p.status === 'Paid' ? 'ok' : 'warn') + '">' + p.status + '</span>' +
+      '</div>' +
+      '<p class="faint" style="font-size:.75rem">System-generated statement for the ' + p.month +
+      ' payroll cycle — valid without a signature.</p>';
+
+    var close = VHR.modal({
+      title: 'Salary slip — ' + p.month,
+      sub: me.company + ' · payroll cycle ' + cycle(p.period),
+      wide: true,
+      body: body,
+      foot: '<button class="btn btn--ghost" data-close>Close</button>' +
+            '<button class="btn btn--primary" data-ok>' + VHR.icon('download', 16) + 'Download PDF</button>',
+      onOk: function () { close(); download(p); }
+    });
+  }
+
+  /* ---- render ----
+     The real screen suppresses the whole body while the list is in
+     flight, so the skeletons stand in for that beat before the cards
+     land. */
+  setTimeout(function () {
+    var box = $('slips'), slips = D.payslips || [];
+
+    if (!slips.length) {
+      box.hidden = true;
+      $('emptyicon').innerHTML = VHR.icon('inbox', 22);
+      $('slipsempty').hidden = false;
+      return;
+    }
+
+    box.innerHTML = slips.map(card).join('');
+
+    box.addEventListener('click', function (e) {
+      var b = e.target.closest('[data-act]');
+      if (!b) return;
+      var i = +b.getAttribute('data-i'), act = b.getAttribute('data-act');
+      if (act === 'pdf') { download(D.payslips[i]); return; }
+      /* View and Print open the same slip — the live screen hands both
+         to the browser's own PDF viewer. */
+      if (act === 'print') VHR.toast('Opened for printing — use your browser’s print option');
+      openSlip(i);
+    });
+  }, 350);
+})();
+</script>
+</body>
+</html>

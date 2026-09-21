@@ -1,0 +1,223 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Home — ValidureHR</title>
+<link rel="icon" href="../assets/brand/validure-mark.svg">
+<link rel="stylesheet" href="../assets/css/vhr.css">
+<script>try{var t=localStorage.getItem('vhr.theme');if(t)document.documentElement.setAttribute('data-theme',t);}catch(e){}</script>
+</head>
+<body data-root="../">
+
+<main class="page" data-page>
+
+  <div class="page__head">
+    <div>
+      <p class="eyebrow">Home</p>
+      <h1 style="margin-top:var(--s2)">Welcome back, <span id="firstname">Ananya</span>!</h1>
+      <p class="muted" style="font-size:.875rem;margin-top:.25rem" id="todayline">Monday, 21/09/2026</p>
+    </div>
+    <div class="row" style="gap:var(--s3)">
+      <a class="btn btn--ghost" href="leave/apply.html">Apply leave</a>
+      <a class="btn btn--primary" href="attendance.html">My attendance</a>
+    </div>
+  </div>
+
+  <div class="stack" style="gap:var(--s5)">
+
+    <!-- ------------------------------------------------ punch card -->
+    <section class="card">
+      <div class="card__head">
+        <div>
+          <h2 style="font-size:1.0625rem;font-family:var(--font-body);font-weight:600">Today’s attendance</h2>
+          <p class="faint" style="font-size:.75rem">Night shift · 19:00 – 04:00 IST · BIOMAX-BLR-01</p>
+        </div>
+        <span class="badge badge--ok" id="punchstate">Punched in</span>
+      </div>
+      <div class="card__body">
+        <div class="grid grid--4" style="gap:var(--s4)">
+          <div>
+            <p class="stat__label">Check in</p>
+            <p class="stat__val mono" style="font-size:1.5rem;margin-top:var(--s2)" id="inTime">19:02</p>
+            <p class="faint" style="font-size:.75rem">on time</p>
+          </div>
+          <div>
+            <p class="stat__label">Check out</p>
+            <p class="stat__val mono" style="font-size:1.5rem;margin-top:var(--s2)" id="outTime">—</p>
+            <p class="faint" style="font-size:.75rem">shift in progress</p>
+          </div>
+          <div>
+            <p class="stat__label">Hours today</p>
+            <p class="stat__val mono" style="font-size:1.5rem;margin-top:var(--s2)" id="hrs">6.4</p>
+            <p class="faint" style="font-size:.75rem">of 9.0 expected</p>
+          </div>
+          <div class="row" style="align-items:flex-end">
+            <button class="btn btn--primary btn--block" id="punchbtn">Punch out</button>
+          </div>
+        </div>
+        <div style="margin-top:var(--s5)">
+          <div class="row row--between" style="margin-bottom:var(--s2)">
+            <span class="faint" style="font-size:.75rem">Shift progress</span>
+            <span class="faint mono" style="font-size:.75rem">71%</span>
+          </div>
+          <div class="meter"><div class="meter__fill" style="width:71%"></div></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ------------------------------------------------ month overview -->
+    <section class="card">
+      <div class="card__head">
+        <div>
+          <h2 style="font-size:1.0625rem;font-family:var(--font-body);font-weight:600">Attendance overview</h2>
+          <p class="faint" style="font-size:.75rem">September 2026 · up to today</p>
+        </div>
+        <a class="btn btn--quiet btn--sm" href="attendance.html">View calendar →</a>
+      </div>
+      <div class="card__body">
+        <div class="grid grid--4" id="monthstats" style="gap:var(--s4)"></div>
+      </div>
+    </section>
+
+    <!-- ------------------------------------------------ team leave -->
+    <section class="card">
+      <div class="card__head">
+        <div>
+          <h2 style="font-size:1.0625rem;font-family:var(--font-body);font-weight:600">Who’s away</h2>
+          <p class="faint" style="font-size:.75rem">Your team, next 14 days</p>
+        </div>
+      </div>
+      <div class="card__body card__body--flush">
+        <div class="tablewrap">
+          <table class="table">
+            <thead>
+              <tr><th>Employee</th><th>Type</th><th>From</th><th>To</th><th>Status</th></tr>
+            </thead>
+            <tbody id="teamleave"></tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- ------------------------------------------------ holidays + birthdays -->
+    <div class="grid grid--2">
+      <section class="card">
+        <div class="card__head">
+          <h2 style="font-size:1.0625rem;font-family:var(--font-body);font-weight:600">Upcoming holidays</h2>
+        </div>
+        <div class="card__body"><div class="stack" style="gap:var(--s4)" id="holidays"></div></div>
+      </section>
+
+      <section class="card">
+        <div class="card__head">
+          <h2 style="font-size:1.0625rem;font-family:var(--font-body);font-weight:600">Birthdays</h2>
+        </div>
+        <div class="card__body"><div class="stack" style="gap:var(--s4)" id="birthdays"></div></div>
+      </section>
+    </div>
+
+    <!-- ------------------------------------------------ announcements -->
+    <section class="card">
+      <div class="card__head">
+        <h2 style="font-size:1.0625rem;font-family:var(--font-body);font-weight:600">Company announcements</h2>
+      </div>
+      <div class="card__body"><div class="stack" style="gap:var(--s5)" id="announcements"></div></div>
+    </section>
+
+  </div>
+</main>
+
+<script src="../assets/js/data.js"></script>
+<script src="../assets/js/shell.js"></script>
+<script>
+(function () {
+  'use strict';
+  var D = window.VHR_DATA, $ = function (id) { return document.getElementById(id); };
+
+  $('firstname').textContent = D.me.name.split(' ')[0];
+
+  /* The server clock is not IST, so the mockup states the date it
+     is presenting rather than reading the visitor's clock. */
+  $('todayline').textContent = 'Monday, 21/09/2026 · ' + D.me.designation + ' · ' + D.me.department;
+
+  /* ---- month tiles ---- */
+  var done = D.attendance.filter(function (a) { return a.status !== 'Future'; });
+  var tiles = [
+    { label: 'Present', val: done.filter(function (a) { return a.status === 'Present'; }).length, icon: 'check', tone: 'ok' },
+    { label: 'On leave', val: done.filter(function (a) { return a.status === 'Leave'; }).length, icon: 'calendarCheck', tone: 'warn' },
+    { label: 'Holidays', val: done.filter(function (a) { return a.status === 'Holiday'; }).length, icon: 'badge', tone: 'info' },
+    { label: 'Late marks', val: done.filter(function (a) { return a.late; }).length, icon: 'clock', tone: 'err' }
+  ];
+  $('monthstats').innerHTML = tiles.map(function (t) {
+    return '<div class="card" style="box-shadow:none"><div class="stat">' +
+      '<div class="row row--between"><span class="stat__label">' + t.label + '</span>' +
+      '<span class="stat__icon" style="width:1.75rem;height:1.75rem;background:var(--' + t.tone + '-soft);color:var(--' + t.tone + ')">' +
+      VHR.icon(t.icon, 14) + '</span></div>' +
+      '<p class="stat__val">' + t.val + '</p><p class="stat__meta">days this month</p>' +
+      '</div></div>';
+  }).join('');
+
+  /* ---- who's away ---- */
+  function fmt(d) {
+    var p = d.split('-'), m = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+    return p[2] + ' ' + m[+p[1] - 1];
+  }
+  var tone = { Approved: 'ok', Pending: 'warn', Rejected: 'err' };
+  $('teamleave').innerHTML = D.teamLeave.map(function (l) {
+    var ini = l.name.split(' ').map(function (w) { return w[0]; }).join('').toUpperCase();
+    return '<tr><td><span class="person"><span class="avatar avatar--sm">' + ini + '</span>' +
+      '<span class="person__name">' + l.name + '</span></span></td>' +
+      '<td class="muted">' + l.type + '</td>' +
+      '<td class="mono">' + fmt(l.from) + '</td>' +
+      '<td class="mono">' + fmt(l.to) + '</td>' +
+      '<td><span class="badge badge--' + tone[l.status] + '">' + l.status + '</span></td></tr>';
+  }).join('');
+
+  /* ---- holidays ---- */
+  $('holidays').innerHTML = D.holidays.filter(function (h) { return h.date >= '2026-09-21'; })
+    .slice(0, 4).map(function (h) {
+      var p = h.date.split('-'), m = ['JAN','FEB','MAR','APR','MAY','JUN','JUL','AUG','SEP','OCT','NOV','DEC'];
+      return '<div class="row" style="gap:var(--s4)">' +
+        '<div style="text-align:center;flex:none;width:3rem;padding:.4rem 0;border:1px solid var(--line);border-radius:var(--r-sm);background:var(--bg)">' +
+        '<p class="mono" style="font-size:1.125rem;font-weight:600;line-height:1">' + p[2] + '</p>' +
+        '<p class="eyebrow eyebrow--plain" style="font-size:9px;justify-content:center">' + m[+p[1] - 1] + '</p></div>' +
+        '<div><p style="font-size:.875rem;font-weight:600">' + h.name + '</p>' +
+        '<p class="faint" style="font-size:.75rem">' + h.type + ' holiday</p></div></div>';
+    }).join('');
+
+  /* ---- birthdays ---- */
+  $('birthdays').innerHTML = D.birthdays.map(function (b) {
+    var ini = b.name.split(' ').map(function (w) { return w[0]; }).join('').toUpperCase();
+    return '<div class="row row--between"><span class="person">' +
+      '<span class="avatar">' + ini + '</span><span><span class="person__name" style="display:block">' + b.name + '</span>' +
+      '<span class="person__meta">' + b.dept + '</span></span></span>' +
+      '<span class="chip">' + fmt(b.date) + '</span></div>';
+  }).join('');
+
+  /* ---- announcements ---- */
+  $('announcements').innerHTML = D.announcements.map(function (a) {
+    return '<article style="padding-left:var(--s4);border-left:2px solid ' +
+      (a.pinned ? 'var(--accent)' : 'var(--line)') + '">' +
+      '<div class="row row--wrap" style="gap:var(--s2)">' +
+      '<h3 style="font-size:.9375rem">' + a.title + '</h3>' +
+      (a.pinned ? '<span class="badge badge--info">Pinned</span>' : '') + '</div>' +
+      '<p class="muted" style="font-size:.875rem;margin-top:.25rem">' + a.body + '</p>' +
+      '<p class="faint" style="font-size:.75rem;margin-top:var(--s2)">' + a.by + ' · ' + fmt(a.at) + '</p>' +
+      '</article>';
+  }).join('');
+
+  /* ---- punch ---- */
+  var punched = true;
+  $('punchbtn').addEventListener('click', function () {
+    punched = !punched;
+    this.textContent = punched ? 'Punch out' : 'Punch in';
+    $('punchstate').textContent = punched ? 'Punched in' : 'Punched out';
+    $('punchstate').className = 'badge badge--' + (punched ? 'ok' : 'neutral');
+    $('outTime').textContent = punched ? '—' : '04:03';
+    VHR.toast(punched ? 'Punched in at 19:02' : 'Punched out at 04:03', 'ok');
+  });
+})();
+</script>
+</body>
+</html>

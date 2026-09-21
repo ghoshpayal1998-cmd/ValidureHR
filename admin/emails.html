@@ -1,0 +1,356 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Email Log — ValidureHR</title>
+<link rel="icon" href="../assets/brand/validure-mark.svg">
+<link rel="stylesheet" href="../assets/css/vhr.css">
+<script>try{var t=localStorage.getItem('vhr.theme');if(t)document.documentElement.setAttribute('data-theme',t);}catch(e){}</script>
+</head>
+<body data-root="../">
+
+<main class="page" data-page>
+
+  <div class="page__head">
+    <div>
+      <p class="eyebrow">Management</p>
+      <h1 style="margin-top:var(--s2)">Email Log</h1>
+      <p class="muted" style="font-size:.875rem;margin-top:.25rem">Every notification the system sent (or would send). Configure SMTP_* environment variables for real delivery.</p>
+    </div>
+    <div class="row" style="gap:var(--s3)">
+      <!-- The real endpoint takes no recipient: it mails the signed-in
+           account and records the attempt in this very log. So the form
+           carries a submit button and nothing else. -->
+      <form id="testform">
+        <button class="btn btn--primary" type="submit">Send Test Email</button>
+      </form>
+    </div>
+  </div>
+
+  <div class="stack" style="gap:var(--s5)">
+
+    <!-- ------------------------------------------------ result banner -->
+    <!-- One slot for both server messages. The success line clears
+         itself after 1.5s and the table reloads at that moment, so the
+         new row arrives just as the banner leaves. -->
+    <div class="row" id="banner" hidden aria-live="polite"
+         style="gap:var(--s3);padding:var(--s3) var(--s4);border:1px solid var(--line);border-radius:var(--r);font-size:.875rem;font-weight:500"></div>
+
+    <!-- ------------------------------------------------ the ledger -->
+    <section class="card">
+      <div class="card__head">
+        <div>
+          <h2 style="font-size:1.0625rem;font-family:var(--font-body);font-weight:600">Notification log</h2>
+          <p class="faint" style="font-size:.75rem">Newest first · the server returns the latest 200 attempts, unfiltered and unpaged</p>
+        </div>
+        <span class="chip mono" id="logcount" aria-live="polite">0 emails</span>
+      </div>
+      <div class="card__body card__body--flush">
+        <div class="tablewrap">
+          <table class="table">
+            <thead>
+              <tr>
+                <th>When</th>
+                <th>To</th>
+                <th>Subject</th>
+                <th>Status</th>
+              </tr>
+            </thead>
+            <tbody id="logrows"></tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+  </div>
+</main>
+
+<script src="../assets/js/data.js"></script>
+<script src="../assets/js/shell.js"></script>
+<script>
+(function () {
+  'use strict';
+  var D = window.VHR_DATA, $ = function (id) { return document.getElementById(id); };
+
+  /* The route is gated on settings.manage. In the mockup the topbar
+     role picker stands in for the permission set. The real screen
+     short-circuits to a bare error when the check fails; here the
+     ledger stays on screen and the refusal is stated in the banner,
+     so the page can still be read at the default role. */
+  var canManage = VHR.role() !== 'employee';
+
+  function esc(s) {
+    return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+  }
+  function pad(n) { return String(n).length < 2 ? '0' + n : String(n); }
+  function cap(w) { return w.charAt(0).toUpperCase() + w.slice(1); }
+
+  /* ---- lookups the payload does not carry ---- */
+  var byEmail = {}, byName = {}, byId = {}, newestFor = {};
+  D.employees.forEach(function (e) { byEmail[e.email] = e; byName[e.name] = e; });
+  D.leaveRequests.forEach(function (l) {
+    byId[l.id] = l;
+    if (!newestFor[l.emp]) newestFor[l.emp] = l;   // the list is newest first
+  });
+
+  function who(addr) {
+    if (addr.indexOf('all@') === 0) return 'Everyone at ' + D.me.company;
+    var e = byEmail[addr];
+    if (e) return e.name;
+    return addr.split('@')[0].split('.').map(cap).join(' ');
+  }
+
+  /* The badge colour is computed from the raw status string, never
+     from a fixed list — a delivery reason the mailer invents later
+     still lands somewhere sensible (amber) instead of nowhere. */
+  function tone(status) {
+    var s = String(status).toLowerCase();
+    if (s === 'delivered' || s === 'sent') return 'ok';
+    if (s.indexOf('bounced') === 0 || s.indexOf('failed') === 0) return 'err';
+    return 'warn';
+  }
+
+  /* ---- the rendered message -------------------------------------
+     data.js stores the delivery record, not the body. The mailer's
+     templates are reconstructed here from the same records that
+     produced them, so the modal shows what actually went out. */
+  function reqFor(m) {
+    var id = m.subject.match(/#(\d{3,5})/);
+    if (id && byId[+id[1]]) return byId[+id[1]];
+    var named = m.subject.split('—').pop().trim();
+    return newestFor[named] || null;
+  }
+
+  function span(l) { return l.from + ' to ' + l.to + ' (' + l.days + ' working day(s))'; }
+
+  function bodyFor(m) {
+    var l = reqFor(m), emp = byEmail[m.to], first = who(m.to).split(' ')[0], p, a, dev;
+
+    if (m.template === 'leave_applied' && l) {
+      return 'Your leave application has been received and is awaiting approval.\n\n' +
+        '  Request  : #' + l.id + '\n' +
+        '  Type     : ' + l.type + '\n' +
+        '  Dates    : ' + span(l) + '\n' +
+        '  Reason   : ' + l.reason + '\n' +
+        '  Approver : ' + l.approver + '\n\n' +
+        'You will be emailed again as soon as a decision is recorded.\n' +
+        'Track it under Attendance & Leave > Leave History in ValidureHR.';
+    }
+    if (m.template === 'leave_approval_request' && l) {
+      return 'A new leave application is awaiting approval.\n\n' +
+        '  Employee : ' + l.emp + ' (' + l.code + ')\n' +
+        '  Type     : ' + l.type + '\n' +
+        '  Dates    : ' + span(l) + '\n' +
+        '  Reason   : ' + l.reason + '\n\n' +
+        'Approve or reject it in the ValidureHR portal (Leave Management).';
+    }
+    if (m.template === 'leave_approved' && l) {
+      return 'Your leave has been approved.\n\n' +
+        '  Request  : #' + l.id + '\n' +
+        '  Type     : ' + l.type + '\n' +
+        '  Dates    : ' + span(l) + '\n' +
+        '  Approver : ' + l.approver + '\n\n' +
+        'The days are marked on your attendance calendar and your balance\n' +
+        'has been updated. Nothing further is needed from you.';
+    }
+    if (m.template === 'leave_rejected' && l) {
+      return 'Your leave application has not been approved.\n\n' +
+        '  Request  : #' + l.id + '\n' +
+        '  Type     : ' + l.type + '\n' +
+        '  Dates    : ' + span(l) + '\n' +
+        '  Decided  : ' + l.approver + '\n' +
+        '  Reason   : ' + (l.note || 'No reason was recorded.') + '\n\n' +
+        'You can apply again for different dates in the ValidureHR portal.';
+    }
+    if (m.template === 'payslip_ready') {
+      p = D.payslips.filter(function (x) { return m.subject.indexOf(x.month) !== -1; })[0] || D.payslips[0];
+      return 'Hi ' + first + ',\n\n' +
+        'Your payslip for ' + p.month + ' is ready.\n\n' +
+        '  Gross earnings : ' + VHR.money(p.gross) + '\n' +
+        '  Net pay        : ' + VHR.money(p.net) + '\n' +
+        '  Loss of pay    : ' + p.lop + ' day(s)\n' +
+        '  Credited on    : ' + p.paidOn + '\n\n' +
+        'Download it from Documents > Salary Slips. The PDF opens with your\n' +
+        'employee code as the password.';
+    }
+    if (m.template === 'attendance_alert') {
+      dev = D.devices[0];
+      return 'A punch is missing from your attendance record.\n\n' +
+        '  Employee  : ' + (emp ? emp.name + ' (' + emp.code + ')' : who(m.to)) + '\n' +
+        '  Shift     : 19 Sep 2026 · 19:00 - 04:00 IST\n' +
+        '  Device    : ' + dev.device + ' (' + dev.location + ')\n' +
+        '  Punch in  : 19:02\n' +
+        '  Punch out : not recorded\n\n' +
+        'A night shift is keyed to the date it starts, so this is the shift\n' +
+        'that began on 19 Sep. Raise a regularisation request under\n' +
+        'Attendance before the payroll cut-off on ' + D.payrollRuns[0].cutoff + ', or the\n' +
+        'shift is treated as absent.';
+    }
+    if (m.template === 'announcement') {
+      var key = m.subject.split('—').pop().trim();
+      a = D.announcements.filter(function (x) { return x.title.indexOf(key) !== -1; })[0] || D.announcements[0];
+      return a.title + '\n\n' + a.body + '\n\n' +
+        '-- ' + a.by + ', ' + (byName[a.by] ? byName[a.by].department : 'People') + '\n' +
+        'Posted in the ValidureHR portal on ' + a.at + '.';
+    }
+    if (m.template === 'test_email') {
+      return 'This is a test message from the ValidureHR notification mailer.\n\n' +
+        '  Sent to   : ' + m.to + '\n' +
+        '  Company   : ' + D.me.company + '\n' +
+        '  Relay     : smtp.validuresolutions.com:2525\n' +
+        '  Requested : ' + ACTING + '\n\n' +
+        'If you are reading this, outbound mail is working. No action is needed.';
+    }
+    return 'This message was sent by the ValidureHR notification mailer.\n\n' +
+      '  Template : ' + m.template + '\n' +
+      '  To       : ' + m.to + '\n' +
+      '  Sent     : ' + m.sent + '\n\n' +
+      'The rendered body is kept with the delivery record.';
+  }
+
+  /* Whoever is signed in signs the test mail — the same name and role
+     the topbar is already showing. */
+  var ACTING = VHR.role() === 'platform' ? 'Rahul Paul (Platform Admin)' : D.me.name + ' (HR Manager)';
+
+  /* ---- rows ----
+     The server orders by id descending; the sample records carry a
+     timestamp instead, so the same order is derived from it here
+     rather than written back into data.js. */
+  var rows = D.emails.slice().sort(function (a, b) {
+    return a.sent < b.sent ? 1 : a.sent > b.sent ? -1 : 0;
+  });
+
+  /* ---- banner ---- */
+  var bannerTimer = null;
+  function banner(kind, msg) {
+    var el = $('banner');
+    el.style.background = 'var(--' + kind + '-soft)';
+    el.style.color = kind === 'err' ? 'var(--err-text)' : 'var(--' + kind + ')';
+    el.innerHTML = VHR.icon(kind === 'ok' ? 'check' : 'alert', 16) + '<span>' + esc(msg) + '</span>';
+    el.hidden = false;
+    clearTimeout(bannerTimer);
+    if (kind === 'ok') bannerTimer = setTimeout(function () { el.hidden = true; }, 4000);
+  }
+  function hideBanner() { clearTimeout(bannerTimer); $('banner').hidden = true; }
+
+  /* ---- table ---- */
+  function rowHtml(m, i) {
+    return '<tr data-i="' + i + '" style="cursor:pointer">' +
+      '<td class="mono" style="white-space:nowrap">' + esc(m.sent) + '</td>' +
+      '<td class="mono" style="font-size:.8125rem">' + esc(m.to) + '</td>' +
+      /* The whole row is the hit target; the subject is also a real
+         button so the log is reachable from the keyboard. */
+      '<td><button type="button" title="' + esc(m.subject) + '" ' +
+        'aria-label="Open the message: ' + esc(m.subject) + '" ' +
+        'style="display:block;max-width:340px;overflow:hidden;text-overflow:ellipsis;' +
+        'white-space:nowrap;text-align:left;font-weight:600">' + esc(m.subject) + '</button></td>' +
+      '<td><span class="badge badge--' + tone(m.status) + '">' + esc(m.status) + '</span></td>' +
+      '</tr>';
+  }
+
+  function loadingRows() {
+    var out = '';
+    for (var i = 0; i < 5; i++) {
+      out += '<tr><td colspan="4"><span class="skel" style="display:block;height:1.5rem"></span></td></tr>';
+    }
+    return out;
+  }
+
+  function paint() {
+    var body = $('logrows');
+    body.removeAttribute('aria-busy');
+    body.innerHTML = rows.length ? rows.map(rowHtml).join('') :
+      '<tr><td colspan="4"><div class="empty">' +
+        '<span class="empty__icon">' + VHR.icon('mail', 22) + '</span>' +
+        '<h3>No emails yet</h3>' +
+        '<p>Leave applications, approvals and new-employee credentials will appear here.</p>' +
+      '</div></td></tr>';
+
+    var bounced = rows.filter(function (m) { return tone(m.status) !== 'ok'; }).length;
+    $('logcount').textContent = rows.length + (rows.length === 1 ? ' email · ' : ' emails · ') +
+      bounced + ' not delivered';
+  }
+
+  function renderTable(loading) {
+    if (loading) {
+      /* The real screen holds a spinner while it refetches; keeping
+         that beat is what makes the new test row feel like it arrived
+         from the server rather than from this page. */
+      var body = $('logrows');
+      body.setAttribute('aria-busy', 'true');
+      body.innerHTML = loadingRows();
+      setTimeout(paint, 320);
+      return;
+    }
+    paint();
+  }
+
+  /* ---- detail ---- */
+  $('logrows').addEventListener('click', function (e) {
+    var tr = e.target.closest('tr[data-i]');
+    if (!tr) return;
+    openDetail(rows[+tr.getAttribute('data-i')]);
+  });
+
+  function openDetail(m) {
+    VHR.modal({
+      wide: true,
+      foot: null,                       // read-only: closed by × or the scrim
+      title: esc(m.subject),
+      body:
+        '<div class="row row--between row--wrap" style="gap:var(--s3)">' +
+          '<p class="muted" style="font-size:.8125rem">To ' +
+            '<span class="mono" style="color:var(--fg);font-weight:500">' + esc(m.to) + '</span>' +
+            ' · <span class="mono">' + esc(m.sent) + '</span></p>' +
+          '<span class="row" style="gap:var(--s2)">' +
+            '<span class="chip mono">' + esc(m.template) + '</span>' +
+            '<span class="badge badge--' + tone(m.status) + '">' + esc(m.status) + '</span>' +
+          '</span>' +
+        '</div>' +
+        '<pre style="white-space:pre-wrap;background:var(--bg);border:1px solid var(--line);' +
+          'border-radius:var(--r-sm);padding:var(--s4);font-family:var(--font-mono);' +
+          'font-size:.8125rem;line-height:1.7;color:var(--fg);overflow-x:auto">' +
+          esc(bodyFor(m)) + '</pre>' +
+        '<p class="help">Addressed to ' + esc(who(m.to)) + '. The log keeps the message exactly as the mailer rendered it — nothing here can be edited or re-sent.</p>'
+    });
+  }
+
+  /* ---- send test email ----
+     Never ask the host clock for a business timestamp: the server this
+     will run on is not on IST. The mockup counts on from the minute it
+     is presenting instead. */
+  var clock = 5;
+  function stamp() { return '2026-09-21 20:' + pad(clock++); }
+
+  var testform = $('testform');
+  if (canManage) {
+    VHR.fakeSubmit(testform, 'Test email queued');
+    testform.addEventListener('submit', function () {
+      setTimeout(function () {
+        banner('ok', 'Test email queued to ' + D.me.email + ' — check the inbox and the Email Log status');
+        setTimeout(function () {
+          hideBanner();
+          rows.unshift({
+            to: D.me.email,
+            subject: '[ValidureHR] Test email — ' + D.me.company,
+            template: 'test_email',
+            sent: stamp(),
+            status: 'Delivered'
+          });
+          renderTable(true);
+        }, 1500);
+      }, 750);
+    });
+  } else {
+    testform.hidden = true;
+    banner('err', 'Not authorised — the Email Log needs the settings.manage permission, so no test mail can be sent from this role. Switch the role picker to HR Manager to use it.');
+  }
+
+  /* ---- first paint ---- */
+  renderTable(true);
+})();
+</script>
+</body>
+</html>

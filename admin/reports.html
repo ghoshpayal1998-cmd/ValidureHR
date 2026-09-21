@@ -1,0 +1,451 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Reports — ValidureHR</title>
+<link rel="icon" href="../assets/brand/validure-mark.svg">
+<link rel="stylesheet" href="../assets/css/vhr.css">
+<script>try{var t=localStorage.getItem('vhr.theme');if(t)document.documentElement.setAttribute('data-theme',t);}catch(e){}</script>
+</head>
+<body data-root="../">
+
+<main class="page" data-page>
+
+  <div class="page__head">
+    <div>
+      <p class="eyebrow">Management</p>
+      <h1 style="margin-top:var(--s2)">Reports</h1>
+      <p class="muted" style="font-size:.875rem;margin-top:.25rem">Attendance and leave utilization summaries</p>
+    </div>
+    <!-- The month navigator drives the attendance card only; the export
+         button always exports the month the navigator is showing. -->
+    <div class="row row--wrap" style="gap:var(--s3)">
+      <div class="row" style="gap:var(--s2)">
+        <button class="iconbtn" id="prevmonth" aria-label="Previous month"></button>
+        <span class="mono" id="monthlabel" aria-live="polite"
+              style="min-width:9.5rem;text-align:center;font-size:.875rem;font-weight:600">September 2026</span>
+        <button class="iconbtn" id="nextmonth" aria-label="Next month"></button>
+      </div>
+      <button class="btn btn--ghost" id="export">Export Attendance CSV</button>
+    </div>
+  </div>
+
+  <div class="stack" style="gap:var(--s5)">
+
+    <!-- ------------------------------------------------ error banner -->
+    <!-- The source screen degrades gracefully: the banner appears above
+         the cards and both cards still render underneath it. -->
+    <div class="row" id="banner" hidden role="alert"
+         style="gap:var(--s3);padding:var(--s3) var(--s4);border:1px solid var(--line);border-radius:var(--r);font-size:.875rem;font-weight:500"></div>
+
+    <!-- ------------------------------------------------ attendance summary -->
+    <section class="card">
+      <div class="card__head">
+        <div>
+          <h2 style="font-size:1.0625rem;font-family:var(--font-body);font-weight:600">Monthly Attendance Summary</h2>
+          <p class="faint" style="font-size:.75rem" id="attsub">Payroll cycle · 22 working days</p>
+        </div>
+        <span class="chip mono" id="attcount" aria-live="polite">0 employees</span>
+      </div>
+      <div class="card__body card__body--flush">
+        <div class="tablewrap">
+          <table class="table">
+            <thead>
+              <tr>
+                <th>Code</th>
+                <th>Name</th>
+                <th>Department</th>
+                <th class="num">Present</th>
+                <th class="num">WFH</th>
+                <th class="num">Half Days</th>
+                <th class="num">Absent</th>
+                <th class="num">Leave</th>
+                <th class="num">Late Marks</th>
+              </tr>
+            </thead>
+            <tbody id="attrows"></tbody>
+            <tfoot id="attfoot"></tfoot>
+          </table>
+        </div>
+      </div>
+      <div class="card__foot">
+        <p class="help">Counts follow the payroll cycle — the 25th of the previous month to the 24th of this one — not the calendar month. Weekends and declared holidays are excluded from the working-day base, and days after today are not yet recorded.</p>
+      </div>
+    </section>
+
+    <!-- ------------------------------------------------ leave utilisation -->
+    <!-- Loaded once, on first paint. The month navigator deliberately
+         leaves this card alone: balances are a leave-year figure, not
+         a monthly one, so re-fetching them on every arrow press would
+         only redraw the same numbers. -->
+    <section class="card">
+      <div class="card__head">
+        <div>
+          <h2 style="font-size:1.0625rem;font-family:var(--font-body);font-weight:600">Leave Utilization — used / accrued (balance)</h2>
+          <p class="faint" style="font-size:.75rem" id="leavesub">Leave year 2026 · accrued to date</p>
+        </div>
+        <span class="chip mono" id="leavecount">0 employees</span>
+      </div>
+      <div class="card__body card__body--flush">
+        <div class="tablewrap">
+          <table class="table">
+            <thead><tr id="leavehead"></tr></thead>
+            <tbody id="leaverows"></tbody>
+          </table>
+        </div>
+      </div>
+      <div class="card__foot">
+        <p class="help" id="leavefoot">Accrued figures are pro-rated to the completed months of the leave year.</p>
+      </div>
+    </section>
+
+  </div>
+</main>
+
+<script src="../assets/js/data.js"></script>
+<script src="../assets/js/shell.js"></script>
+<script>
+(function () {
+  'use strict';
+  var D = window.VHR_DATA, $ = function (id) { return document.getElementById(id); };
+
+  /* The real screen is gated on the reports.view permission. In the
+     mockup the topbar role picker stands in for the permission set:
+     an employee holds attendance.view_own only, so the backend answers
+     403 and both cards come back empty. */
+  var canView = VHR.role() !== 'employee';
+
+  /* The server clock is not IST, so the mockup states the date it is
+     presenting rather than reading the visitor's clock. Every business
+     date below is built through Date.UTC for the same reason. */
+  var TODAY = '2026-09-21';
+  var LEAVE_YEAR = '2026';
+  var MONTHS = ['January', 'February', 'March', 'April', 'May', 'June',
+                'July', 'August', 'September', 'October', 'November', 'December'];
+  var SHORT = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
+               'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+
+  var sel = { y: 2026, m: 9 };
+  var loadTimer = null;
+
+  /* ---- dates ---- */
+  function pad(n) { return String(n).length < 2 ? '0' + n : String(n); }
+  function dow(d) { var p = d.split('-'); return new Date(Date.UTC(+p[0], +p[1] - 1, +p[2])).getUTCDay(); }
+  function daysIn(y, m) { return new Date(Date.UTC(y, m, 0)).getUTCDate(); }
+  function short(d) { var p = d.split('-'); return +p[2] + ' ' + SHORT[+p[1] - 1]; }
+  function esc(s) {
+    return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+  }
+  /* Two decimals at most, trailing zeros dropped: 6, 13.5, 6.75. */
+  function n2(n) { return String(Math.round(n * 100) / 100); }
+
+  var HOL = {};
+  D.holidays.forEach(function (h) { HOL[h.date] = h; });
+
+  /* ---- the payroll cycle ----
+     Payroll closes on the 24th, so September's attendance figures cover
+     25 Aug – 24 Sep. The cycle is built day by day because the working
+     day count changes with the holiday list, not with the month length. */
+  function cycle(y, m) {
+    var sy = m === 1 ? y - 1 : y, sm = m === 1 ? 12 : m - 1;
+    var start = sy + '-' + pad(sm) + '-25';
+    var end = y + '-' + pad(m) + '-24';
+    var days = [], working = 0, recorded = 0;
+    var cur = Date.UTC(sy, sm - 1, 25), stop = Date.UTC(y, m - 1, 24);
+    while (cur <= stop) {
+      var t = new Date(cur);
+      var date = t.getUTCFullYear() + '-' + pad(t.getUTCMonth() + 1) + '-' + pad(t.getUTCDate());
+      var w = t.getUTCDay();
+      var work = w !== 0 && w !== 6 && !HOL[date];
+      if (work) { working++; if (date <= TODAY) recorded++; }
+      days.push({ date: date, working: work });
+      cur += 864e5;
+    }
+    return {
+      start: start, end: end, days: days, working: working, recorded: recorded,
+      label: short(start) + ' – ' + short(end) + ' ' + y,
+      started: start <= TODAY
+    };
+  }
+
+  /* ---- approved leave, spread day by day ----
+     The register keys leave on the employee's name — the sample codes on
+     a request are the payroll codes, not the directory codes — so the
+     lookup below matches on name, the way the approvals screen does. */
+  var LEAVE_DAYS = {};        /* name -> { date: leave type name } */
+  var LEAVE_USED = {};        /* name -> { leave type name: days } */
+  D.leaveRequests.filter(function (r) { return r.status === 'Approved'; }).forEach(function (r) {
+    var a = r.from.split('-'), b = r.to.split('-');
+    var cur = Date.UTC(+a[0], +a[1] - 1, +a[2]), end = Date.UTC(+b[0], +b[1] - 1, +b[2]);
+    LEAVE_DAYS[r.emp] = LEAVE_DAYS[r.emp] || {};
+    while (cur <= end) {
+      var t = new Date(cur);
+      LEAVE_DAYS[r.emp][t.getUTCFullYear() + '-' + pad(t.getUTCMonth() + 1) + '-' + pad(t.getUTCDate())] = r.type;
+      cur += 864e5;
+    }
+    if (r.from.slice(0, 4) !== LEAVE_YEAR) return;
+    LEAVE_USED[r.emp] = LEAVE_USED[r.emp] || {};
+    LEAVE_USED[r.emp][r.type] = (LEAVE_USED[r.emp][r.type] || 0) + r.days;
+  });
+
+  /* The signed-in employee is the only one VHR_DATA ships punches for. */
+  var REG = {};
+  D.attendance.forEach(function (a) { if (a.status !== 'Future') REG[a.date] = a; });
+
+  /* A stable hash, so a given employee's figures for a given day never
+     change between paints — the mockup ships one month of punches, and
+     the rest of the floor is derived from the same source facts. */
+  function hash(s) {
+    var h = 2166136261, i;
+    for (i = 0; i < s.length; i++) { h ^= s.charCodeAt(i); h = (h * 16777619) >>> 0; }
+    return h;
+  }
+
+  var roster = D.employees.filter(function (e) { return e.status === 'Active'; })
+    .sort(function (a, b) { return a.code < b.code ? -1 : a.code > b.code ? 1 : 0; });
+
+  /* ---- attendance summary ----
+     Six counters per employee, in the order the source screen fixes
+     them. Leave is counted from the approved register; the remaining
+     working days are classified per employee per day. */
+  function summary(emp, cy) {
+    var s = { present: 0, wfh: 0, half: 0, absent: 0, leave: 0, late: 0 };
+    var mine = emp.name === D.me.name;
+    cy.days.forEach(function (d) {
+      if (!d.working) return;
+      if (d.date > TODAY) return;                 /* not yet recorded */
+      if (d.date < emp.joined) return;            /* not employed yet */
+
+      if (LEAVE_DAYS[emp.name] && LEAVE_DAYS[emp.name][d.date]) { s.leave++; return; }
+
+      var r = mine ? REG[d.date] : null;
+      if (r) {
+        if (r.status === 'Leave') { s.leave++; return; }
+        if (r.status === 'Present') { s.present++; if (r.late) s.late++; }
+        return;
+      }
+
+      var h = hash(emp.code + d.date) % 100;
+      if (h < 3) { s.absent++; return; }
+      if (h < 8) { s.half++; return; }
+      if (h < 22) { s.wfh++; return; }
+      s.present++;
+      if (hash(d.date + emp.code) % 100 < 16) s.late++;
+    });
+    return s;
+  }
+
+  function cell(v, tone) {
+    if (!v) return '<td class="num faint">0</td>';
+    return '<td class="num"' + (tone ? ' style="color:var(--' + tone + ');font-weight:600"' : '') + '>' + v + '</td>';
+  }
+
+  function attRow(emp, cy) {
+    var s = summary(emp, cy);
+    var ini = emp.name.split(' ').map(function (w) { return w[0]; }).join('').toUpperCase();
+    return '<tr>' +
+      '<td class="mono" style="font-weight:600">' + emp.code + '</td>' +
+      '<td><span class="person"><span class="avatar avatar--sm">' + ini + '</span>' +
+        '<span class="person__name">' + esc(emp.name) + '</span></span></td>' +
+      '<td class="muted">' + (emp.department ? esc(emp.department) : '<span class="faint">—</span>') + '</td>' +
+      cell(s.present, 'ok') +
+      cell(s.wfh, '') +
+      cell(s.half, '') +
+      cell(s.absent, 'err-text') +
+      cell(s.leave, 'accent') +
+      cell(s.late, '') +
+      '</tr>';
+  }
+
+  function totalsRow(list, cy) {
+    var t = { present: 0, wfh: 0, half: 0, absent: 0, leave: 0, late: 0 };
+    list.forEach(function (e) {
+      var s = summary(e, cy);
+      t.present += s.present; t.wfh += s.wfh; t.half += s.half;
+      t.absent += s.absent; t.leave += s.leave; t.late += s.late;
+    });
+    return '<tr>' +
+      '<th scope="row" colspan="3" style="text-align:left">Total · ' + list.length + ' employees</th>' +
+      '<td class="num mono">' + t.present + '</td><td class="num mono">' + t.wfh + '</td>' +
+      '<td class="num mono">' + t.half + '</td><td class="num mono">' + t.absent + '</td>' +
+      '<td class="num mono">' + t.leave + '</td><td class="num mono">' + t.late + '</td>' +
+      '</tr>';
+  }
+
+  function attEmpty(cy) {
+    /* The source screen leaves this body blank when there is nothing to
+       show — a gap worth naming rather than reproducing, so the mockup
+       says what would appear here instead. */
+    var line = !canView
+      ? 'Attendance totals for every active employee appear here once your role carries reports.view.'
+      : !cy.started
+        ? 'This cycle opens on ' + short(cy.start) + '. Totals appear as punches are recorded against it.'
+        : 'No active employee has a punch, leave or absence recorded in this cycle.';
+    return '<tr><td colspan="9"><div class="empty">' +
+      '<span class="empty__icon">' + VHR.icon('calendarClock', 22) + '</span>' +
+      '<h3>Nothing recorded for ' + MONTHS[sel.m - 1] + ' ' + sel.y + '</h3>' +
+      '<p>' + line + '</p></div></td></tr>';
+  }
+
+  function skelRows(cols) {
+    var out = '';
+    for (var i = 0; i < 6; i++) {
+      out += '<tr><td colspan="' + cols + '"><span class="skel" style="display:block;height:1.5rem"></span></td></tr>';
+    }
+    return out;
+  }
+
+  function paintAttendance() {
+    var cy = cycle(sel.y, sel.m);
+    var list = canView && cy.started
+      ? roster.filter(function (e) { return e.joined <= cy.end; })
+      : [];
+
+    $('monthlabel').textContent = MONTHS[sel.m - 1] + ' ' + sel.y;
+    $('attsub').textContent = 'Payroll cycle ' + cy.label + ' · ' + cy.working +
+      ' working days' + (cy.recorded < cy.working ? ' · ' + cy.recorded + ' recorded so far' : '');
+    $('attcount').textContent = list.length + (list.length === 1 ? ' employee' : ' employees');
+
+    var body = $('attrows');
+    body.removeAttribute('aria-busy');
+    body.innerHTML = list.length ? list.map(function (e) { return attRow(e, cy); }).join('') : attEmpty(cy);
+    $('attfoot').innerHTML = list.length ? totalsRow(list, cy) : '';
+  }
+
+  function loadAttendance() {
+    /* The source screen clears the table to a spinner before every
+       refetch; the mockup keeps that beat with skeleton rows so the
+       arrows feel like the refetch they are. */
+    var body = $('attrows');
+    body.setAttribute('aria-busy', 'true');
+    body.innerHTML = skelRows(9);
+    $('attfoot').innerHTML = '';
+    $('monthlabel').textContent = MONTHS[sel.m - 1] + ' ' + sel.y;
+    clearTimeout(loadTimer);
+    loadTimer = setTimeout(paintAttendance, 320);
+  }
+
+  /* ---- leave utilisation ----
+     One column per leave type in the order data.js lists them. Accrual
+     is monthly, so what an employee has actually earned by the end of
+     this month is entitlement × completed months ÷ 12. Loss of Pay does
+     not accrue at all, and maternity leave is a statutory block rather
+     than an accruing balance — both are handled below. */
+  var MONTHS_DONE = sel.m;                 /* January … the selected month */
+
+  function accrued(t, emp) {
+    if (t.code === 'LOP') return 0;
+    if (t.entitled >= 60) return t.entitled;             /* statutory block */
+    var from = emp.joined.slice(0, 4) === LEAVE_YEAR ? +emp.joined.slice(5, 7) - 1 : 0;
+    return Math.round(t.entitled / 12 * Math.max(0, MONTHS_DONE - from) * 100) / 100;
+  }
+
+  /* Contract staff are paid for extra hours instead of banking them, so
+     no comp-off ledger is opened for them — the cell is an em-dash, not
+     a zero, exactly as it is when a balance row is missing. */
+  function hasRow(t, emp) { return !(t.code === 'CO' && emp.type === 'Contract'); }
+
+  function used(t, emp, acc) {
+    /* The signed-in employee's own usage is a fact in the data. */
+    if (emp.name === D.me.name) return t.used;
+    var real = (LEAVE_USED[emp.name] && LEAVE_USED[emp.name][t.name]) || 0;
+    if (t.code === 'ML') return real;
+    if (t.code === 'LOP') return real + (hash(emp.code + 'LOP') % 6 === 0 ? 1 : 0);
+    /* The register only carries the last few months, so earlier usage in
+       the leave year is derived — the same employee always reads the
+       same figure. */
+    var span = Math.floor(acc / 2) + 1;
+    return Math.min(real + hash(emp.code + t.code) % span, acc);
+  }
+
+  function leaveCell(t, emp) {
+    if (!hasRow(t, emp)) return '<td class="num faint">—</td>';
+    var acc = accrued(t, emp), u = used(t, emp, acc), bal = Math.round((acc - u) * 100) / 100;
+    return '<td class="num">' +
+      '<span class="mono"><span style="font-weight:600">' + n2(u) + '</span> / ' + n2(acc) + '</span>' +
+      '<span class="mono" style="display:block;font-size:11px;color:var(' +
+        (bal < 0 ? '--err-text' : '--accent-strong') + ')">bal ' + n2(bal) + '</span>' +
+      '</td>';
+  }
+
+  function paintLeave() {
+    var types = D.leaveTypes;
+    $('leavehead').innerHTML = '<th>Code</th><th>Name</th>' + types.map(function (t) {
+      return '<th class="num"><abbr title="' + esc(t.name) + '" style="text-decoration:none">' + t.code + '</abbr></th>';
+    }).join('');
+
+    var cols = 2 + types.length;
+    var list = canView ? roster : [];
+    $('leavecount').textContent = list.length + (list.length === 1 ? ' employee' : ' employees');
+    $('leavesub').textContent = 'Leave year ' + LEAVE_YEAR + ' · accrued to ' +
+      MONTHS[sel.m - 1] + ' ' + sel.y;
+    $('leavefoot').textContent = 'Accrued figures are pro-rated to the ' + MONTHS_DONE +
+      ' completed months of the ' + LEAVE_YEAR + ' leave year — the full entitlements are ' +
+      types.filter(function (t) { return t.entitled && t.entitled < 60; })
+        .map(function (t) { return t.code + ' ' + t.entitled; }).join(' · ') +
+      ' days. Loss of Pay does not accrue, so an LOP day reads as a negative balance, and an em-dash means no balance row exists for that type.';
+
+    $('leaverows').innerHTML = list.length
+      ? list.map(function (e) {
+          var ini = e.name.split(' ').map(function (w) { return w[0]; }).join('').toUpperCase();
+          return '<tr><td class="mono" style="font-weight:600">' + e.code + '</td>' +
+            '<td><span class="person"><span class="avatar avatar--sm">' + ini + '</span>' +
+            '<span class="person__name">' + esc(e.name) + '</span></span></td>' +
+            types.map(function (t) { return leaveCell(t, e); }).join('') + '</tr>';
+        }).join('')
+      : '<tr><td colspan="' + cols + '"><div class="empty">' +
+          '<span class="empty__icon">' + VHR.icon('scale', 22) + '</span>' +
+          '<h3>No employees yet</h3>' +
+          '<p>' + (canView
+            ? 'Every active employee is listed here with their used, accrued and remaining days for each leave type.'
+            : 'Balances for every active employee appear here once your role carries reports.view.') +
+          '</p></div></td></tr>';
+  }
+
+  /* ---- banner ---- */
+  function banner(kind, msg) {
+    var el = $('banner');
+    el.style.background = 'var(--' + kind + '-soft)';
+    el.style.color = kind === 'err' ? 'var(--err-text)' : 'var(--' + kind + ')';
+    el.innerHTML = VHR.icon(kind === 'ok' ? 'check' : 'alert', 16) + '<span>' + esc(msg) + '</span>';
+    el.hidden = false;
+  }
+
+  /* ---- month navigation ---- */
+  function stepMonth(delta) {
+    sel.m += delta;
+    if (sel.m < 1) { sel.m = 12; sel.y -= 1; }
+    if (sel.m > 12) { sel.m = 1; sel.y += 1; }
+    /* Only the attendance card reloads — balances are untouched. */
+    loadAttendance();
+  }
+
+  $('prevmonth').innerHTML = '<span style="display:block;rotate:90deg">' + VHR.icon('chevron', 16) + '</span>';
+  $('nextmonth').innerHTML = '<span style="display:block;rotate:-90deg">' + VHR.icon('chevron', 16) + '</span>';
+  $('prevmonth').addEventListener('click', function () { stepMonth(-1); });
+  $('nextmonth').addEventListener('click', function () { stepMonth(1); });
+
+  /* ---- export ----
+     One click, no dropdown and no confirmation — the source screen saves
+     attendance-YYYY-MM.csv straight to disk. Nothing in this mockup
+     writes a file, so the toast names the file it would have written. */
+  $('export').innerHTML = VHR.icon('download', 16) + 'Export Attendance CSV';
+  $('export').addEventListener('click', function () {
+    var file = 'attendance-' + sel.y + '-' + pad(sel.m) + '.csv';
+    if (!canView) { VHR.toast('403 — reports.view is required to export ' + file, 'err'); return; }
+    VHR.toast(file + ' — not in this mockup');
+  });
+
+  /* ---- first paint ---- */
+  paintLeave();
+  loadAttendance();
+
+  if (!canView) {
+    banner('err', 'Forbidden — your role does not carry the reports.view permission, so both reports came back empty. Switch the role picker in the top bar to HR Manager to read them.');
+  }
+})();
+</script>
+</body>
+</html>

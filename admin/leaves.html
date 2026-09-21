@@ -1,0 +1,440 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Leave Management — ValidureHR</title>
+<link rel="icon" href="../assets/brand/validure-mark.svg">
+<link rel="stylesheet" href="../assets/css/vhr.css">
+<script>try{var t=localStorage.getItem('vhr.theme');if(t)document.documentElement.setAttribute('data-theme',t);}catch(e){}</script>
+</head>
+<body data-root="../">
+
+<main class="page" data-page>
+
+  <div class="page__head">
+    <div>
+      <p class="eyebrow">Management</p>
+      <h1 style="margin-top:var(--s2)">Leave Management</h1>
+      <p class="muted" style="font-size:.875rem;margin-top:.25rem">A single approval from HR or the Director fully approves a request</p>
+    </div>
+    <div class="row" style="gap:var(--s3)">
+      <!-- Every decision on this screen is taken on its own row, so
+           the header carries no action buttons — only the workload. -->
+      <span class="chip mono" id="pendingchip">— awaiting approval</span>
+    </div>
+  </div>
+
+  <div class="stack" style="gap:var(--s5)">
+
+    <!-- ------------------------------------------------ result banner -->
+    <!-- Success clears itself after four seconds; a warning (read-only
+         role) stays until something replaces it. -->
+    <div class="row" id="banner" hidden aria-live="polite"
+         style="gap:var(--s3);padding:var(--s3) var(--s4);border:1px solid var(--line);border-radius:var(--r);font-size:.875rem;font-weight:500"></div>
+
+    <!-- ------------------------------------------------ status pills -->
+    <div class="row row--wrap" id="pills" role="group" aria-label="Filter applications by status" style="gap:var(--s2)"></div>
+
+    <!-- ------------------------------------------------ applications -->
+    <section class="card">
+      <div class="card__head">
+        <div>
+          <h2 style="font-size:1.0625rem;font-family:var(--font-body);font-weight:600">Leave applications</h2>
+          <p class="faint" style="font-size:.75rem" id="tablesub">Awaiting approval · newest first</p>
+        </div>
+        <span class="chip mono" id="tablecount" aria-live="polite">0 applications</span>
+      </div>
+      <div class="card__body card__body--flush">
+        <div class="tablewrap">
+          <table class="table">
+            <thead>
+              <tr>
+                <th>#</th>
+                <th>Employee</th>
+                <th>Type</th>
+                <th>Dates</th>
+                <th class="num">Days</th>
+                <th>Reason</th>
+                <th>Doc</th>
+                <th>Status</th>
+                <th>Decided by</th>
+                <th class="num">Actions</th>
+              </tr>
+            </thead>
+            <tbody id="approws"></tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- ------------------------------------------------ leave calendar -->
+    <section class="card">
+      <div class="card__head">
+        <div>
+          <h2 style="font-size:1.0625rem;font-family:var(--font-body);font-weight:600">Leave calendar</h2>
+          <p class="faint" style="font-size:.75rem">Approved leave overlapping the selected month</p>
+        </div>
+        <div class="row" style="gap:var(--s2)">
+          <button class="iconbtn" id="prevmonth" aria-label="Previous month"></button>
+          <span class="mono" id="calmonth" aria-live="polite"
+                style="min-width:9.5rem;text-align:center;font-size:.875rem;font-weight:600">September 2026</span>
+          <button class="iconbtn" id="nextmonth" aria-label="Next month"></button>
+        </div>
+      </div>
+      <div class="card__body" id="calbody"></div>
+    </section>
+
+  </div>
+</main>
+
+<script src="../assets/js/data.js"></script>
+<script src="../assets/js/shell.js"></script>
+<script>
+(function () {
+  'use strict';
+  var D = window.VHR_DATA, $ = function (id) { return document.getElementById(id); };
+
+  /* The real screen is gated on the leaves.approve permission. In the
+     mockup the topbar role picker stands in for the permission set:
+     an employee sees the whole list but decides nothing. */
+  var canApprove = VHR.role() !== 'employee';
+
+  /* Whoever is signed in signs the decision — matching the name and
+     role the topbar is already showing. */
+  var ACTING = VHR.role() === 'platform' ? 'Rahul Paul (Platform Admin)' : D.me.name + ' (HR Manager)';
+
+  var LABEL = { Pending: 'Awaiting Approval', Approved: 'Approved', Rejected: 'Rejected', Cancelled: 'Cancelled' };
+  var TONE  = { Pending: 'warn', Approved: 'ok', Rejected: 'err', Cancelled: 'neutral' };
+  var MONTHS = ['January','February','March','April','May','June',
+                'July','August','September','October','November','December'];
+
+  var FILTERS = [
+    { label: 'Awaiting Approval', value: 'Pending' },
+    { label: 'All', value: 'all' },
+    { label: 'Approved', value: 'Approved' },
+    { label: 'Rejected', value: 'Rejected' },
+    { label: 'Cancelled', value: 'Cancelled' }
+  ];
+  var filter = 'Pending';
+  var cal = { y: 2026, m: 9 };
+  var loadTimer = null, bannerTimer = null;
+
+  function esc(s) {
+    return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+  }
+  function pad(n) { return String(n).length < 2 ? '0' + n : String(n); }
+  function dmy(d) { var p = d.split('-'); return p[2] + '/' + p[1] + '/' + p[0]; }
+  /* Never ask the host clock for a business date — the server it will
+     eventually run on is not on IST. Month lengths are arithmetic. */
+  function daysIn(y, m) {
+    var leap = (y % 4 === 0 && y % 100 !== 0) || y % 400 === 0;
+    return [31, leap ? 29 : 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31][m - 1];
+  }
+
+  var CODE = {};
+  D.leaveTypes.forEach(function (t) { CODE[t.name] = t.code; });
+
+  var byName = {};
+  D.employees.forEach(function (e) { byName[e.name] = e; });
+
+  function actor(name) {
+    var e = byName[name];
+    return e ? name + ' (' + e.designation + ')' : name;
+  }
+
+  /* One mutable working copy, so approving or cancelling a request
+     changes this screen without writing back into the sample data
+     that every other page reads. Fields the payload does not carry
+     — the leave code, the unpaid marker, the attachment — are
+     derived here rather than added to data.js. */
+  var rows = D.leaveRequests.map(function (l) {
+    var emp = byName[l.emp];
+    return {
+      id: l.id, emp: l.emp, code: l.code, type: l.type,
+      tcode: CODE[l.type] || l.type,
+      from: l.from, to: l.to, days: l.days, reason: l.reason,
+      status: l.status,
+      /* Probation staff accrue nothing, and Loss of Pay is unpaid by
+         definition — both surface as the amber "Unpaid" marker. */
+      unpaid: l.type === 'Loss of Pay' || !!(emp && emp.status === 'Probation'),
+      /* A sick leave is the only kind that arrives with a certificate. */
+      doc: l.type === 'Sick Leave' ? 'certificate-' + l.id + '.pdf' : null,
+      by: l.status === 'Pending' ? null : actor(l.approver),
+      note: l.note || null
+    };
+  });
+
+  function find(id) {
+    for (var i = 0; i < rows.length; i++) if (rows[i].id === id) return rows[i];
+    return null;
+  }
+
+  /* ---- banner ---- */
+  function banner(kind, msg) {
+    var el = $('banner');
+    el.style.background = 'var(--' + kind + '-soft)';
+    el.style.color = kind === 'err' ? 'var(--err-text)' : 'var(--' + kind + ')';
+    el.innerHTML = VHR.icon(kind === 'ok' ? 'check' : 'alert', 16) + '<span>' + esc(msg) + '</span>';
+    el.hidden = false;
+    clearTimeout(bannerTimer);
+    if (kind === 'ok') bannerTimer = setTimeout(function () { el.hidden = true; }, 4000);
+  }
+
+  /* ---- filter pills ---- */
+  function renderPills() {
+    $('pills').innerHTML = FILTERS.map(function (f) {
+      var on = f.value === filter;
+      return '<button class="btn btn--sm ' + (on ? 'btn--primary' : 'btn--ghost') + '" ' +
+        'style="border-radius:var(--r-full)" data-status="' + f.value + '" aria-pressed="' + on + '">' +
+        f.label + '</button>';
+    }).join('');
+  }
+
+  $('pills').addEventListener('click', function (e) {
+    var b = e.target.closest('[data-status]');
+    if (!b) return;
+    filter = b.getAttribute('data-status');
+    renderPills();
+    renderTable(true);
+  });
+
+  /* ---- table ---- */
+  function iconBtn(act, l, name, label, colour) {
+    return '<button class="iconbtn" style="width:2rem;height:2rem;color:' + colour + '" ' +
+      'data-act="' + act + '" data-id="' + l.id + '" title="' + esc(label) + '" ' +
+      'aria-label="' + esc(label) + ' request #' + l.id + ', ' + esc(l.emp) + '">' +
+      VHR.icon(name, 17) + '</button>';
+  }
+
+  function actionsFor(l) {
+    if (!canApprove) return '';
+    var b = '';
+    if (l.status === 'Pending') {
+      b += iconBtn('approve', l, 'check', 'Approve', 'var(--ok)');
+      b += iconBtn('reject', l, 'x', 'Reject', 'var(--err-text)');
+    }
+    /* Cancelling is the undo — it gives the balance and the
+       attendance days back, so the history icon stands in for the
+       slash the spec draws. */
+    if (l.status !== 'Cancelled' && l.status !== 'Rejected') {
+      b += iconBtn('cancel', l, 'history', 'Cancel leave', 'var(--muted)');
+    }
+    return b;
+  }
+
+  function rowHtml(l) {
+    var ini = l.emp.split(' ').map(function (w) { return w[0]; }).join('').toUpperCase();
+    return '<tr>' +
+      '<td class="mono faint">#' + l.id + '</td>' +
+      '<td><span class="person"><span class="avatar avatar--sm">' + ini + '</span>' +
+        '<span><span class="person__name" style="display:block">' + esc(l.emp) + '</span>' +
+        '<span class="person__meta">' + l.code + '</span></span></span></td>' +
+      '<td><span style="display:grid;gap:.25rem;justify-items:start">' +
+        '<span class="mono" style="font-weight:600">' + l.tcode + '</span>' +
+        (l.unpaid ? '<span class="badge badge--warn">Unpaid</span>' : '') + '</span></td>' +
+      '<td class="mono" style="white-space:nowrap">' + dmy(l.from) + ' → ' + dmy(l.to) + '</td>' +
+      '<td class="num">' + l.days + '</td>' +
+      '<td><span class="muted" title="' + esc(l.reason) + '" ' +
+        'style="display:block;max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">' +
+        esc(l.reason) + '</span></td>' +
+      '<td>' + (l.doc
+        ? '<button class="iconbtn" style="width:2rem;height:2rem;color:var(--accent)" data-act="doc" data-id="' + l.id + '" ' +
+          'title="' + l.doc + '" aria-label="Open the attachment on request #' + l.id + '">' + VHR.icon('fileText', 16) + '</button>'
+        : '<span class="faint">—</span>') + '</td>' +
+      '<td><span class="badge badge--' + TONE[l.status] + '"' +
+        (l.status === 'Rejected' && l.note ? ' title="' + esc(l.note) + '"' : '') + '>' +
+        LABEL[l.status] + '</span></td>' +
+      '<td class="faint" style="font-size:.75rem">' + (l.by ? esc(l.by) : '—') + '</td>' +
+      '<td><span class="row" style="gap:var(--s1);justify-content:flex-end">' + actionsFor(l) + '</span></td>' +
+      '</tr>';
+  }
+
+  function loadingRows() {
+    var out = '';
+    for (var i = 0; i < 5; i++) {
+      out += '<tr><td colspan="10"><span class="skel" style="display:block;height:1.5rem"></span></td></tr>';
+    }
+    return out;
+  }
+
+  function paint(list) {
+    var body = $('approws');
+    body.removeAttribute('aria-busy');
+    body.innerHTML = list.length ? list.map(rowHtml).join('') :
+      '<tr><td colspan="10"><div class="empty">' +
+        '<span class="empty__icon">' + VHR.icon('inbox', 22) + '</span>' +
+        '<h3>Nothing under this filter</h3>' +
+        '<p>No leave applications match this filter. Requests move here as they are approved, rejected or cancelled.</p>' +
+      '</div></td></tr>';
+    $('tablecount').textContent = list.length + (list.length === 1 ? ' application' : ' applications');
+  }
+
+  function renderTable(loading) {
+    var list = rows.filter(function (l) { return filter === 'all' || l.status === filter; });
+    var label = FILTERS.filter(function (f) { return f.value === filter; })[0].label;
+    $('tablesub').textContent = (filter === 'all' ? 'Every application' : label) + ' · newest first';
+    $('pendingchip').textContent = rows.filter(function (l) { return l.status === 'Pending'; }).length +
+      ' awaiting approval';
+
+    if (loading) {
+      /* The real screen blanks the table while it refetches; keeping
+         that beat makes the pills feel like the filter they are. */
+      var body = $('approws');
+      body.setAttribute('aria-busy', 'true');
+      body.innerHTML = loadingRows();
+      clearTimeout(loadTimer);
+      loadTimer = setTimeout(function () { paint(list); }, 320);
+      return;
+    }
+    paint(list);
+  }
+
+  /* ---- row actions ---- */
+  $('approws').addEventListener('click', function (e) {
+    var b = e.target.closest('[data-act]');
+    if (!b) return;
+    var l = find(+b.getAttribute('data-id'));
+    if (!l) return;
+    var act = b.getAttribute('data-act');
+    if (act === 'doc') { VHR.toast('Attachments are not part of this mockup (' + l.doc + ')'); return; }
+    if (act === 'approve') { approve(l); return; }
+    if (act === 'reject') { openReject(l); return; }
+    if (act === 'cancel') { openCancel(l); }
+  });
+
+  function approve(l) {
+    l.status = 'Approved';
+    l.by = ACTING;
+    renderTable();
+    renderCal();
+    banner('ok', 'Leave approved — employee and manager notified by email.');
+    VHR.toast('Request #' + l.id + ' approved', 'ok');
+  }
+
+  function openReject(l) {
+    var close = VHR.modal({
+      title: 'Reject leave application',
+      sub: '#' + l.id + ' · ' + l.emp + ' · ' + l.tcode + ' · ' + dmy(l.from) + ' → ' + dmy(l.to),
+      foot: null,
+      body:
+        '<form id="rejectform" class="stack" style="gap:var(--s4)">' +
+          '<div class="field">' +
+            '<label class="label" for="rejreason">Rejection reason<span class="req">*</span></label>' +
+            '<textarea class="textarea" id="rejreason" name="reason" rows="3" required ' +
+              'placeholder="Why is this request being rejected?"></textarea>' +
+            '<p class="help">This text is quoted in the rejection email, so say what would make a re-application succeed.</p>' +
+          '</div>' +
+          '<div class="row" style="justify-content:flex-end;gap:var(--s3)">' +
+            '<button type="button" class="btn btn--ghost" data-close>Cancel</button>' +
+            '<button type="submit" class="btn btn--danger">Reject application</button>' +
+          '</div>' +
+        '</form>'
+    });
+
+    var form = $('rejectform');
+    VHR.fakeSubmit(form, 'Leave rejected');
+    form.addEventListener('submit', function () {
+      var reason = form.reason.value.trim();
+      setTimeout(function () {
+        close();
+        l.status = 'Rejected';
+        l.by = ACTING;
+        l.note = reason;
+        /* Only the table reloads — a rejection cannot change which
+           leaves are approved, so the calendar is left alone. */
+        renderTable();
+        banner('ok', 'Leave rejected — ' + l.emp + ' has been sent the reason.');
+      }, 750);
+    });
+  }
+
+  function openCancel(l) {
+    var close = VHR.modal({
+      title: 'Cancel leave request',
+      sub: '#' + l.id + ' · ' + l.emp + ' · ' + l.tcode,
+      body:
+        '<p style="font-size:.875rem">Cancel leave #' + l.id + ' for ' + esc(l.emp) + '?' +
+          (l.status === 'Approved' ? ' Balance and attendance will be restored.' : '') + '</p>' +
+        '<p class="help">The application is removed from the register and the employee is notified. This cannot be undone here.</p>',
+      foot: '<button class="btn btn--ghost" data-close>Keep it</button>' +
+            '<button class="btn btn--danger" data-ok>Cancel leave</button>',
+      onOk: function () {
+        close();
+        l.status = 'Cancelled';
+        l.by = ACTING;
+        renderTable();
+        renderCal();
+        banner('ok', 'Leave cancelled — balance and attendance restored.');
+        VHR.toast('Request #' + l.id + ' cancelled', 'ok');
+      }
+    });
+  }
+
+  /* ---- leave calendar ---- */
+  function renderCal(loading) {
+    var start = cal.y + '-' + pad(cal.m) + '-01';
+    var end = cal.y + '-' + pad(cal.m) + '-' + pad(daysIn(cal.y, cal.m));
+    $('calmonth').textContent = MONTHS[cal.m - 1] + ' ' + cal.y;
+
+    if (loading) {
+      $('calbody').innerHTML = '<div class="grid grid--3">' +
+        '<span class="skel" style="display:block;height:3.5rem"></span>' +
+        '<span class="skel" style="display:block;height:3.5rem"></span>' +
+        '<span class="skel" style="display:block;height:3.5rem"></span></div>';
+      setTimeout(function () { renderCal(); }, 320);
+      return;
+    }
+
+    /* Approved leave that touches the month at all, not just leave
+       that starts in it — a trip over a month boundary still means
+       the desk is empty. */
+    var list = rows.filter(function (l) {
+      return l.status === 'Approved' && l.from <= end && l.to >= start;
+    }).sort(function (a, b) { return a.from < b.from ? -1 : a.from > b.from ? 1 : 0; });
+
+    if (!list.length) {
+      $('calbody').innerHTML = '<div class="empty">' +
+        '<span class="empty__icon">' + VHR.icon('calendarCheck', 22) + '</span>' +
+        '<h3>No approved leave this month</h3>' +
+        '<p>Approved leave for ' + MONTHS[cal.m - 1] + ' ' + cal.y + ' would be listed here, one card per employee.</p>' +
+      '</div>';
+      return;
+    }
+
+    $('calbody').innerHTML = '<ul class="grid grid--3" style="list-style:none;padding:0">' +
+      list.map(function (l) {
+        return '<li style="padding:var(--s3);border:1px solid var(--line);border-radius:var(--r);background:var(--info-soft)">' +
+          '<p style="font-size:.875rem;font-weight:600">' + esc(l.emp) +
+            ' <span class="mono faint" style="font-weight:400">(' + l.code + ')</span></p>' +
+          '<p class="mono" style="font-size:.75rem;color:var(--info);margin-top:.15rem">' +
+            l.tcode + ' · ' + dmy(l.from) + ' → ' + dmy(l.to) + '</p>' +
+        '</li>';
+      }).join('') + '</ul>';
+  }
+
+  function stepMonth(delta) {
+    cal.m += delta;
+    if (cal.m < 1) { cal.m = 12; cal.y -= 1; }
+    if (cal.m > 12) { cal.m = 1; cal.y += 1; }
+    renderCal(true);
+  }
+
+  $('prevmonth').innerHTML = '<span style="display:block;rotate:90deg">' + VHR.icon('chevron', 16) + '</span>';
+  $('nextmonth').innerHTML = '<span style="display:block;rotate:-90deg">' + VHR.icon('chevron', 16) + '</span>';
+  $('prevmonth').addEventListener('click', function () { stepMonth(-1); });
+  $('nextmonth').addEventListener('click', function () { stepMonth(1); });
+
+  /* ---- first paint ---- */
+  renderPills();
+  renderTable();
+  renderCal();
+
+  if (!canApprove) {
+    banner('warn', 'Read-only view — this role does not hold leaves.approve, so the Actions column stays empty. Switch the role picker to HR Manager to decide a request.');
+  }
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,395 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>My Profile — ValidureHR</title>
+<link rel="icon" href="../assets/brand/validure-mark.svg">
+<link rel="stylesheet" href="../assets/css/vhr.css">
+<script>try{var t=localStorage.getItem('vhr.theme');if(t)document.documentElement.setAttribute('data-theme',t);}catch(e){}</script>
+</head>
+<body data-root="../">
+
+<main class="page" data-page>
+
+  <div class="page__head">
+    <div>
+      <p class="eyebrow">My Profile</p>
+      <h1 style="margin-top:var(--s2)">Welcome back, <span id="firstname">Ananya</span>!</h1>
+      <p class="muted" style="font-size:.875rem;margin-top:.25rem" id="todayline">Monday, 21/09/2026</p>
+    </div>
+  </div>
+
+  <div class="stack" style="gap:var(--s5)">
+
+    <!-- ------------------------------------------------ probation banner
+         Conditional: only an employee still inside their probation
+         window sees it, and they also get a twelfth row on the
+         profile list below. Ananya is confirmed, so it stays hidden. -->
+    <section class="card" id="probation" hidden
+             style="background:var(--warn-soft);border-color:var(--warn-soft);box-shadow:none">
+      <div class="card__body">
+        <div class="row row--between row--wrap" style="gap:var(--s4)">
+          <div>
+            <p class="row" style="gap:var(--s2);font-size:.875rem;font-weight:700;color:var(--warn)" id="probtitle"></p>
+            <p style="font-size:.75rem;color:var(--warn);margin-top:.25rem" id="probline"></p>
+          </div>
+          <div style="text-align:right">
+            <p class="num" style="font-family:var(--font-head);font-size:1.875rem;font-weight:680;line-height:1;color:var(--warn)" id="probdays"></p>
+            <p class="eyebrow eyebrow--plain" style="font-size:10px;color:var(--warn);justify-content:flex-end">days left</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <div class="grid grid--3" style="align-items:flex-start">
+
+      <!-- ------------------------------------------------ employee information -->
+      <section class="card">
+        <div class="card__head">
+          <div>
+            <h2 style="font-size:1.125rem" id="myname">Ananya Iyer</h2>
+            <p class="faint" style="font-size:.875rem;margin-top:.15rem" id="myrole">Senior Software Engineer · Engineering</p>
+          </div>
+        </div>
+        <div class="card__body">
+          <dl id="profilelist"></dl>
+        </div>
+      </section>
+
+      <!-- ------------------------------------------------ photo + month -->
+      <div class="stack" style="gap:var(--s5)">
+
+        <section class="card">
+          <div class="card__head">
+            <div>
+              <h2 style="font-size:1.0625rem;font-family:var(--font-body);font-weight:600">Profile photo</h2>
+              <p class="faint" style="font-size:.75rem">Passport size · shown on your ID card</p>
+            </div>
+          </div>
+          <div class="card__body">
+            <form id="photoform">
+              <div class="stack" style="gap:var(--s3);justify-items:center">
+                <div id="photoframe"
+                     style="position:relative;width:10rem;height:13rem;border:1px solid var(--line-strong);border-radius:var(--r-sm);background:var(--surface);overflow:hidden">
+                  <div id="photoholder" style="width:100%;height:100%;display:grid;place-items:center;align-content:center">
+                    <p style="font-family:var(--font-head);font-size:2.25rem;font-weight:680;color:var(--faint)" id="photoini">AI</p>
+                    <p class="eyebrow eyebrow--plain" style="font-size:10px;color:var(--faint);margin-top:var(--s2)">No photo</p>
+                  </div>
+                  <!-- Upload overlay is injected only for viewers who hold
+                       employees.manage (or the platform role); a plain
+                       employee sees no control at all, per the spec. -->
+                </div>
+                <p class="help" style="max-width:10rem;text-align:center" id="photohint" hidden></p>
+              </div>
+            </form>
+          </div>
+        </section>
+
+        <section class="card">
+          <div class="card__head">
+            <div>
+              <h2 style="font-size:1.0625rem;font-family:var(--font-body);font-weight:600">Current month overview</h2>
+              <p class="faint" style="font-size:.75rem" id="cycleline">September 2026 · up to today</p>
+            </div>
+          </div>
+          <div class="card__body">
+            <div class="grid grid--2" style="gap:var(--s4)" id="cycletiles"></div>
+
+            <h3 style="font-size:.875rem;font-family:var(--font-body);font-weight:600;margin-top:var(--s6);padding-bottom:var(--s2);border-bottom:1px solid var(--line)">Available leaves</h3>
+            <div class="stack" style="gap:var(--s3);margin-top:var(--s3)" id="balances"></div>
+          </div>
+        </section>
+
+      </div>
+
+      <!-- ------------------------------------------------ directory -->
+      <section class="card" style="max-height:37.5rem;display:flex;flex-direction:column">
+        <div class="card__head" style="flex:none">
+          <h2 style="font-size:1.0625rem;font-family:var(--font-body);font-weight:600;white-space:nowrap">Active employees</h2>
+          <div class="search">
+            <label class="sr" for="dirsearch">Search employees by name or designation</label>
+            <input class="input" id="dirsearch" type="search" placeholder="Search employees…" autocomplete="off"
+                   style="min-width:0;width:100%;max-width:12.5rem;height:2.25rem;min-height:2.25rem">
+          </div>
+        </div>
+        <div class="card__body" style="flex:1;min-height:0;overflow-y:auto">
+          <ul id="directory" class="stack" style="gap:var(--s2);list-style:none;padding:0;margin:0"></ul>
+        </div>
+        <div class="card__foot" style="flex:none">
+          <p class="faint" style="font-size:.75rem" id="dircount"></p>
+        </div>
+      </section>
+
+    </div>
+  </div>
+</main>
+
+<script src="../assets/js/data.js"></script>
+<script src="../assets/js/shell.js"></script>
+<script>
+(function () {
+  'use strict';
+  var D = window.VHR_DATA, $ = function (id) { return document.getElementById(id); };
+
+  /* The sample payload carries what the other screens need; this one
+     asks for three fields /me returns that data.js does not hold.
+     data.js is shared, so they are derived here instead. */
+  var self = D.employees.filter(function (e) { return e.name === D.me.name; })[0] || {};
+  var profile = {
+    dob: '1994-02-11',
+    emergency: '+91 98862 40119 (Sundar Iyer — Father)',
+    status: self.status || 'Active'
+  };
+
+  /* The server clock is not IST, so the mockup states the date it
+     is presenting rather than reading the visitor's clock. */
+  var TODAY = '2026-09-21';
+
+  function dash(v) { return v === null || v === undefined || v === '' ? '—' : v; }
+  function dmy(d) { if (!d) return '—'; var p = d.split('-'); return p[2] + '/' + p[1] + '/' + p[0]; }
+  function ini(n) { return n.split(' ').map(function (w) { return w[0]; }).slice(0, 2).join('').toUpperCase(); }
+  function qty(n) { return String(Math.round(n * 100) / 100); }
+  /* UTC arithmetic — the host clock is not on IST and must not decide
+     a business date. */
+  function daysBetween(a, b) {
+    function u(s) { var p = s.split('-'); return Date.UTC(+p[0], +p[1] - 1, +p[2]); }
+    return Math.round((u(b) - u(a)) / 86400000);
+  }
+  function addMonths(d, n) {
+    var p = d.split('-'), dt = new Date(Date.UTC(+p[0], +p[1] - 1 + n, +p[2]));
+    return dt.toISOString().slice(0, 10);
+  }
+
+  $('firstname').textContent = D.me.name.split(' ')[0];
+  $('todayline').textContent = 'Monday, ' + dmy(TODAY) + ' · ' + D.me.designation + ' · ' + D.me.department;
+  $('myname').textContent = D.me.name;
+  $('myrole').textContent = dash(D.me.designation) + ' · ' + dash(D.me.department);
+  $('photoini').textContent = ini(D.me.name);
+
+  /* ---- probation ---- */
+  var onProbation = profile.status === 'Probation';
+  if (onProbation) {
+    var ends = addMonths(D.me.joined, 6);
+    $('probtitle').innerHTML = VHR.icon('clock', 15) + '<span>Probation period active</span>';
+    $('probline').innerHTML = 'Your probationary period ends on <strong>' + dmy(ends) +
+      '</strong>. During this time you can only apply for unpaid leave.';
+    $('probdays').textContent = Math.max(0, daysBetween(TODAY, ends));
+    $('probation').hidden = false;
+  }
+
+  /* ---- profile list ---- */
+  var tone = { Active: 'ok', Inactive: 'err' };
+  var pill = '<span class="badge badge--' + (tone[profile.status] || 'neutral') + '">' + profile.status + '</span>';
+
+  var rows = [
+    ['Employee Name', D.me.name],
+    ['Employee ID', '<span class="mono">' + D.me.code + '</span>'],
+    ['Phone Number', '<span class="mono">' + dash(D.me.phone) + '</span>'],
+    ['Emergency Contact', dash(profile.emergency)],
+    ['Email ID', D.me.email],
+    ['Date of Joining', '<span class="mono">' + dmy(D.me.joined) + '</span>'],
+    ['Date of Birth', '<span class="mono">' + dmy(profile.dob) + '</span>'],
+    ['Designation', dash(D.me.designation)],
+    ['Department', dash(D.me.department)],
+    ['Reporting Manager', dash(D.me.manager)],
+    ['Employment Status', pill]
+  ];
+  if (onProbation) {
+    rows.push(['Probation Period',
+      '<span style="color:var(--warn);font-weight:600">Active (ends ' + dmy(addMonths(D.me.joined, 6)) + ')</span>']);
+  }
+
+  $('profilelist').innerHTML = rows.map(function (r, i) {
+    var line = i === rows.length - 1 ? '0' : '1px solid var(--line)';
+    return '<div class="row row--between" style="gap:var(--s4);padding:var(--s3) 0;border-bottom:' + line + '">' +
+      '<dt class="muted" style="font-size:.875rem">' + r[0] + '</dt>' +
+      '<dd style="font-size:.875rem;font-weight:500;text-align:right;min-width:0">' + r[1] + '</dd></div>';
+  }).join('');
+
+  /* ---- photo upload
+     Only a platform admin or a role carrying employees.manage may
+     replace the picture; the role picker in the top bar switches
+     between the two views. Nothing is uploaded — the frame previews
+     the chosen file and the form goes through VHR.fakeSubmit. */
+  var roleName = { employee: 'Employee', hr: 'HR Manager', platform: 'HR Manager' }[VHR.role()];
+  var perms = (D.roles.filter(function (r) { return r.name === roleName; })[0] || {}).perms || [];
+  var mayUpload = VHR.role() === 'platform' || perms.indexOf('employees.manage') !== -1;
+
+  if (mayUpload) {
+    /* The spec paints this overlay black at 60%; there is no
+       always-light ink token, so it uses the accent pair instead —
+       the one combination the design system guarantees in both
+       themes. */
+    var lab = document.createElement('label');
+    lab.setAttribute('for', 'photofile');
+    lab.style.cssText = 'position:absolute;inset:0;display:grid;place-items:center;cursor:pointer;' +
+      'background:var(--accent);color:var(--accent-ink);font-size:.875rem;font-weight:600;' +
+      'opacity:0;transition:opacity var(--dur-micro) var(--ease-out)';
+    lab.innerHTML = '<span class="row" style="gap:var(--s2)">' + VHR.icon('upload', 16) + 'Upload photo</span>' +
+      '<input class="sr" type="file" id="photofile" accept="image/jpeg,image/png,image/webp,image/heic">';
+    $('photoframe').appendChild(lab);
+
+    var frame = $('photoframe');
+    function reveal(on) { lab.style.opacity = on ? '1' : '0'; }
+    frame.addEventListener('mouseenter', function () { reveal(true); });
+    frame.addEventListener('mouseleave', function () { reveal(false); });
+    frame.addEventListener('focusin', function () { reveal(true); });
+    frame.addEventListener('focusout', function () { reveal(false); });
+
+    $('photohint').textContent = 'Hover the frame to upload a passport size photo.';
+    $('photohint').hidden = false;
+
+    var form = $('photoform');
+    VHR.fakeSubmit(form, 'Profile photo updated');
+
+    $('photofile').addEventListener('change', function () {
+      var file = this.files && this.files[0];
+      if (!file) return;
+      if (!/^image\/(jpeg|png|webp|heic)$/.test(file.type)) {
+        VHR.toast('Choose a JPG, PNG, WebP or HEIC image', 'err');
+        this.value = '';
+        return;
+      }
+      var input = this;
+      input.disabled = true;                     /* disabled while "in flight" */
+      $('photoholder').innerHTML = '<img src="' + URL.createObjectURL(file) +
+        '" alt="Profile photo of ' + D.me.name + '" style="width:100%;height:100%;object-fit:cover">';
+      $('photoholder').style.display = 'block';
+      $('photohint').hidden = true;
+      setTimeout(function () { input.disabled = false; }, 800);
+      if (form.requestSubmit) form.requestSubmit();
+      else form.dispatchEvent(new Event('submit', { cancelable: true, bubbles: true }));
+    });
+  }
+
+  /* ---- current month
+     The cycle runs to today; weekends and declared holidays are not
+     counted either way. A half day would weigh 0.5, which is why the
+     present figure is summed rather than counted. */
+  var cycle = D.attendance.filter(function (a) { return a.status !== 'Future'; });
+  var present = cycle.reduce(function (n, a) {
+    return n + (a.status === 'Present' ? 1 : a.status === 'Half Day' ? 0.5 : 0);
+  }, 0);
+  var absent = cycle.filter(function (a) {
+    return a.status !== 'Present' && a.status !== 'Half Day' && a.status !== 'Weekend' && a.status !== 'Holiday';
+  }).length;
+
+  $('cycleline').textContent = '01 – 21 September 2026 · weekends and holidays excluded';
+  $('cycletiles').innerHTML = [
+    { label: 'Present', val: present, tone: 'ok' },
+    { label: 'Absent', val: absent, tone: 'err' }
+  ].map(function (t) {
+    return '<div style="text-align:center;padding:var(--s3);border-radius:var(--r);' +
+      'background:var(--' + t.tone + '-soft);border:1px solid var(--line)">' +
+      '<p style="font-size:.75rem;font-weight:500;color:var(--' + t.tone + ')">' + t.label + '</p>' +
+      '<p class="num" style="font-size:1.25rem;font-weight:700;color:var(--' + t.tone + ');margin-top:var(--s1)">' +
+      qty(t.val) + '</p></div>';
+  }).join('');
+
+  /* ---- available leaves
+     Loss of Pay is this product's unpaid type; it is never a balance
+     anybody can spend, so it is filtered out even at zero. */
+  var bal = D.leaveTypes.filter(function (t) { return t.code !== 'LOP'; })
+    .map(function (t) { return { name: t.name, left: t.entitled - t.used }; });
+
+  $('balances').innerHTML = bal.length ? bal.map(function (b) {
+    return '<div class="row row--between" style="gap:var(--s3);padding:var(--s2) var(--s3);' +
+      'background:var(--bg);border:1px solid var(--line);border-radius:var(--r-sm)">' +
+      '<span style="font-size:.75rem;font-weight:500;color:var(--muted)">' + b.name + '</span>' +
+      '<span class="num" style="font-size:.875rem;font-weight:700;color:var(--accent-strong)">' + qty(b.left) + '</span>' +
+      '</div>';
+  }).join('') :
+    '<div class="empty"><span class="empty__icon">' + VHR.icon('scale', 20) + '</span>' +
+    '<h3>No leave balances found</h3><p>Your entitlements appear here once HR opens the leave year.</p></div>';
+
+  /* ---- directory
+     Active colleagues only, alphabetical by first name, minus
+     yourself. The search matches first name, last name or
+     designation — not the code, email or department. */
+  var peers = D.employees
+    .filter(function (e) { return e.status === 'Active' && e.name !== D.me.name; })
+    .sort(function (a, b) { return a.first < b.first ? -1 : a.first > b.first ? 1 : 0; });
+
+  function draw(q) {
+    var term = q.trim().toLowerCase();
+    var list = term ? peers.filter(function (e) {
+      return e.first.toLowerCase().indexOf(term) !== -1 ||
+             e.last.toLowerCase().indexOf(term) !== -1 ||
+             (e.designation || '').toLowerCase().indexOf(term) !== -1;
+    }) : peers;
+
+    $('dircount').textContent = list.length + ' of ' + peers.length + ' colleagues shown';
+
+    if (!list.length) {
+      $('directory').innerHTML = '<li><div class="empty"><span class="empty__icon">' +
+        VHR.icon('users', 20) + '</span><h3>' +
+        (term ? 'No employees match your search' : 'No other active employees found') + '</h3>' +
+        '<p>' + (term ? 'Try a first name, last name or designation.'
+                      : 'Colleagues appear here as soon as HR marks them active.') + '</p></div></li>';
+      return;
+    }
+
+    $('directory').innerHTML = list.map(function (e) {
+      return '<li><button type="button" class="person" data-code="' + e.code + '" ' +
+        'style="width:100%;text-align:left;padding:var(--s2);border-radius:var(--r-sm);border:1px solid transparent">' +
+        '<span class="avatar">' + ini(e.name) + '</span>' +
+        '<span style="min-width:0">' +
+        '<span class="person__name" style="display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">' + e.name + '</span>' +
+        '<span class="person__meta" style="display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">' +
+        (e.designation || 'Employee') + '</span></span></button></li>';
+    }).join('');
+  }
+
+  $('directory').addEventListener('click', function (ev) {
+    var btn = ev.target.closest('button[data-code]');
+    if (btn) details(btn.getAttribute('data-code'));
+  });
+
+  $('dirsearch').addEventListener('input', function () { draw(this.value); });
+  draw('');
+
+  /* ---- colleague modal
+     Read-only: no edit, no message, no footer buttons. The sample
+     payload has no emergency contact for colleagues, so that row
+     shows the em dash the spec asks for. */
+  function details(code) {
+    var e = peers.filter(function (p) { return p.code === code; })[0];
+    if (!e) return;
+
+    var mail = e.email
+      ? '<a href="mailto:' + e.email + '" style="color:var(--accent-strong);text-decoration:underline">' + e.email + '</a>'
+      : '—';
+
+    var lines = [
+      ['Employee ID', '<span class="mono">' + e.code + '</span>'],
+      ['Mail ID', mail],
+      ['Contact No.', '<span class="mono">' + dash(e.phone) + '</span>'],
+      ['Emergency Contact', dash(e.emergency)],
+      ['Date of Joining', '<span class="mono">' + dmy(e.joined) + '</span>'],
+      ['Department', dash(e.department)],
+      ['Designation', dash(e.designation)],
+      ['Reporting Manager', dash(e.manager === '—' ? null : e.manager)]
+    ];
+
+    var body =
+      '<div class="row" style="gap:var(--s4)">' +
+        '<span class="avatar avatar--lg">' + ini(e.name) + '</span>' +
+        '<span><span style="display:block;font-family:var(--font-head);font-size:1.25rem;font-weight:680">' + e.name + '</span>' +
+        '<span class="muted" style="font-size:.875rem">' + (e.designation || 'Employee') + '</span></span>' +
+      '</div>' +
+      '<dl style="border:1px solid var(--line);border-radius:var(--r-sm);background:var(--bg);overflow:hidden">' +
+      lines.map(function (l, i) {
+        var line = i === lines.length - 1 ? '0' : '1px solid var(--line)';
+        return '<div class="row row--between" style="gap:var(--s4);padding:var(--s3);border-bottom:' + line + '">' +
+          '<dt class="muted" style="font-size:.875rem">' + l[0] + '</dt>' +
+          '<dd style="font-size:.875rem;font-weight:500;text-align:right;min-width:0;overflow-wrap:anywhere">' + l[1] + '</dd></div>';
+      }).join('') +
+      '</dl>';
+
+    VHR.modal({ title: 'Employee details', sub: e.department + ' · ' + e.location, body: body, foot: null });
+  }
+})();
+</script>
+</body>
+</html>
