@@ -1,0 +1,31 @@
+{
+  "name": "validurehr-backend",
+  "version": "1.0.0",
+  "description": "ValidureHR - HRMS Portal REST API",
+  "main": "src/server.js",
+  "scripts": {
+    "start": "node src/init.js && node src/server.js",
+    "dev": "node --watch src/server.js",
+    "init": "node src/init.js",
+    "seed:demo": "node src/seed.js",
+    "reset:admin": "node src/resetAdmin.js",
+    "test": "node --test \"test/unit/*.test.js\" \"test/security/*.test.js\"",
+    "test:unit": "node --test \"test/unit/*.test.js\"",
+    "test:security": "node --test \"test/security/*.test.js\""
+  },
+  "dependencies": {
+    "bcryptjs": "^2.4.3",
+    "cors": "^2.8.5",
+    "express": "^4.21.2",
+    "express-rate-limit": "^7.4.1",
+    "helmet": "^8.0.0",
+    "jsonwebtoken": "^9.0.2",
+    "multer": "^2.0.1",
+    "nodemailer": "^9.0.4",
+    "pdfkit": "^0.15.2",
+    "pg": "^8.13.1"
+  },
+  "devDependencies": {
+    "supertest": "^7.0.0"
+  }
+}
