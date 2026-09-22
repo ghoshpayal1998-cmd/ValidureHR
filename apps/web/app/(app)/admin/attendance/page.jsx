@@ -295,14 +295,18 @@ export default function AdminAttendancePage() {
         setBulkLocked(locked);
         setBulkHoliday(data.holiday_name || '');
         const rows = (data.rows || []).map((r) => {
-          /* An unmarked working day starts at Present — that is the baseline
-           * HR is confirming, not a change, so it is not counted as one. */
-          const start = locked || (BULK_STATUSES.includes(r.status) ? r.status : 'Present');
+          /* An unmarked working day starts at Present — the baseline HR is
+           * confirming. But it is not an unchanged Present: nothing is stored
+           * yet, and writing it is the whole point of this dialog, so the
+           * row has to remember that there was no record. */
+          const stored = BULK_STATUSES.includes(r.status) ? r.status : null;
+          const start = locked || stored || 'Present';
           return {
             employee_id: r.employee_id,
             emp_code: r.emp_code,
             name: r.name,
             dept: r.department || 'Unassigned',
+            existed: !!stored,
             was: start,
             now: start,
           };
@@ -337,8 +341,23 @@ export default function AdminAttendancePage() {
       });
   }, [bulkRows, bulkQuery, bulkDept]);
 
-  const bulkDirty = useMemo(
+  /* Two different questions, and collapsing them into one made Save All
+   * impossible on exactly the day this dialog exists for. A day nobody has
+   * marked returns status null on every row, which the dialog shows as
+   * Present — so "differs from what is on screen" is false for all of them
+   * while nothing at all is stored. Mark All Present then set Present over
+   * Present, and the save button stayed disabled at (0). */
+
+  /* What the user has altered — drives the discard prompt and the row tint. */
+  const bulkTouched = useMemo(
     () => (bulkLocked ? [] : (bulkRows || []).filter((r) => r.now !== r.was)),
+    [bulkRows, bulkLocked],
+  );
+
+  /* What has to be written — every row with no stored record, plus every
+   * stored row the user changed. */
+  const bulkDirty = useMemo(
+    () => (bulkLocked ? [] : (bulkRows || []).filter((r) => !r.existed || r.now !== r.was)),
     [bulkRows, bulkLocked],
   );
 
@@ -354,7 +373,9 @@ export default function AdminAttendancePage() {
 
   function requestCloseBulk() {
     if (bulkBusy) return;
-    if (bulkDirty.length) { setAskDiscard(true); return; }
+    /* Only ask about work the user actually did. An untouched unrecorded day
+     * is pending a write, but closing it discards nothing they typed. */
+    if (bulkTouched.length) { setAskDiscard(true); return; }
     closeBulk();
   }
 
