@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import Link from 'next/link';
 import {
   Calculator, CalendarCog, Pencil, Plus, RefreshCw, Save, Scale, ScrollText, Trash2, Users,
 } from 'lucide-react';
@@ -32,13 +33,10 @@ export default function AdminBalancesPage() {
   const [data, setData] = useState(null);
   const [error, setError] = useState('');
 
-  /* The accrual day is a separate settings lookup with a documented default,
-   * so it is held apart from the grid and never blocks it. */
+  /* The accrual day is a second, cheap lookup — derived server-side from the
+   * payroll cycle start day — so it is held apart from the grid and never
+   * blocks it. Read-only here; Settings owns the cycle. */
   const [accrualDay, setAccrualDay] = useState(24);
-  const [editingDay, setEditingDay] = useState(false);
-  const [dayDraft, setDayDraft] = useState('24');
-  const [dayErr, setDayErr] = useState('');
-  const [savingDay, setSavingDay] = useState(false);
 
   /* Rate inputs edit locally — nothing reaches the server until the save icon
    * on that tile is clicked, so a half-typed "1." never becomes a rate. */
@@ -83,7 +81,6 @@ export default function AdminBalancesPage() {
       .then((r) => {
         const d = Number(r?.accrual_day) || 24;
         setAccrualDay(d);
-        setDayDraft(String(d));
       })
       .catch(() => { /* default stands */ });
   };
@@ -101,35 +98,6 @@ export default function AdminBalancesPage() {
       toast(e.message, 'err');
     } finally {
       setRunning(false);
-    }
-  }
-
-  /* ---------------------------------------------------------- accrual day */
-
-  function openDayEdit() {
-    setDayDraft(String(accrualDay));
-    setDayErr('');
-    setEditingDay(true);
-  }
-
-  async function saveDay() {
-    const d = parseInt(dayDraft, 10);
-    if (isNaN(d) || d < 1 || d > 28) {
-      setDayErr('Accrual day must be a number between 1 and 28');
-      return;
-    }
-    setSavingDay(true);
-    try {
-      const res = await api('/balances/accrual-day', { method: 'PUT', body: { accrual_day: d } });
-      toast(res?.message || `Accrual day updated to the ${d}th of every month`, 'ok');
-      setAccrualDay(d);
-      setEditingDay(false);
-      load();
-    } catch (e) {
-      /* leave the strip in edit mode with the typed day still in it */
-      toast(e.message, 'err');
-    } finally {
-      setSavingDay(false);
     }
   }
 
@@ -360,49 +328,18 @@ export default function AdminBalancesPage() {
               >
                 <CalendarCog size={16} aria-hidden="true" style={{ color: 'var(--faint)', flex: 'none' }} />
 
-                {editingDay ? (
-                  <>
-                    <label className="stat__label" htmlFor="accrual-day">Monthly accrual day</label>
-                    <input
-                      id="accrual-day"
-                      className="input"
-                      type="number"
-                      min={1}
-                      max={28}
-                      step={1}
-                      required
-                      value={dayDraft}
-                      disabled={savingDay}
-                      aria-invalid={dayErr ? 'true' : undefined}
-                      aria-describedby={dayErr ? 'accrual-day-error' : undefined}
-                      onChange={(e) => { setDayDraft(e.target.value); setDayErr(''); }}
-                      style={{ width: '5rem', textAlign: 'center', flex: 'none' }}
-                    />
-                    <button className="btn btn--primary btn--sm" onClick={saveDay} disabled={savingDay}>
-                      {savingDay ? 'Saving…' : 'Save'}
-                    </button>
-                    <button
-                      className="btn btn--quiet btn--sm"
-                      onClick={() => { setEditingDay(false); setDayErr(''); setDayDraft(String(accrualDay)); }}
-                      disabled={savingDay}
-                    >
-                      Cancel
-                    </button>
-                    {dayErr && (
-                      <p className="err" id="accrual-day-error" role="alert" style={{ flexBasis: '100%' }}>
-                        {dayErr}
-                      </p>
-                    )}
-                  </>
-                ) : (
-                  <>
-                    <span className="stat__label">Monthly accrual day</span>
-                    <span className="badge badge--info">Day {accrualDay} of the month</span>
-                    <button className="btn btn--quiet btn--sm" onClick={openDayEdit}>
-                      Change accrual day
-                    </button>
-                  </>
-                )}
+                {/* Stated, not edited. The accrual day is derived from the
+                    payroll cycle start day and is deliberately not stored on
+                    its own — see cycle.js. The editor that used to sit here
+                    wrote a setting the accrual engine never reads, answered
+                    with a success message, and left this screen disagreeing
+                    with Settings about the same company. */}
+                <span className="stat__label">Monthly accrual day</span>
+                <span className="badge badge--info">Day {accrualDay} of the month</span>
+                <span className="faint" style={{ fontSize: '.75rem' }}>
+                  follows the payroll cycle — set the cycle start day in{' '}
+                  <Link href="/admin/settings" style={{ color: 'var(--accent)' }}>Settings</Link>
+                </span>
               </div>
 
               {/* ------------------------------ one tile per leave type */}

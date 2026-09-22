@@ -1,7 +1,7 @@
 /* Tenant management endpoints: overview, reports, analytics, org settings,
  * audit log and email log — all permission-gated. */
 const express = require('express');
-const { tq, tqOne } = require('../db');
+const { qOne, tq, tqOne } = require('../db');
 const audit = require('../audit');
 const { sendMail } = require('../mailer');
 const { reconcileLeave } = require('../leaveReconcile');
@@ -391,8 +391,15 @@ router.get('/email-log', requirePerm('settings.manage'), async (req, res, next) 
 // The result lands in the email log with its delivery status.
 router.post('/test-email', requirePerm('settings.manage'), async (req, res, next) => {
   try {
+    /* A platform admin's id comes from `admins`, a tenant user's from the
+     * company's own `users`. Looking every caller up in {s}.users meant an
+     * admin's test mail went to whichever employee happened to share their
+     * id — a real message, to a real person, while the admin watched an
+     * inbox that never received anything and concluded SMTP was broken. */
     const to = req.body?.to
-      || (await tqOne(req.s, 'SELECT email FROM {s}.users WHERE id=$1', [req.user.id]))?.email
+      || (req.user.adm
+        ? (await qOne('SELECT email FROM admins WHERE id=$1', [req.user.id]))?.email
+        : (await tqOne(req.s, 'SELECT email FROM {s}.users WHERE id=$1', [req.user.id]))?.email)
       || null;
     if (!to) return res.status(400).json({ error: 'Provide a "to" address (your account has no email)' });
     const smtpConfigured = !!process.env.SMTP_HOST;

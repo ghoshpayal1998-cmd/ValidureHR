@@ -4,7 +4,7 @@
 const express = require('express');
 const { tq, tqOne } = require('../db');
 const audit = require('../audit');
-const { runAccrualForCompany, ym } = require('../accrual');
+const { runAccrualForCompany, ym, getAccrualDay } = require('../accrual');
 const { authenticate, tenant, requirePerm } = require('../middleware/auth');
 
 const router = express.Router();
@@ -142,27 +142,21 @@ router.post('/run-accrual', async (req, res, next) => {
   } catch (e) { next(e); }
 });
 
-// GET /api/balances/accrual-day — get configured day of month
+/*
+ * GET /api/balances/accrual-day — the day accrual actually credits on.
+ *
+ * DERIVED from cycle_start_day, never stored. These two handlers used to read
+ * and write a separate `accrual_day` setting, but cycle.js abandoned that on
+ * purpose ("DERIVED from this and never read back", and deliberately no
+ * fallback to it), and PUT /admin/org-settings deletes the row outright. So
+ * the old GET reported a number the engine ignores and the old PUT wrote one
+ * nothing would ever read — it answered with a success message, disagreed
+ * with the Settings screen, and changed nothing. There is no PUT here now:
+ * the cycle start day is the single place this is configured.
+ */
 router.get('/accrual-day', async (req, res, next) => {
   try {
-    const row = await tqOne(req.s, `SELECT value FROM {s}.settings WHERE key='accrual_day'`);
-    res.json({ accrual_day: row ? parseInt(row.value, 10) : 24 });
-  } catch (e) { next(e); }
-});
-
-// PUT /api/balances/accrual-day — update day of month
-router.put('/accrual-day', async (req, res, next) => {
-  try {
-    const { accrual_day } = req.body || {};
-    const day = parseInt(accrual_day, 10);
-    if (isNaN(day) || day < 1 || day > 28) {
-      return res.status(400).json({ error: 'Accrual day must be a number between 1 and 28' });
-    }
-    await tq(req.s, `
-      INSERT INTO {s}.settings (key, value) VALUES ('accrual_day', $1)
-      ON CONFLICT (key) DO UPDATE SET value=EXCLUDED.value`, [String(day)]);
-    audit(req, 'ACCRUAL_DAY_SET', `Accrual day set to ${day} of the month`);
-    res.json({ message: `Accrual day updated to the ${day}th of every month` });
+    res.json({ accrual_day: await getAccrualDay(req.s) });
   } catch (e) { next(e); }
 });
 
