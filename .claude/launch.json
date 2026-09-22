@@ -5,8 +5,15 @@
       "name": "vhr-web",
       "runtimeExecutable": "npm",
       "runtimeArgs": ["run", "dev"],
-      "cwd": "frontend",
+      "cwd": "apps/web",
       "port": 3000
+    },
+    {
+      "name": "vhr-api",
+      "runtimeExecutable": "npm",
+      "runtimeArgs": ["run", "dev"],
+      "cwd": "apps/api",
+      "port": 5050
     },
     {
       "name": "vhr-mockup",

@@ -15,7 +15,8 @@ const path = require('path');
 
 const { buildApp } = require('../helpers/testApp');
 
-const MOBILE_JS = path.join(__dirname, '..', '..', '..', 'mobile', 'www', 'js');
+/* Four levels: test/security -> test -> api -> apps -> repo root. */
+const MOBILE_JS = path.join(__dirname, '..', '..', '..', '..', 'mobile', 'www', 'js');
 
 /* ValidureHR has no mobile client yet. These tests guard the contract
  * between the mobile app and this API, so they are kept intact and skip

@@ -1,5 +1,5 @@
 {
-  "name": "validurehr-backend",
+  "name": "@validurehr/api",
   "version": "1.0.0",
   "description": "ValidureHR - HRMS REST API",
   "main": "src/server.js",

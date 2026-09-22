@@ -4,11 +4,17 @@ HR software from Validure Solutions: attendance, leave, payroll and
 documents for the whole company, in one place.
 
 ```
-VHR/
+Validure-HR/
+  apps/
+    web/       the marketing site + product UI (Next.js 15, app router)
+    api/       the REST API (Express + Postgres), ported from F1HR
   mockup/      the clickable design reference — 25 static pages, no backend
-  frontend/    the real app + marketing site (Next.js)
-  backend/     the REST API (Express + Postgres), ported from F1HR
+  package.json npm workspaces root
 ```
+
+An npm workspaces monorepo: one `npm install` at the root installs
+both apps and hoists their dependencies, and the root scripts below
+drive either one.
 
 ## Running it
 
@@ -18,20 +24,22 @@ on Node 24 with Postgres 16.
 ### 1. A database
 
 ```bash
-docker run -d --name vhr-postgres -e POSTGRES_USER=validurehr -e POSTGRES_PASSWORD=validurehr -e POSTGRES_DB=validurehr -p 5432:5432 postgres:16-alpine
+npm run db:up
 ```
 
-Any Postgres will do — point `DATABASE_URL` at it instead. Stop and
-start the container again later with `docker stop vhr-postgres` /
-`docker start vhr-postgres`; the data survives.
+Starts a Postgres 16 container, or restarts the existing one — the
+data survives. `npm run db:down` stops it. Any Postgres will do:
+point `DATABASE_URL` at it instead.
 
 ### 2. The API
 
+Install once, from the root:
+
 ```bash
-cd backend && npm install
+npm install
 ```
 
-It reads `backend/.env`, which is gitignored and already generated on
+The API reads `apps/api/.env`, which is gitignored and already generated on
 this machine. On a fresh checkout, copy `.env.example` and set at
 least these — the API refuses to boot otherwise, on purpose:
 
@@ -50,7 +58,7 @@ node -e "console.log(require('crypto').randomBytes(48).toString('base64url'))"
 Then create the schema and fill it:
 
 ```bash
-cd backend && npm run init && npm run seed:validure && npm run dev
+npm run init && npm run seed && npm run dev:api
 ```
 
 `init` creates the platform schema and the `admin` account from
@@ -75,7 +83,7 @@ Platform admin is `admin` with your `ADMIN_PASSWORD`.
 ### 3. The web app
 
 ```bash
-cd frontend && npm install && npm run dev
+npm run dev
 ```
 
 <http://localhost:3000> — the marketing homepage. `/api/*` proxies to
@@ -87,7 +95,7 @@ exists so far; the API and its data are ready for them.
 ### The mockup
 
 ```bash
-cd mockup && python -m http.server 4173
+npm run mockup
 ```
 
 Worth keeping running: it is the design reference the app is built
@@ -109,7 +117,7 @@ product and the marketing site read as one brand.
 | Labels | JetBrains Mono, uppercase, wide tracking |
 | Cards | 16px radius, hairline border, soft lift |
 
-One stylesheet — `frontend/app/globals.css`, carried over from the
+One stylesheet — `apps/web/app/globals.css`, carried over from the
 mockup — holds every token. Nothing hard-codes a colour, which is
 what makes the dark theme work at all.
 
@@ -120,7 +128,7 @@ teal→cyan axis until it clears 4.5:1 as text.
 
 ### Logo
 
-`assets/brand/` (and `frontend/public/brand/`) hold variants derived
+`mockup/assets/brand/` (and `apps/web/public/brand/`) hold variants derived
 from the master `validure-logo.svg`, which is kept as supplied.
 
 The master is auto-traced: 953 paths across an 18-step ramp from brand
@@ -140,7 +148,7 @@ the supplied asset exactly.
   text, table headers, heading order, classes matching no CSS rule,
   raw colours, empty containers). A static scan of these pages reports
   mostly phantoms, because the markup is built in JS.
-- `cd backend && npm test` — 287 tests covering authorization, JWT
+- `npm test` — 287 tests covering authorization, JWT
   handling, data access, uploads, cron auth, the payroll cycle and the
   storage drivers.
 

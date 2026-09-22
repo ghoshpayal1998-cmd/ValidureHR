@@ -18,7 +18,8 @@ const fs = require('fs');
 const path = require('path');
 const vm = require('vm');
 
-const API_JS = path.join(__dirname, '..', '..', '..', 'mobile', 'www', 'js', 'api.js');
+/* Four levels: test/security -> test -> api -> apps -> repo root. */
+const API_JS = path.join(__dirname, '..', '..', '..', '..', 'mobile', 'www', 'js', 'api.js');
 
 /* ValidureHR has no mobile client yet. These tests guard the escaping
  * contract in the mobile API client, so they are kept intact and skip
@@ -179,7 +180,7 @@ function htmlTemplates(source) {
 }
 
 test('the mobile pages do not interpolate known server fields unescaped into HTML', { skip: MOBILE_ABSENT }, () => {
-  const jsDir = path.join(__dirname, '..', '..', '..', 'mobile', 'www', 'js');
+  const jsDir = path.join(__dirname, '..', '..', '..', '..', 'mobile', 'www', 'js');
   const files = [
     ...fs.readdirSync(path.join(jsDir, 'pages')).filter((f) => f.endsWith('.js')).map((f) => path.join('pages', f)),
     'app.js',

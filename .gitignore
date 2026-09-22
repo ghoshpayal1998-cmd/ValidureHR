@@ -3,16 +3,18 @@ Thumbs.db
 .DS_Store
 *.swp
 
-# nothing is built here — the mockup is served as-is
+# dependencies (npm workspaces hoists to the root)
 node_modules/
 
-# backend
-backend/node_modules/
-backend/.env
-backend/uploads/
-backend/logs/
+# secrets — never commit
+.env
+.env.local
+apps/api/.env
 
-# frontend
-frontend/node_modules/
-frontend/.next/
-frontend/out/
+# build output
+apps/web/.next/
+apps/web/out/
+
+# runtime
+apps/api/uploads/
+apps/api/logs/
