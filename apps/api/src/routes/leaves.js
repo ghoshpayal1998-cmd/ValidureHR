@@ -236,9 +236,18 @@ router.put('/:id', leaveDocUpload.single('document'), async (req, res, next) => 
     const days = workingDays(from_date, to_date, await holidaySet(req.s));
     if (days <= 0) return res.status(400).json({ error: 'Selected range has no working days' });
 
-    // unpaid status follows the CURRENT probation state
+    /*
+     * Unpaid follows the leave TYPE as well as the current probation state —
+     * the same rule POST /apply applies. Deciding it from probation alone ran
+     * the balance check against Unpaid Leave, whose balance is always zero,
+     * so an employee not on probation could never edit an unpaid request:
+     * saving an unchanged reason answered "Insufficient balance: 0.00 day(s)
+     * available", and the Edit button could not be made to work at all.
+     */
+    const editType = await tqOne(req.s, 'SELECT code FROM {s}.leave_types WHERE id=$1', [leave_type_id]);
     const { onProbation } = await probationOf(req.s, row.employee_id);
-    if (!onProbation) {
+    const unpaid = editType?.code === 'UL' || onProbation;
+    if (!unpaid) {
       const bal = await tqOne(req.s,
         `SELECT (accrued - used) AS balance FROM {s}.leave_balances WHERE employee_id=$1 AND leave_type_id=$2`,
         [row.employee_id, leave_type_id]);
@@ -262,7 +271,7 @@ router.put('/:id', leaveDocUpload.single('document'), async (req, res, next) => 
       SET leave_type_id=$1, from_date=$2, to_date=$3, days=$4, reason=$5, is_unpaid=$6,
           attachment_file=COALESCE($7, attachment_file)
       WHERE id=$8`,
-      [leave_type_id, from_date, to_date, days, reason, onProbation,
+      [leave_type_id, from_date, to_date, days, reason, unpaid,
         req.file ? req.file.filename : null, row.id]);
 
     const emp = await tqOne(req.s,
@@ -274,7 +283,7 @@ router.put('/:id', leaveDocUpload.single('document'), async (req, res, next) => 
       `  Reason   : ${reason}\n\nReview it in the ValidureHR portal (Leave Approvals).`);
 
     audit(req, 'LEAVE_EDITED', `Leave #${row.id} edited by owner (${from_date} to ${to_date}, ${days} day(s))`);
-    res.json({ message: 'Leave application updated', days, is_unpaid: onProbation });
+    res.json({ message: 'Leave application updated', days, is_unpaid: unpaid });
   } catch (e) { next(e); }
 });
 

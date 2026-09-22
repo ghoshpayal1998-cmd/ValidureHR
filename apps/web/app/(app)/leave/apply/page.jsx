@@ -20,20 +20,25 @@ function utcOf(value) {
   return Date.UTC(y, m - 1, d);
 }
 
-/* Weekends come off here so the employee sees a count before submitting.
- * Declared holidays come off server-side, so this is the ceiling, never an
- * under-count — the line that shows it says as much. */
-function countDays(from, to) {
+/* Weekends AND declared holidays come off here, so the count the employee
+ * sees is the one the server will charge them — workingDays() in
+ * routes/leaves.js subtracts exactly the same two things. Counting weekends
+ * alone made this a ceiling, which was fine for the day count but not for the
+ * overdrawn banner built on top of it: a range covering a company holiday was
+ * told the request would be refused when the server would have accepted it. */
+function countDays(from, to, holidays) {
   const end = utcOf(from) <= utcOf(to) ? utcOf(to) : utcOf(from);
   let working = 0;
   let weekend = 0;
+  let holiday = 0;
   let guard = 0;
   for (let t = utcOf(from); t <= end && guard < 400; t += DAY_MS, guard += 1) {
     const wd = new Date(t).getUTCDay();
-    if (wd === 0 || wd === 6) weekend += 1;
-    else working += 1;
+    if (wd === 0 || wd === 6) { weekend += 1; continue; }
+    if (holidays && holidays.has(new Date(t).toISOString().slice(0, 10))) { holiday += 1; continue; }
+    working += 1;
   }
-  return { working, weekend };
+  return { working, weekend, holiday };
 }
 
 const STEPS = [
@@ -69,11 +74,19 @@ export default function ApplyLeavePage() {
    * the page as well as in the toast that announces it. */
   const [notice, setNotice] = useState(null);
 
+  /* GET /admin/holidays carries no requirePerm, so an ordinary employee can
+   * read the company calendar — which is what makes an exact count possible
+   * here. A failure is not fatal: the count falls back to the old ceiling. */
+  const [holidays, setHolidays] = useState(null);
+
   const load = () => {
     setError('');
     Promise.all([api('/leaves/types'), api('/leaves/balance')])
       .then(([t, b]) => { setTypes(t || []); setBalance(b || null); })
       .catch((e) => setError(e.message));
+    api('/admin/holidays')
+      .then((rows) => setHolidays(new Set((rows || []).map((h) => String(h.date).slice(0, 10)))))
+      .catch(() => setHolidays(new Set()));
   };
   useEffect(load, []);
 
@@ -110,7 +123,7 @@ export default function ApplyLeavePage() {
   /* Single-day mode reuses the from-date field, so both ends are the one day. */
   const from = fromDate;
   const to = singleDay ? fromDate : toDate;
-  const counted = from && to && to >= from ? countDays(from, to) : null;
+  const counted = from && to && to >= from ? countDays(from, to, holidays) : null;
 
   /* Unpaid leave is not drawn from a balance, and on probation the balance is
    * locked, so neither case can overdraw. */
@@ -454,7 +467,12 @@ export default function ApplyLeavePage() {
                           {counted.weekend
                             ? ` · ${counted.weekend} weekend ${counted.weekend === 1 ? 'day' : 'days'} excluded`
                             : ''}
-                          {' · declared holidays come off when it is processed'}
+                          {/* Holidays are now subtracted here rather than only on the
+                              server, so this states what was taken off instead of
+                              warning that something still will be. */}
+                          {counted.holiday
+                            ? ` · ${counted.holiday} company ${counted.holiday === 1 ? 'holiday' : 'holidays'} excluded`
+                            : ''}
                         </span>
                       </div>
                     )}
