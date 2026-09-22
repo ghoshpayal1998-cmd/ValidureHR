@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { BadgeCheck, CalendarCheck, Check, Clock } from 'lucide-react';
-import { api, fmtDay, getUser, initials } from '@/lib/api';
+import { api, fmtDay, getUser, initials, isOnProbation } from '@/lib/api';
 import { Empty, ErrorNote, PageHead, Skeleton, StatusBadge, useToast } from '@/components/ui';
 
 const TILES = [
@@ -57,7 +57,7 @@ export default function HomePage() {
 
   const { profile, widgets, upcomingHolidays, upcomingBirthdays, announcements, teamLeaves } = data;
   const punch_ = widgets.todayPunch || {};
-  const onProbation = profile.probation_until && profile.probation_until >= widgets.month;
+  const onProbation = isOnProbation(profile.probation_until);
 
   return (
     <div className="page">

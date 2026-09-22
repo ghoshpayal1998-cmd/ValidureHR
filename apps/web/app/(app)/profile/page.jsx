@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState } from 'react';
 import { CalendarX, Check, Clock, ExternalLink, Search, Upload, UserRound } from 'lucide-react';
-import { api, fmtDate, hasPerm, initials, openProtectedFile } from '@/lib/api';
+import { api, fmtDate, hasPerm, initials, isOnProbation, openProtectedFile } from '@/lib/api';
 import { ConfirmModal, Empty, ErrorNote, Field, Modal, PageHead, Skeleton, StatusBadge, useToast } from '@/components/ui';
 
 /* Present counts a Half Day as 0.5, so both tiles can be fractional. */
@@ -113,7 +113,7 @@ export default function ProfilePage() {
   }
 
   const me = fullName(profile);
-  const onProbation = profile.probation_until && profile.probation_until >= widgets.month;
+  const onProbation = isOnProbation(profile.probation_until);
   const canUpload = hasPerm('employees.manage');
 
   /* Unpaid Leave is a bookkeeping type, not an entitlement — it never has a

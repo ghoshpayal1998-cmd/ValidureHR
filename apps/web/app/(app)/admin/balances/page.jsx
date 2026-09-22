@@ -5,7 +5,7 @@ import Link from 'next/link';
 import {
   Calculator, CalendarCog, Pencil, Plus, RefreshCw, Save, Scale, ScrollText, Trash2, Users,
 } from 'lucide-react';
-import { api, fmtDateTime, fmtDay } from '@/lib/api';
+import { api, fmtDateTime, fmtDay, isOnProbation } from '@/lib/api';
 import {
   ConfirmModal, Empty, ErrorNote, Field, Modal, PageHead, Skeleton, StatusBadge, useToast,
 } from '@/components/ui';
@@ -604,8 +604,7 @@ export default function AdminBalancesPage() {
             <div className="stack" style={{ gap: 'var(--s4)' }}>
               {/* probation is decided against the period the API just sent,
                   never against the browser clock */}
-              {ledger.employee?.probation_until
-                && ledger.employee.probation_until >= data.current_period && (
+              {isOnProbation(ledger.employee?.probation_until) && (
                 <div
                   className="row"
                   style={{

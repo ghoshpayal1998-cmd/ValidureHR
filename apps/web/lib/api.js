@@ -152,6 +152,32 @@ export async function openProtectedFile(path, download = false, filename = 'docu
   setTimeout(() => URL.revokeObjectURL(url), 60000);
 }
 
+/* ---------------------------------------------------------------- dates */
+
+/* The viewer's own calendar day, as YYYY-MM-DD. Server dates are compared as
+ * strings, so this returns the same shape rather than a Date. Which day it is
+ * for the person reading the screen is the one question their local clock is
+ * the right authority on. */
+export function todayISO() {
+  const n = new Date();
+  const p = (v) => String(v).padStart(2, '0');
+  return `${n.getFullYear()}-${p(n.getMonth() + 1)}-${p(n.getDate())}`;
+}
+
+/*
+ * Probation runs to the end of `probation_until` inclusive — the server's rule
+ * is `today <= until` (probationOf in routes/leaves.js).
+ *
+ * Three screens compared that full date against a YYYY-MM period string
+ * instead. String comparison makes "2026-09-04" >= "2026-09" true, so a
+ * probation that ended on the 4th went on announcing itself for the rest of
+ * September — on the dashboard, on the profile and in the balance ledger,
+ * while the API had already started deducting leave normally.
+ */
+export function isOnProbation(until) {
+  return !!until && todayISO() <= String(until).slice(0, 10);
+}
+
 /* ---------------------------------------------------------------- format */
 
 /* The server clock is not IST, so dates arrive as plain YYYY-MM-DD strings and
