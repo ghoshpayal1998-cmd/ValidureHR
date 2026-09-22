@@ -102,11 +102,23 @@ worse than a failed deploy.
 
 **First boot.** The service runs `init` before `server` and creates the
 schema and the platform admin automatically. To load the demo company,
-run once from a shell with the same `DATABASE_URL`:
+run once from a shell with the same `DATABASE_URL`, from the repo root:
 
 ```bash
-npm run seed --workspace @validurehr/api
+npm run seed
 ```
+
+That is `seed:validure` in `apps/api` — there is no plain `seed` script
+inside the workspace, so `npm run seed --workspace @validurehr/api`
+fails. It creates Validure Solutions Pvt. Ltd. with 24 employees, a
+month of attendance, 18 leave applications, three months of payslips,
+six policies and an appointment letter per employee.
+
+**Re-running the seed drops and recreates that one company**, which
+changes its id and invalidates every token already issued for it.
+Anyone signed in gets "Company not found" until they sign in again.
+That is fine on a demo, and worth knowing before you do it on anything
+someone is using.
 
 ---
 
@@ -142,14 +154,40 @@ curl https://<render-url>/api/health
 # {"status":"ok","service":"ValidureHR API"}
 ```
 
-Then open the Netlify URL, sign in as `VS-0101` / the seeded password,
-and confirm the dashboard loads its own data rather than an error.
+Then open the Netlify URL and sign in. The seed prints the accounts; the
+password is `Validure@123` for all of them:
+
+| Code | Who | Sees |
+|---|---|---|
+| `VS-0101` | Vikram Rao, Owner | everything, including Analytics |
+| `VS-0104` | Sneha Nair, HR | all management screens except Analytics |
+| `VS-0113` | Ananya Iyer, Employee | own attendance, leave and documents only |
+
+Worth checking all three, because the nav is built from granted
+permissions: an employee should see **no MANAGEMENT section at all**,
+not a greyed-out one, and typing `/admin/employees` directly should
+answer "Missing permission: employees.view" rather than render anything.
+
+Change `Validure@123` before anyone real uses this, and change
+`ADMIN_PASSWORD` from whatever you first set.
 
 ---
 
-## What is not deployable yet
+## State of the three accounts
 
-`apps/web` currently contains **only the marketing homepage**. There is
-no `/login` and no product UI — those screens are still to be built.
-Deploying today gets you a working marketing site and a working API with
-nothing in front of it.
+Checked 22 September 2026, read-only:
+
+| | |
+|---|---|
+| Supabase | **no projects** — step 1 creates the first |
+| Render | workspace `supriyopachal772.sp@gmail.com`, **no services** |
+| Netlify | team `6a85e4f280349a4758260650`, two projects: `msworkliva` and `validure` |
+
+`validure` is serving **www.validuresolutions.com** right now. ValidureHR
+is not among them and must be created as a third, separate project.
+
+## What is deployable
+
+All of it. `apps/web` has the marketing homepage, sign-in and 24 product
+screens; `apps/api` has the full backend with 266 passing tests. The
+production build compiles all 27 routes.

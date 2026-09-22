@@ -89,8 +89,25 @@ npm run dev
 <http://localhost:3000> — the marketing homepage. `/api/*` proxies to
 port 5050 (`API_PROXY_URL` to change that).
 
-**The product screens are not built yet.** Only the marketing site
-exists so far; the API and its data are ready for them.
+Sign in at `/login`. Twenty-four product screens sit behind it: the
+employee's home, profile, attendance calendar, the four leave screens
+and three document screens, plus twelve management screens and the
+platform company switcher.
+
+**The sidebar is built from granted permissions**, so what you see
+depends on who you sign in as. An employee gets no MANAGEMENT section
+at all — not a disabled one. HR gets every management screen except
+Analytics, which belongs to Owner and Director. Try `VS-0113` and
+`VS-0104` side by side; it is the fastest way to see the model.
+
+### What a screen may assume
+
+`docs/api-shapes.md` records what every endpoint really returns, and
+opens with a query-parameter table scanned out of the route source.
+Read it before building a URL: `year` and `month` are **two separate
+integers**, because the API parses them with `parseInt`. A combined
+`?month=2026-09` arrives as month 2026 and the screen fills with wrong
+numbers and no error. `apps/web/CONTRACT.md` has the rest of the rules.
 
 ### The mockup
 
