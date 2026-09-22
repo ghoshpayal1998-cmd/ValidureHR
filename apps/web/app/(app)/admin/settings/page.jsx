@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import {
-  Building2, CalendarDays, IdCard, Megaphone, Plus, ScrollText, Settings2, Trash2,
+  Building2, CalendarDays, IdCard, Lock, Megaphone, Plus, ScrollText, Settings2, Trash2,
 } from 'lucide-react';
 import { api, fmtDateTime, fmtDay, hasPerm } from '@/lib/api';
 import {
@@ -84,10 +84,15 @@ export default function AdminSettingsPage() {
   const load = () => {
     setError('');
     const fail = (e) => setError(e.message);
-    api('/admin/org-settings').then(setSettings).catch(fail);
     api('/admin/departments').then(setDepartments).catch(fail);
     api('/admin/designations').then(setDesignations).catch(fail);
     api('/admin/holidays').then(setHolidays).catch(fail);
+    /* The other three need settings.manage. Firing them anyway turned a
+     * missing permission into three 403s sharing one banner, and left the
+     * three cards on a skeleton that never resolved — the screen looked like
+     * it was still loading, permanently. */
+    if (!canManage) return;
+    api('/admin/org-settings').then(setSettings).catch(fail);
     api('/admin/announcements').then(setAnnouncements).catch(fail);
     api('/admin/audit-logs?limit=50').then(setLogs).catch(fail);
   };
@@ -223,7 +228,13 @@ export default function AdminSettingsPage() {
             </div>
           </div>
 
-          {!settings ? (
+          {!canManage ? (
+            <Empty
+              icon={Lock}
+              title="Restricted"
+              body="The payroll cycle and probation defaults need the settings.manage permission."
+            />
+          ) : !settings ? (
             <Skeleton rows={3} />
           ) : (
             <div className="card__body">
@@ -521,7 +532,13 @@ export default function AdminSettingsPage() {
                 </form>
               )}
 
-              {!announcements ? (
+              {!canManage ? (
+                <Empty
+                  icon={Lock}
+                  title="Restricted"
+                  body="Announcements need the settings.manage permission. They still reach you on the home page."
+                />
+              ) : !announcements ? (
                 <Skeleton rows={3} height={52} />
               ) : announcements.length === 0 ? (
                 <Empty
@@ -580,7 +597,13 @@ export default function AdminSettingsPage() {
             </div>
           </div>
 
-          {!logs ? (
+          {!canManage ? (
+            <Empty
+              icon={Lock}
+              title="Restricted"
+              body="The audit log needs the settings.manage permission."
+            />
+          ) : !logs ? (
             <Skeleton rows={6} />
           ) : logs.length === 0 ? (
             <Empty

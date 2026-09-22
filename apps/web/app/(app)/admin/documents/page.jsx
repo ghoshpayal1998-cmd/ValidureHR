@@ -388,19 +388,24 @@ export default function AdminDocumentsPage() {
 
                 <span className="spacer" />
 
-                {canManage && (
+                {/* A slip cannot be filed without an employee, and the picker
+                    needs employees.view. Without it, `canSeeEmployees && !selectedEmp`
+                    evaluated to false — so these buttons were ENABLED with nothing
+                    selected and posted employee_id 0, which cleared the route's
+                    required-field guard and then tripped the employees foreign key. */}
+                {canManage && canSeeEmployees && (
                   <>
                     <button
                       className="btn btn--ghost btn--sm"
                       onClick={openSlipUpload}
-                      disabled={canSeeEmployees && !selectedEmp}
+                      disabled={!selectedEmp}
                     >
                       <FileUp size={16} aria-hidden="true" />Upload PDF slip
                     </button>
                     <button
                       className="btn btn--primary btn--sm"
                       onClick={openGenerate}
-                      disabled={canSeeEmployees && !selectedEmp}
+                      disabled={!selectedEmp}
                     >
                       <Plus size={16} aria-hidden="true" />Generate slip
                     </button>
@@ -422,7 +427,7 @@ export default function AdminDocumentsPage() {
                     icon={FileText}
                     title="No salary slips for this employee."
                     body="Every slip issued to them — generated from amounts here, or uploaded as a ready-made PDF — appears in this list, newest first."
-                    action={canManage ? (
+                    action={canManage && canSeeEmployees ? (
                       <button className="btn btn--primary btn--sm" onClick={openGenerate}>
                         <Plus size={16} aria-hidden="true" />Generate slip
                       </button>

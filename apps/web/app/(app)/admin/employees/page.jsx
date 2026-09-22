@@ -4,7 +4,7 @@ import { useEffect, useMemo, useState } from 'react';
 import {
   Eye, Image as ImageIcon, KeyRound, Pencil, Plus, Search, Trash2, Users,
 } from 'lucide-react';
-import { api, fmtDate, hasPerm, initials, openProtectedFile } from '@/lib/api';
+import { api, fmtDate, getUser, hasPerm, initials, openProtectedFile } from '@/lib/api';
 import {
   ConfirmModal, Empty, ErrorNote, Field, Modal, PageHead, Skeleton, StatusBadge, useToast,
 } from '@/components/ui';
@@ -67,6 +67,10 @@ function toForm(e) {
 export default function AdminEmployeesPage() {
   const toast = useToast();
   const canManage = hasPerm('employees.manage');
+  /* GET /employees/:id/photo allows employees.manage or the employee
+   * themselves. The session carries emp_code but no employee id, and the
+   * roster rows carry emp_code too, so that is what the two are matched on. */
+  const selfCode = getUser()?.employee?.emp_code || null;
   const today = todayIST();
 
   const [rows, setRows] = useState(null);
@@ -395,7 +399,11 @@ export default function AdminEmployeesPage() {
                               className="row"
                               style={{ gap: 'var(--s1)', justifyContent: 'flex-end', flexWrap: 'nowrap' }}
                             >
-                              {e.photo_file && (
+                              {/* Offered only to someone the photo route will
+                                  actually serve — otherwise the eye opened a blank
+                                  tab, took a 403 and read as broken rather than
+                                  unavailable. */}
+                              {e.photo_file && (canManage || e.emp_code === selfCode) && (
                                 <button
                                   className="iconbtn"
                                   onClick={() => viewPhoto(e)}

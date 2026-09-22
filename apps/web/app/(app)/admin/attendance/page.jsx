@@ -148,8 +148,18 @@ export default function AdminAttendancePage() {
 
   /* ------------------------------------------------ loaders */
 
+  /*
+   * The roster only feeds the employee picker, and /employees gates on
+   * employees.view — a different permission from the two this screen runs on.
+   * A role holding attendance.view_all and attendance.manage alone used to
+   * get the whole page replaced by "Missing permission: employees.view",
+   * including the day overview and the calendar their own permission covers.
+   * Without employees.view the picker is built from the day overview instead,
+   * which is gated on attendance.view_all and names everybody anyway.
+   */
   const loadRoster = useCallback(() => {
     setRosterError('');
+    if (!hasPerm('employees.view')) { setRoster(null); return; }
     api('/employees')
       .then((list) => {
         const sorted = [...list].sort((a, b) => (a.emp_code < b.emp_code ? -1 : 1));
@@ -195,7 +205,18 @@ export default function AdminAttendancePage() {
     setDayError('');
     setDayData(null);
     api(`/attendance/overview?date=${day}`)
-      .then(setDayData)
+      .then((d) => {
+        setDayData(d);
+        /* Fallback picker for a caller without employees.view: the same
+         * people, named by the endpoint they are allowed to read. */
+        if (!hasPerm('employees.view')) {
+          const sorted = [...(d.rows || [])]
+            .map((r) => ({ id: r.employee_id, emp_code: r.emp_code, first_name: r.name, last_name: '' }))
+            .sort((a, b) => (a.emp_code < b.emp_code ? -1 : 1));
+          setRoster(sorted);
+          setEmpId((cur) => cur || (sorted[0] ? String(sorted[0].id) : ''));
+        }
+      })
       .catch((e) => setDayError(e.message));
   }, [day]);
   useEffect(loadDay, [loadDay]);
