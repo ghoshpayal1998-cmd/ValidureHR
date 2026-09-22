@@ -1,0 +1,39 @@
+# Netlify build config — ValidureHR web app.
+#
+# Base is the repo root, not apps/web: this is an npm workspaces monorepo, so
+# dependencies hoist to the root and installing from inside apps/web alone
+# leaves it without them.
+#
+# The Next.js runtime plugin is declared explicitly. Relying on auto-detection
+# published a raw .next folder statically on F1HR and every route 404'd.
+
+[build]
+  base = ""
+  command = "npm run build --workspace @validurehr/web"
+  publish = "apps/web/.next"
+
+[[plugins]]
+  package = "@netlify/plugin-nextjs"
+
+[build.environment]
+  NODE_VERSION = "20"
+  # next.config.mjs skips output:'standalone' when this is set — Netlify's
+  # runtime does not support it and falls back to broken static hosting.
+  NETLIFY = "true"
+
+# The browser calls /api/* on its own origin; Netlify forwards to Render so
+# there is no cross-origin preflight and no CORS surface to get wrong.
+# API_BASE is set in the Netlify UI to the Render service URL.
+[[redirects]]
+  from = "/api/*"
+  to = "https://REPLACE-WITH-RENDER-URL.onrender.com/api/:splat"
+  status = 200
+  force = true
+
+[[headers]]
+  for = "/*"
+  [headers.values]
+    X-Frame-Options = "DENY"
+    X-Content-Type-Options = "nosniff"
+    Referrer-Policy = "strict-origin-when-cross-origin"
+    Permissions-Policy = "geolocation=(), microphone=(), camera=()"
