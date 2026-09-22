@@ -221,6 +221,10 @@ export default function AttendancePage() {
   const summary = data.summary || {};
   const days = buildDays(data, ym);
   const leaveDays = summary.leaveDays || 0;
+  /* Loss of pay is a working day too, and it is the one that costs a day's
+   * pay — so it is named separately rather than folded into "leave". */
+  const lopDays = summary.lopDays || 0;
+  const offDays = leaveDays + lopDays;
 
   /* Weekends and holidays are on the calendar, not in the table — this list
      is the working-day record, in date order. A day the reader has not lived
@@ -269,11 +273,18 @@ export default function AttendancePage() {
               </div>
             ))}
           </div>
-          {leaveDays > 0 && (
+          {offDays > 0 && (
             <p className="faint" style={{ fontSize: '.75rem', marginTop: 'var(--s3)' }}>
-              {leaveDays} approved leave {leaveDays === 1 ? 'day' : 'days'} this period
-              {leaveDays === 1 ? ' is ' : ' are '}drawn on the calendar and listed below, but counted by
-              none of these six tiles — so the day types will not add up to working days.
+              {leaveDays > 0 && (
+                <>{leaveDays} approved leave {leaveDays === 1 ? 'day' : 'days'}</>
+              )}
+              {leaveDays > 0 && lopDays > 0 ? ' and ' : ''}
+              {lopDays > 0 && (
+                <>{lopDays} loss-of-pay {lopDays === 1 ? 'day' : 'days'}</>
+              )}
+              {' '}this period {offDays === 1 ? 'is' : 'are'} drawn on the calendar and listed below,
+              but counted by none of these six tiles — so the day types will not add up to working
+              days.
             </p>
           )}
         </div>

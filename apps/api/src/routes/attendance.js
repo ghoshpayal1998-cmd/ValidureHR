@@ -89,14 +89,34 @@ async function monthGrid(schema, empId, year, month) {
   return { records, totalWorkingDays, period: { from, to, label: cycleLabel(year, month, startDay) } };
 }
 
+/*
+ * Every working day a record can carry has to land in exactly one counter.
+ *
+ * totalWorkingDays counts every non-weekend, non-holiday day in the cycle,
+ * but this only recognised 'Leave' — so EL, SL and LOP, which HR can set from
+ * both the edit and the bulk dialog, were counted by nothing. A month with
+ * five sick days showed 15 present out of 21 working with a six-day hole and
+ * no line on the screen explaining it, because the caption that exists to
+ * explain exactly that keys off leaveDays.
+ *
+ * LOP is kept apart from the paid leave codes: it is the one that costs the
+ * employee a day's pay, so it is not folded into a figure labelled "leave".
+ */
+const PAID_LEAVE = new Set(['Leave', 'EL', 'SL']);
+
 function summarize(records, totalWorkingDays) {
-  const s = { totalWorkingDays, presentDays: 0, absentDays: 0, halfDays: 0, wfhDays: 0, leaveDays: 0, lateMarks: 0 };
+  const s = {
+    totalWorkingDays,
+    presentDays: 0, absentDays: 0, halfDays: 0, wfhDays: 0,
+    leaveDays: 0, lopDays: 0, lateMarks: 0,
+  };
   for (const r of records) {
     if (r.status === 'Present') s.presentDays++;
     if (r.status === 'Absent') s.absentDays++;
     if (r.status === 'Half Day') s.halfDays++;
     if (r.status === 'WFH') s.wfhDays++;
-    if (r.status === 'Leave') s.leaveDays++;
+    if (PAID_LEAVE.has(r.status)) s.leaveDays++;
+    if (r.status === 'LOP') s.lopDays++;
     if (r.late_mark) s.lateMarks++;
   }
   return s;
