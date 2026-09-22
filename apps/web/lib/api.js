@@ -106,23 +106,49 @@ export async function api(path, options = {}) {
 /* Documents sit behind auth, so they cannot be a plain href. Fetch as a blob
  * with the token attached, then hand the browser an object URL. */
 export async function openProtectedFile(path, download = false, filename = 'document.pdf') {
-  const res = await fetch(`${API_BASE}${path}`, { headers: authHeaders(), cache: 'no-store' });
+  /* A tab opened *after* the await has lost the click that authorised it, and
+   * Safari and Firefox then swallow it with no error at all — the button just
+   * appears dead. Claim the tab synchronously, while the gesture still counts,
+   * and point it at the blob once that arrives. */
+  const tab = download ? null : window.open('', '_blank');
+  if (tab) {
+    tab.document.write(
+      '<!doctype html><meta charset="utf-8"><title>Opening…</title>'
+      + '<p style="font:14px/1.5 system-ui,sans-serif;padding:2rem">Opening document…</p>',
+    );
+    tab.document.close();
+  }
+
+  let res;
+  try {
+    res = await fetch(`${API_BASE}${path}`, { headers: authHeaders(), cache: 'no-store' });
+  } catch (e) {
+    if (tab) tab.close();
+    throw e;
+  }
   if (!res.ok) {
+    if (tab) tab.close();
     let msg = 'Could not open that document';
     try { msg = (await res.json()).error || msg; } catch { /* not json */ }
     throw new Error(msg);
   }
+
   const url = URL.createObjectURL(await res.blob());
-  if (download) {
+  const save = () => {
     const a = document.createElement('a');
     a.href = url;
     a.download = filename;
     document.body.appendChild(a);
     a.click();
     a.remove();
-  } else {
-    window.open(url, '_blank');
-  }
+  };
+
+  if (download) save();
+  else if (tab) tab.location.replace(url);
+  /* Blocked despite the gesture. Save the file rather than leave the click
+   * with nothing to show for it. */
+  else save();
+
   setTimeout(() => URL.revokeObjectURL(url), 60000);
 }
 

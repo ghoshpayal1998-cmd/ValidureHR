@@ -1,7 +1,34 @@
-# API response shapes
+# API request and response shapes
 
 Recorded live against the seeded Validure Solutions company.
 Build screens against these, not against what a route name implies.
+
+## Query parameters — read this first
+
+Scanned out of `apps/api/src/routes/*.js`, so it cannot drift from the
+code. **`year` and `month` are two separate integers.** The API reads
+them with `parseInt`, so a combined `?month=2026-09` arrives as month
+2026 and the response describes a period that does not exist — no error,
+just wrong data. `/attendance/overview` is the odd one out: it takes a
+single `date`, not a month.
+
+| Route | Query parameters |
+| --- | --- |
+| `GET /admin/audit-logs` | `limit` |
+| `GET /admin/email-log` | `limit` |
+| `GET /admin/leave-reconciliation` | `since` |
+| `GET /admin/reports/attendance-summary` | `month`, `year` |
+| `GET /attendance/employee/:id` | `month`, `year` |
+| `GET /attendance/export` | `month`, `year` |
+| `GET /attendance/me` | `month`, `year` |
+| `GET /attendance/overview` | `date` |
+| `GET /documents/offer-letters` | `employee_id` |
+| `GET /documents/salary-slips` | `employee_id` |
+| `GET /employees` | `q` |
+| `GET /leaves` | `status` |
+| `GET /leaves/calendar` | `month`, `year` |
+
+Every other route takes none.
 
 
 ## employee
@@ -69,7 +96,7 @@ Build screens against these, not against what a route name implies.
   }
   announcements: [4] of {
     title: string ("Ganesh Chaturthi — office closed")
-    body: string ("The Bengaluru and Pune offices will be…")
+    body: string ("The Bengaluru and Pune offices will be...")
     date: string ("2026-09-14")
   }
   teamLeaves: [] (empty)
@@ -121,7 +148,7 @@ Build screens against these, not against what a route name implies.
 }
 ```
 
-### `GET /attendance/me`
+### `GET /attendance/me?year=2026&month=9`
 
 ```
 {
@@ -288,47 +315,47 @@ Build screens against these, not against what a route name implies.
     emp_code: string ("VS-0122")
     employee_name: string ("Arjun Kulkarni")
   }
-  recentAudit: [5] of {
+  recentAudit: [8] of {
     actor: string ("VS-0113")
     action: string ("LOGIN")
     details: string ("EMPLOYEE login (VS-0113)")
-    timestamp: string ("2026-09-22 17:04:13")
+    timestamp: string ("2026-09-22 19:35:03")
   }
   today: string ("2026-09-22")
 }
 ```
 
-### `GET /admin/analytics` — **403**
+### `GET /admin/analytics` - **403**
 
 ```
 Missing permission: analytics.view
 ```
 
-### `GET /admin/reports/attendance-summary?month=2026-09`
+### `GET /admin/reports/attendance-summary?year=2026&month=9`
 
 ```
 {
   year: number (2026)
-  month: number (2026)
+  month: number (9)
   period: {
-    from: string ("2026-2025-25")
-    to: string ("2026-2026-24")
+    from: string ("2026-08-25")
+    to: string ("2026-09-24")
   }
   rows: [24] of {
     emp_code: string ("VS-0101")
     name: string ("Vikram Rao")
     department: string ("Engineering")
-    present: number (0)
+    present: number (15)
     wfh: number (0)
     half_days: number (0)
     absent: number (0)
-    leave: number (0)
-    late_marks: number (0)
+    leave: number (1)
+    late_marks: number (3)
   }
 }
 ```
 
-### `GET /admin/reports/leave-summary?month=2026-09`
+### `GET /admin/reports/leave-summary?year=2026&month=9`
 
 ```
 {
@@ -408,7 +435,7 @@ Missing permission: analytics.view
 [4] of {
   id: number (1)
   title: string ("Ganesh Chaturthi — office closed")
-  body: string ("The Bengaluru and Pune offices will be…")
+  body: string ("The Bengaluru and Pune offices will be...")
   date: string ("2026-09-14")
 }
 ```
@@ -425,16 +452,16 @@ Missing permission: analytics.view
 }
 ```
 
-### `GET /admin/audit-logs`
+### `GET /admin/audit-logs?limit=20`
 
 ```
-[5] of {
-  id: number (5)
+[12] of {
+  id: number (12)
   user_id: number (5)
   actor: string ("VS-0113")
   action: string ("LOGIN")
   details: string ("EMPLOYEE login (VS-0113)")
-  timestamp: string ("2026-09-22 17:04:13")
+  timestamp: string ("2026-09-22 19:35:03")
 }
 ```
 
@@ -500,7 +527,7 @@ Missing permission: analytics.view
 }
 ```
 
-### `GET /attendance/overview?month=2026-09`
+### `GET /attendance/overview?date=2026-09-22`
 
 ```
 {
@@ -519,7 +546,7 @@ Missing permission: analytics.view
 }
 ```
 
-### `GET /attendance/device-map` — **403**
+### `GET /attendance/device-map` - **403**
 
 ```
 Platform admin access required
@@ -550,17 +577,23 @@ Platform admin access required
 }
 ```
 
-### `GET /leaves/calendar?month=2026-09`
+### `GET /leaves/calendar?year=2026&month=9`
 
 ```
 {
   year: number (2026)
-  month: number (2026)
+  month: number (9)
   period: {
-    from: string ("2026-2025-25")
-    to: string ("2026-2026-24")
+    from: string ("2026-08-25")
+    to: string ("2026-09-24")
   }
-  leaves: [] (empty)
+  leaves: [3] of {
+    from_date: string ("2026-09-01")
+    to_date: string ("2026-09-03")
+    leave_code: string ("EL")
+    emp_code: string ("VS-0149")
+    employee_name: string ("Tanvi Shah")
+  }
 }
 ```
 
@@ -699,7 +732,7 @@ Platform admin access required
 }
 ```
 
-### `GET /access/users` — **403**
+### `GET /access/users` - **403**
 
 ```
 Platform admin access required
@@ -708,89 +741,8 @@ Platform admin access required
 
 ## platform
 
-### `GET /companies` — **403**
+### `GET /companies` - **403**
 
 ```
 Platform admin access required
-```
-
-## platform admin only
-
-These need `admin: true`. The HR role is refused, which is correct -- they are platform-level, not tenant-level.
-
-### `GET /companies`
-
-```
-[1] of {
-  id: number (2)
-  name: string ("Validure Solutions Pvt. Ltd.")
-  slug: string ("vs")
-  schema_name: string ("c_vs")
-  status: string ("Active")
-  created_at: string ("2026-09-22 13:53:02")
-  has_device_attendance: bool
-  employees: number (24)
-  pending_leaves: number (3)
-}
-```
-
-### `GET /access/users`
-
-```
-[24] of {
-  id: number (1)
-  username: string ("VS-0101")
-  email: string ("vikram.rao@validuresolutions.com")
-  role: string ("OWNER")
-  role_permissions: [12] of string ("employees.view")
-  name: string ("Vikram Rao")
-  extra_permissions: [] (empty)
-}
-```
-
-### `GET /access/roles`
-
-```
-[4] of {
-  id: number (2)
-  name: string ("DIRECTOR")
-  is_system: bool
-  permissions: [12] of string ("employees.view")
-}
-```
-
-### `GET /attendance/device-map` — **404**
-
-```
-Device attendance is not enabled for this company
-```
-
-### `GET /admin/analytics`
-
-```
-{
-  attendanceTrend: [6] of {
-    month: string ("2026-04")
-    rate: number (0)
-  }
-  leaveByType: [7] of {
-    name: string ("Unpaid Leave")
-    code: string ("UL")
-    days: number (0)
-    applications: number (0)
-  }
-  deptHeadcount: [12] of {
-    name: string ("Engineering")
-    c: number (7)
-  }
-  lateTop: [5] of {
-    emp_code: string ("VS-0152")
-    name: string ("Manish Gupta")
-    late_marks: number (4)
-  }
-  leaveStatusSplit: [3] of {
-    status: string ("Pending")
-    c: number (3)
-  }
-}
 ```

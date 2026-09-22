@@ -135,10 +135,16 @@ export default function AttendancePage() {
   /* Cleared before every fetch, so stepping a month drops the whole content
      area to skeletons rather than leaving last month's numbers on screen
      under the new month's name. */
+  /* The API takes year and month as two separate integers, NOT a YYYY-MM
+   * string: it reads them with parseInt, so `month=2026-09` arrives as month
+   * 2026 and the whole response comes back describing a period that does not
+   * exist. `month` below is only the effect key. */
   const load = () => {
     setError('');
     setData(null);
-    api(`/attendance/me?month=${month}`).then(setData).catch((e) => setError(e.message));
+    api(`/attendance/me?year=${ym.y}&month=${ym.m}`)
+      .then(setData)
+      .catch((e) => setError(e.message));
   };
   useEffect(load, [month]);
 
@@ -265,9 +271,9 @@ export default function AttendancePage() {
           </div>
           {leaveDays > 0 && (
             <p className="faint" style={{ fontSize: '.75rem', marginTop: 'var(--s3)' }}>
-              {leaveDays} approved leave {leaveDays === 1 ? 'day' : 'days'} this period are drawn on the
-              calendar and listed below, but counted by none of these six tiles — so the day types will
-              not add up to working days.
+              {leaveDays} approved leave {leaveDays === 1 ? 'day' : 'days'} this period
+              {leaveDays === 1 ? ' is ' : ' are '}drawn on the calendar and listed below, but counted by
+              none of these six tiles — so the day types will not add up to working days.
             </p>
           )}
         </div>
