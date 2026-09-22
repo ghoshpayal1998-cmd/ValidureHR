@@ -22,12 +22,13 @@ const d2 = (v) => num(v).toFixed(2);                         /* 9 → "9.00"  */
 const raw = (v) => String(Math.round(num(v) * 100) / 100);   /* 6.5 → "6.5" */
 const signed = (v) => (num(v) > 0 ? '+' : '') + raw(v);
 
-/* Loss of pay is not an entitlement — nothing accrues against it, so days
- * taken are counted, never drawn down. It is also the one type a probationer
- * can still take, so it never locks. */
-const isUnpaid = (t) =>
-  ['UL', 'LOP', 'LWP'].includes(String(t.code || '').toUpperCase()) ||
-  /unpaid|loss of pay/i.test(t.name || '');
+/* The API treats exactly ONE type as unpaid — the code UL — and draws every
+ * other type, Loss of Pay included, against the balance, refusing it when the
+ * balance is short. Guessing from the name or from a zero accrual rate made
+ * this screen disagree with the server: it showed Loss of Pay as takeable
+ * during probation, which the API rejects outright.
+ * See the unpaid check in apps/api/src/routes/leaves.js. */
+const isUnpaid = (t) => String(t.code || '').toUpperCase() === 'UL';
 
 export default function LeaveBalancePage() {
   const [data, setData] = useState(null);
@@ -156,10 +157,13 @@ export default function LeaveBalancePage() {
                       />
                     </div>
                   ) : (
-                    /* No entitlement: a meter here would read as a spent bar
-                       against nothing, so the days are stated as a count. */
+                    /* Nothing accrued yet, so a meter would read as a spent
+                       bar against nothing. These types are still deducted
+                       when granted — saying "no entitlement" would read as
+                       "you may not take this", which is wrong for maternity
+                       leave in particular. */
                     <p className="faint" style={{ fontSize: '.6875rem', fontWeight: 600 }}>
-                      No entitlement · counted, not deducted
+                      {t.unpaid ? 'Unpaid · balance not deducted' : 'Granted by HR, not accrued'}
                     </p>
                   )}
 
@@ -168,7 +172,9 @@ export default function LeaveBalancePage() {
                       ? 'Balance inactive'
                       : t.entitled
                         ? `accrued ${d2(t.accrued)} · used ${raw(t.used)} · ${t.rate ? `+${raw(t.rate)}/month` : 'no accrual'}`
-                        : `${raw(t.used)} day${num(t.used) === 1 ? '' : 's'} taken · unpaid`}
+                        : t.unpaid
+                          ? `${raw(t.used)} day${num(t.used) === 1 ? '' : 's'} taken · never deducted`
+                          : 'ask HR to grant days before applying'}
                   </p>
                 </div>
               </div>
