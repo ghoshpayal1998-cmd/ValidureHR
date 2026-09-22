@@ -171,9 +171,14 @@ export default function HomePage() {
           <div className="card__head">
             <div>
               <h2 style={{ fontFamily: 'var(--font-body)', fontSize: '1.0625rem', fontWeight: 600 }}>
-                Who’s away
+                Leave in your team
               </h2>
-              <p className="faint" style={{ fontSize: '.75rem' }}>Approved leave in your team</p>
+              <p className="faint" style={{ fontSize: '.75rem' }}>
+                {/* The route filters on reporting manager, not on status, so
+                    this is every recent request from a direct report — the
+                    intimation a manager gets, not an approval queue. */}
+                Recent requests from the people who report to you
+              </p>
             </div>
           </div>
           {teamLeaves?.length ? (
@@ -185,16 +190,23 @@ export default function HomePage() {
                   </thead>
                   <tbody>
                     {teamLeaves.map((l) => {
-                      const name = `${l.first_name} ${l.last_name}`;
+                      /* The route returns a single concatenated employee_name
+                       * and a leave_code — not first_name/last_name/leave_type,
+                       * which would render "undefined undefined" and a blank
+                       * type for every row a manager actually has. */
+                      const name = l.employee_name || 'Unnamed employee';
                       return (
                         <tr key={l.id}>
                           <td>
                             <span className="person">
                               <span className="avatar avatar--sm">{initials(name)}</span>
-                              <span className="person__name">{name}</span>
+                              <span>
+                                <span className="person__name" style={{ display: 'block' }}>{name}</span>
+                                <span className="person__meta">{l.emp_code}</span>
+                              </span>
                             </span>
                           </td>
-                          <td className="muted">{l.leave_type || l.type}</td>
+                          <td className="muted">{l.leave_code}</td>
                           <td className="mono">{fmtDay(l.from_date, false)}</td>
                           <td className="mono">{fmtDay(l.to_date, false)}</td>
                           <td><StatusBadge status={l.status} /></td>
@@ -208,8 +220,8 @@ export default function HomePage() {
           ) : (
             <Empty
               icon={CalendarCheck}
-              title="Nobody is away"
-              body="Approved leave for your team appears here, so you can see who is out before planning around them."
+              title="Nothing from your team"
+              body="Leave requests from the people who report to you appear here, so you see them without having to be the one who approves them."
             />
           )}
         </section>
