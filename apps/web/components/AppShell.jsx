@@ -64,7 +64,10 @@ function buildMenu(user, company) {
     if (has('attendance.view_all')) mgmt.push({ label: 'Attendance', href: '/admin/attendance', icon: CalendarClock });
     if (has('leaves.view_all')) mgmt.push({ label: 'Leave Management', href: '/admin/leaves', icon: ClipboardCheck });
     if (has('balances.manage')) mgmt.push({ label: 'Leave Balances', href: '/admin/balances', icon: Calculator });
-    if (has('payroll.view')) mgmt.push({ label: 'Payroll', href: '/admin/payroll', icon: Wallet });
+    /* The payroll routes gate on documents.manage; there is no payroll.view
+     * permission in the system at all, so gating on one would hide this
+     * item from every role including the ones that can use it. */
+    if (has('documents.manage')) mgmt.push({ label: 'Payroll', href: '/admin/payroll', icon: Wallet });
     if (has('documents.manage')) mgmt.push({ label: 'Documents', href: '/admin/documents', icon: FolderOpen });
     if (has('reports.view')) mgmt.push({ label: 'Reports', href: '/admin/reports', icon: BarChart3 });
     if (has('analytics.view')) mgmt.push({ label: 'Analytics', href: '/admin/analytics', icon: LineChart });
