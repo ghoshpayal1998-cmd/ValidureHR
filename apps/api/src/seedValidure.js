@@ -11,8 +11,9 @@
  * Usage: npm run seed:validure
  */
 const bcrypt = require('bcryptjs');
+const PDFDocument = require('pdfkit');
 const { q, qOne, tq, tqOne, pool, initSchema, createTenantSchema } = require('./db');
-const { ensureCompanyDirs } = require('./storage');
+const { ensureCompanyDirs, driver, objectKey } = require('./storage');
 const { ym } = require('./accrual');
 
 const SLUG = 'vs';
@@ -113,7 +114,138 @@ const LEAVE_APPLICATIONS = [
   ['Tanvi Shah', 'EL', '2026-09-01', '2026-09-03', 3, 'Sibling’s wedding', 'Approved'],
   ['Gaurav Singh', 'CL', '2026-08-28', '2026-08-28', 1, 'Bank work', 'Rejected'],
   ['Meera Krishnan', 'CO', '2026-08-21', '2026-08-21', 1, 'Worked Sunday 16 Aug for the UAT window', 'Approved'],
+
+  /* Earlier months, so Leave History opens on a real list rather than its
+   * empty state — including Sneha Nair, who is the HR account most of the
+   * admin screens are demonstrated from. */
+  ['Sneha Nair', 'EL', '2026-07-20', '2026-07-24', 5, 'Annual leave — Coorg', 'Approved'],
+  ['Sneha Nair', 'CL', '2026-06-12', '2026-06-12', 1, 'Property registration', 'Approved'],
+  ['Sneha Nair', 'SL', '2026-05-04', '2026-05-05', 2, 'Migraine', 'Approved'],
+  ['Vikram Rao', 'EL', '2026-07-06', '2026-07-10', 5, 'Family holiday', 'Approved'],
+  ['Ananya Iyer', 'SL', '2026-08-13', '2026-08-14', 2, 'Food poisoning', 'Approved'],
+  ['Ananya Iyer', 'EL', '2026-06-22', '2026-06-26', 5, 'Wedding in the family', 'Approved'],
+  ['Ananya Iyer', 'CL', '2026-05-18', '2026-05-18', 1, 'Passport appointment', 'Rejected'],
+  ['Karthik Subramanian', 'CL', '2026-07-30', '2026-07-30', 1, 'School admission', 'Approved'],
+  ['Priya Sharma', 'EL', '2026-06-01', '2026-06-04', 4, 'Vacation', 'Approved'],
+  ['Rohan Mehta', 'SL', '2026-08-05', '2026-08-05', 1, 'Dental surgery', 'Approved'],
 ];
+
+/* ------------------------------------------------------------------- pay */
+
+/* A monthly basic per designation. Everything else on a payslip is derived
+ * from it, so the payslip and the salary sheet can never disagree about what
+ * somebody is paid. Indian structure: HRA at 40% of basic, a fixed
+ * conveyance, PF at 12% of basic capped at the statutory 1,800. */
+const BASIC_BY_DESIGNATION = {
+  'Engineering Manager': 96000, 'Cloud Architect': 88000, 'Solution Architect': 86000,
+  'Tech Lead': 82000, 'Product Manager': 74000, 'HR Manager': 68000,
+  'Senior Software Engineer': 64000, 'QA Lead': 62000, 'Database Administrator': 58000,
+  'Data Engineer': 56000, 'DevOps Engineer': 55000, 'Sales Manager': 54000,
+  'Full Stack Developer': 52000, 'Mobile Developer': 50000, 'Business Analyst': 46000,
+  'UI/UX Designer': 45000, 'Software Engineer': 42000, 'QA Engineer': 40000,
+  'Content Strategist': 38000, 'Finance Executive': 37000, 'Talent Acquisition': 36000,
+  'Marketing Executive': 34000, 'Support Engineer': 32000,
+};
+
+const BANKS = [
+  ['HDFC Bank', 'HDFC0001842'], ['ICICI Bank', 'ICIC0004417'],
+  ['State Bank of India', 'SBIN0011203'], ['Axis Bank', 'UTIB0002165'],
+  ['Kotak Mahindra Bank', 'KKBK0008091'],
+];
+
+function payComponents(basic) {
+  const hra = Math.round(basic * 0.4);
+  const conveyance = 1600;
+  const special = Math.round(basic * 0.25);
+  const gross = basic + hra + conveyance + special;
+  const pf = Math.min(Math.round(basic * 0.12), 1800);
+  const tax = gross > 100000 ? Math.round(gross * 0.12)
+    : gross > 60000 ? Math.round(gross * 0.08)
+      : gross > 40000 ? Math.round(gross * 0.04) : 0;
+  /* ESIC applies only below the statutory gross ceiling, so most of this
+   * company is outside it — which is itself worth showing on the screen. */
+  const esic = gross <= 21000 ? Math.round(gross * 0.0075) : 0;
+  return { basic, hra, conveyance, special, gross, pf, tax, esic };
+}
+
+/* The three months of payslips the demo opens with, newest last. */
+const SLIP_MONTHS = [[2026, 7], [2026, 8], [2026, 9]];
+
+/* Unpaid days by employee index and month, so a couple of slips carry a real
+ * LOP line instead of every one of them being arithmetically identical. */
+const LOP_DAYS = { '7|2026|8': 1, '12|2026|9': 2, '19|2026|7': 0.5 };
+
+/* --------------------------------------------------------------- documents */
+
+const POLICIES = [
+  ['Leave and Attendance Policy', 'People',
+    'Entitlements, monthly accrual, the approval chain, and how a 19:00–04:00 shift is counted against a calendar day.'],
+  ['Code of Conduct', 'People',
+    'What Validure expects of everyone, and how a concern is raised, recorded and closed.'],
+  ['IT and Security Policy', 'Security',
+    'Device standards, VPN access, password rules, and how to report a suspected incident.'],
+  ['Travel and Expense Policy', 'Finance',
+    'Booking limits by grade, per-diem rates, and how to file a claim with receipts.'],
+  ['Remote Work Policy', 'People',
+    'Eligibility, core overlap hours, and the equipment the company provides and insures.'],
+  ['POSH Policy', 'Compliance',
+    'Prevention of sexual harassment: the committee, the redressal process, and the timelines it runs to.'],
+];
+
+const EMAIL_LOG = [
+  ['Leave application approved', 'sent'],
+  ['Your payslip for August 2026 is ready', 'sent'],
+  ['Leave application rejected', 'sent'],
+  ['Password changed on your account', 'sent'],
+  ['New announcement: Appraisal cycle', 'sent'],
+  ['Leave application received', 'sent'],
+  ['Monthly attendance summary', 'failed'],
+  ['Welcome to ValidureHR', 'sent'],
+];
+
+/* Collects a PDFKit document into a buffer the storage driver can take,
+ * rather than writing straight to disk — the same seed then works against
+ * Supabase storage, where there is no local path to write to. */
+function pdfBuffer(build) {
+  return new Promise((resolve, reject) => {
+    const doc = new PDFDocument({ margin: 56 });
+    const chunks = [];
+    doc.on('data', (c) => chunks.push(c));
+    doc.on('end', () => resolve(Buffer.concat(chunks)));
+    doc.on('error', reject);
+    build(doc);
+    doc.end();
+  });
+}
+
+async function storePdf(kind, fileName, build) {
+  const buf = await pdfBuffer(build);
+  await driver.put(objectKey(SLUG, kind, fileName), buf, 'application/pdf');
+  return fileName;
+}
+
+/* A plain, readable document. It is placeholder content and says so — an
+ * uploaded policy replaces it — but it is a real PDF that really opens, so
+ * the View and Download buttons can be tested end to end. */
+function simpleDoc(title, subtitle, paragraphs) {
+  return (doc) => {
+    doc.fontSize(20).text('Validure Solutions Pvt. Ltd.', { align: 'left' });
+    doc.moveDown(0.2);
+    doc.fontSize(9).fillColor('#666').text(subtitle);
+    doc.moveDown(1.2);
+    doc.fillColor('#000').fontSize(15).text(title);
+    doc.moveDown(0.8);
+    doc.fontSize(10.5).fillColor('#222');
+    for (const p of paragraphs) {
+      doc.text(p, { align: 'left', lineGap: 3 });
+      doc.moveDown(0.7);
+    }
+    doc.moveDown(1);
+    doc.fontSize(8).fillColor('#888').text(
+      'Demo content generated by the ValidureHR seed. Replace it by uploading the real document.',
+    );
+  };
+}
 
 const empCode = (i) => `VS-${String(101 + i * 3).padStart(4, '0')}`;
 
@@ -238,9 +370,132 @@ const SEPT = 'PPPPPWWPPPPPWWPLPPPWWP'.split('');
       [title, body, date]);
   }
 
+  /* ----------------------------------------------------- pay and documents
+   *
+   * Without this section the payroll, payslip, policy and offer-letter
+   * screens all open on their empty state, which shows the layout but
+   * proves nothing about how they render real rows. Everything below is
+   * demo content and labels itself as such.
+   */
+  const staff = await tq(SCHEMA, `
+    SELECT e.id, e.emp_code, e.first_name, e.last_name, e.doj, e.email,
+           g.title AS designation
+    FROM {s}.employees e
+    LEFT JOIN {s}.designations g ON g.id = e.designation_id
+    ORDER BY e.id`);
+
+  let structures = 0;
+  let slips = 0;
+  for (const [i, e] of staff.entries()) {
+    const basic = BASIC_BY_DESIGNATION[e.designation] || 40000;
+    const p = payComponents(basic);
+    const [bank, ifsc] = BANKS[i % BANKS.length];
+    /* A PAN that is obviously synthetic, so nobody mistakes demo data for
+     * somebody's real tax number. */
+    const pan = `ABCDE${String(1000 + i).slice(-4)}F`;
+
+    await tq(SCHEMA, `
+      INSERT INTO {s}.salary_structures
+        (employee_id, basic, hra, special_allowance, conveyance,
+         pf_deduction, tax_deduction, esic_deduction,
+         bank_name, bank_account_no, bank_ifsc, pan_no)
+      VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12)`,
+    [e.id, p.basic, p.hra, p.special, p.conveyance, p.pf, p.tax, p.esic,
+      bank, `${50100000000 + i * 7771}`, ifsc, pan]);
+    structures++;
+
+    for (const [year, month] of SLIP_MONTHS) {
+      const lopDays = LOP_DAYS[`${i}|${year}|${month}`] || 0;
+      /* A day of unpaid leave costs a thirtieth of gross — the same rule the
+       * payslip and the salary sheet both apply. */
+      const lop = Math.round((p.gross / 30) * lopDays);
+      const net = p.gross - p.pf - p.tax - p.esic - lop;
+      await tq(SCHEMA, `
+        INSERT INTO {s}.salary_slips
+          (employee_id, month, year, basic, hra, special_allowance, conveyance,
+           pf_deduction, tax_deduction, esic_deduction, lop_deduction, net_pay)
+        VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12)`,
+      [e.id, month, year, p.basic, p.hra, p.special, p.conveyance,
+        p.pf, p.tax, p.esic, lop, net]);
+      slips++;
+    }
+  }
+
+  /* Policies and offer letters are stored files, so a row without bytes
+   * behind it gives the reader a button that 404s. Each row gets a real
+   * PDF written through the same storage driver an upload would use. */
+  for (const [title, category, description] of POLICIES) {
+    const fileName = `${title.toLowerCase().replace(/[^a-z0-9]+/g, '-')}.pdf`;
+    await storePdf('policies', fileName, simpleDoc(title, `${category} · Policy document`, [
+      description,
+      'This placeholder stands in for the signed policy document. It exists so the '
+      + 'document list, the viewer and the download all work end to end in the demo.',
+      'Questions about this policy go to the People team.',
+    ]));
+    await tq(SCHEMA, `
+      INSERT INTO {s}.policies (title, category, description, file_name)
+      VALUES ($1,$2,$3,$4)`, [title, category, description, fileName]);
+  }
+
+  let offers = 0;
+  for (const e of staff) {
+    const fileName = `offer-${e.emp_code}.pdf`;
+    const name = `${e.first_name} ${e.last_name}`;
+    await storePdf('offers', fileName, simpleDoc(
+      `Letter of appointment — ${name}`,
+      `${e.emp_code} · issued ${e.doj}`,
+      [
+        `Dear ${e.first_name}, we are pleased to confirm your appointment as `
+        + `${e.designation} with Validure Solutions Pvt. Ltd., effective ${e.doj}.`,
+        'Your working hours follow the company shift of 19:00 to 04:00 IST. Your '
+        + 'compensation, leave entitlement and notice period are set out in the '
+        + 'annexure to this letter.',
+        'We look forward to working with you.',
+      ],
+    ));
+    await tq(SCHEMA, `
+      INSERT INTO {s}.offer_letters (employee_id, title, file_name, uploaded_at)
+      VALUES ($1,$2,$3,$4)`,
+    [e.id, `Letter of appointment — ${name}`, fileName, `${e.doj} 10:00:00`]);
+    offers++;
+  }
+
+  /* A few read and unread notifications, so the bell in the top bar has both
+   * states to show rather than only its empty one. */
+  let notes = 0;
+  for (const [i, e] of staff.entries()) {
+    const seeds = [
+      ['Payslip available', 'Your payslip for September 2026 is ready to download.',
+        '/documents/salary-slips', i % 3 === 0],
+      ['Attendance reminder', 'You have not punched out for one shift this month.',
+        '/attendance', i % 4 === 0],
+    ];
+    for (const [title, body, link, isRead] of seeds) {
+      await tq(SCHEMA, `
+        INSERT INTO {s}.notifications (employee_id, title, body, link, is_read)
+        VALUES ($1,$2,$3,$4,$5)`, [e.id, title, body, link, isRead]);
+      notes++;
+    }
+  }
+
+  /* The email log records what the mailer did. SMTP is not configured in the
+   * demo, so a seeded log is the only way this screen has anything to show —
+   * including one failure, because the screen has to render that too. */
+  for (const [i, [subject, status]] of EMAIL_LOG.entries()) {
+    const to = staff[i % staff.length];
+    await tq(SCHEMA, `
+      INSERT INTO {s}.email_log (to_email, subject, body, status, created_at)
+      VALUES ($1,$2,$3,$4,$5)`,
+    [to.email, subject,
+      `${subject}\n\nThis is a seeded record of a notification email.`,
+      status, `2026-09-${String(8 + i).padStart(2, '0')} 09:${String(10 + i * 5).padStart(2, '0')}:00`]);
+  }
+
   console.log('ValidureHR seed complete — Validure Solutions Pvt. Ltd.');
   console.log(`  ${emps.length} employees, ${linked} reporting lines, ${attRows} attendance rows,`);
-  console.log(`  ${apps} leave applications, ${HOLIDAYS.length} holidays, ${ANNOUNCEMENTS.length} announcements.`);
+  console.log(`  ${apps} leave applications, ${HOLIDAYS.length} holidays, ${ANNOUNCEMENTS.length} announcements,`);
+  console.log(`  ${structures} salary structures, ${slips} payslips, ${POLICIES.length} policies,`);
+  console.log(`  ${offers} offer letters, ${notes} notifications, ${EMAIL_LOG.length} email-log rows.`);
   console.log('');
   console.log(`  Sign in with any employee code, password ${PASSWORD}:`);
   console.log(`    ${empCode(0)}  Vikram Rao      OWNER`);
