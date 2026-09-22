@@ -166,6 +166,7 @@ Every other route takes none.
     halfDays: number (0)
     wfhDays: number (0)
     leaveDays: number (1)
+    lopDays: number (0)
     lateMarks: number (0)
   }
   records: [25] of {
@@ -213,7 +214,7 @@ Every other route takes none.
 ### `GET /leaves/history`
 
 ```
-[1] of {
+[4] of {
   id: number (4)
   employee_id: number (5)
   leave_type_id: number (2)
@@ -226,7 +227,7 @@ Every other route takes none.
   decided_by: null
   decided_at: null
   rejection_reason: null
-  applied_at: string ("2026-09-22 13:53:04")
+  applied_at: string ("2026-09-22 19:38:57")
   is_unpaid: bool
   leave_type: string ("Casual Leave")
   leave_code: string ("CL")
@@ -251,7 +252,7 @@ Every other route takes none.
   decided_by: null
   decided_at: null
   rejection_reason: null
-  applied_at: string ("2026-09-22 13:53:04")
+  applied_at: string ("2026-09-22 19:38:57")
   is_unpaid: bool
   leave_type: string ("Casual Leave")
   leave_code: string ("CL")
@@ -263,25 +264,64 @@ Every other route takes none.
 ### `GET /documents/salary-slips`
 
 ```
-[] (empty)
+[3] of {
+  id: number (15)
+  month: number (9)
+  year: number (2026)
+  net_pay: number (92536)
+  file_name: null
+  generated_at: string ("2026-09-22 19:38:57")
+  basic: number (64000)
+  hra: number (25600)
+  special_allowance: number (16000)
+  conveyance: number (1600)
+  pf_deduction: number (1800)
+  tax_deduction: number (12864)
+  lop_deduction: number (0)
+  esic_deduction: number (0)
+  label: string ("September 2026")
+  period: string ("25 Aug – 24 Sep 2026")
+  source: string ("generated")
+}
 ```
 
 ### `GET /documents/offer-letters`
 
 ```
-[] (empty)
+[1] of {
+  id: number (5)
+  employee_id: number (5)
+  title: string ("Letter of appointment — Ananya Iyer")
+  file_name: string ("offer-VS-0113.pdf")
+  is_revised: bool
+  uploaded_at: string ("2023-04-17 10:00:00")
+}
 ```
 
 ### `GET /documents/policies`
 
 ```
-[] (empty)
+[6] of {
+  id: number (2)
+  title: string ("Code of Conduct")
+  category: string ("People")
+  description: string ("What Validure expects of everyone, and...")
+  file_name: string ("code-of-conduct.pdf")
+  uploaded_at: string ("2026-09-22 19:38:57")
+}
 ```
 
 ### `GET /notifications`
 
 ```
-[] (empty)
+[3] of {
+  id: number (57)
+  title: string ("Leave Request Submitted")
+  body: string ("Your leave request from 2026-11-10 to ...")
+  link: string ("/leave/history")
+  is_read: bool
+  created_at: string ("2026-09-22 20:22:18")
+}
 ```
 
 
@@ -305,21 +345,21 @@ Every other route takes none.
     name: string ("Engineering")
     c: number (7)
   }
-  recentLeaves: [3] of {
-    id: number (1)
-    from_date: string ("2026-09-24")
-    to_date: string ("2026-09-25")
-    days: number (2)
+  recentLeaves: [6] of {
+    id: number (2)
+    from_date: string ("2026-09-22")
+    to_date: string ("2026-09-22")
+    days: number (1)
     status: string ("Pending")
-    leave_code: string ("CL")
-    emp_code: string ("VS-0122")
-    employee_name: string ("Arjun Kulkarni")
+    leave_code: string ("SL")
+    emp_code: string ("VS-0125")
+    employee_name: string ("Kavya Reddy")
   }
   recentAudit: [8] of {
     actor: string ("VS-0113")
     action: string ("LOGIN")
     details: string ("EMPLOYEE login (VS-0113)")
-    timestamp: string ("2026-09-22 19:35:03")
+    timestamp: string ("2026-09-22 20:27:21")
   }
   today: string ("2026-09-22")
 }
@@ -455,20 +495,27 @@ Missing permission: analytics.view
 ### `GET /admin/audit-logs?limit=20`
 
 ```
-[12] of {
-  id: number (12)
+[20] of {
+  id: number (36)
   user_id: number (5)
   actor: string ("VS-0113")
   action: string ("LOGIN")
   details: string ("EMPLOYEE login (VS-0113)")
-  timestamp: string ("2026-09-22 19:35:03")
+  timestamp: string ("2026-09-22 20:27:21")
 }
 ```
 
 ### `GET /admin/email-log?limit=20`
 
 ```
-[] (empty)
+[20] of {
+  id: number (26)
+  to_email: string ("sneha.nair@validuresolutions.com")
+  subject: string ("[Leave Request Updated] Ananya Iyer — ...")
+  body: string ("Leave application #22 was edited by th...")
+  status: string ("skipped (SMTP not configured)")
+  created_at: string ("2026-09-22 20:22:42")
+}
 ```
 
 ### `GET /employees`
@@ -517,6 +564,7 @@ Missing permission: analytics.view
   managers: [24] of {
     id: number (1)
     emp_code: string ("VS-0101")
+    status: string ("Active")
     name: string ("Vikram Rao")
   }
   roles: [4] of {
@@ -555,7 +603,7 @@ Platform admin access required
 ### `GET /leaves`
 
 ```
-[8] of {
+[18] of {
   id: number (1)
   employee_id: number (8)
   leave_type_id: number (2)
@@ -568,7 +616,7 @@ Platform admin access required
   decided_by: null
   decided_at: null
   rejection_reason: null
-  applied_at: string ("2026-09-22 13:53:04")
+  applied_at: string ("2026-09-22 19:38:57")
   is_unpaid: bool
   leave_type: string ("Casual Leave")
   leave_code: string ("CL")
@@ -678,17 +726,17 @@ Platform admin access required
   last_name: string ("Pandey")
   department: string ("Support")
   designation: string ("Support Engineer")
-  basic: number (0)
-  hra: number (0)
-  special_allowance: number (0)
+  basic: number (32000)
+  hra: number (12800)
+  special_allowance: number (8000)
   conveyance: number (1600)
-  pf_deduction: number (0)
+  pf_deduction: number (1800)
   esic_deduction: number (0)
-  tax_deduction: number (0)
-  bank_name: null
-  bank_account_no: null
-  bank_ifsc: null
-  pan_no: null
+  tax_deduction: number (2176)
+  bank_name: string ("ICICI Bank")
+  bank_account_no: string ("50100163191")
+  bank_ifsc: string ("ICIC0004417")
+  pan_no: string ("ABCDE1021F")
 }
 ```
 
