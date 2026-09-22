@@ -633,17 +633,31 @@ function EmployeeForm({ form, setForm, meta, today, onSubmit }) {
               onChange={(ev) => set({ emp_code: ev.target.value })}
             />
           </Field>
-          <Field id="f-status" label="Status" required help="Inactive also disables the login.">
-            <select
-              id="f-status"
-              className="select"
-              value={v.status}
-              onChange={(ev) => set({ status: ev.target.value })}
-            >
-              <option value="Active">Active</option>
-              <option value="Inactive">Inactive</option>
-            </select>
-          </Field>
+          {/* Status is offered only when editing. POST /employees hard-codes
+              'Active' on insert, so a picker here would take HR's choice,
+              discard it, and hand the new joiner a working login under a
+              help line promising the opposite. */}
+          {edit ? (
+            <Field id="f-status" label="Status" required help="Inactive also disables the login.">
+              <select
+                id="f-status"
+                className="select"
+                value={v.status}
+                onChange={(ev) => set({ status: ev.target.value })}
+              >
+                <option value="Active">Active</option>
+                <option value="Inactive">Inactive</option>
+              </select>
+            </Field>
+          ) : (
+            <div className="field">
+              <span className="label">Status</span>
+              <p className="help" style={{ marginTop: 'var(--s2)' }}>
+                A new employee is created <b>Active</b> and is sent a one-time
+                password. Deactivate them from this form afterwards if you need to.
+              </p>
+            </div>
+          )}
         </div>
       </fieldset>
 
