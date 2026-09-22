@@ -52,6 +52,14 @@ captured live against the seeded database.** Render those fields. Do not
 invent field names, and do not assume a route returns what its name
 suggests.
 
+It also opens with a **query-parameter table scanned out of the route
+source**. Read it before you build a URL. `year` and `month` are two
+separate integers — the API parses them with `parseInt`, so a combined
+`?month=2026-09` arrives as month 2026 and you get a confident-looking
+screen full of wrong numbers and no error anywhere. `/attendance/overview`
+takes a single `date`, not a month. A route not in that table takes no
+query parameters at all.
+
 Permissions the API actually enforces are exactly:
 `employees.view` `employees.manage` `attendance.view_all`
 `attendance.manage` `attendance.export` `leaves.view_all`
