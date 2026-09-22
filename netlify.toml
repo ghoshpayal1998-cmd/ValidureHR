@@ -26,7 +26,7 @@
 # API_BASE is set in the Netlify UI to the Render service URL.
 [[redirects]]
   from = "/api/*"
-  to = "https://REPLACE-WITH-RENDER-URL.onrender.com/api/:splat"
+  to = "https://validurehr-api.onrender.com/api/:splat"
   status = 200
   force = true
 
