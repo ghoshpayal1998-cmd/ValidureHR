@@ -96,7 +96,11 @@ export default function LeaveApprovalsPage() {
 
   async function openAttachment(l) {
     try {
-      await openProtectedFile(`/leaves/${l.id}/attachment`);
+      /* No extension: an attachment may be a PDF, a scan or a .docx, and the
+       * popup-blocked fallback saves under the name given here. Defaulting to
+       * document.pdf handed the approver a .jpg that no PDF reader would
+       * open. Left off, the browser derives it from the blob's own type. */
+      await openProtectedFile(`/leaves/${l.id}/attachment`, false, `leave-${l.id}-document`);
     } catch (e) {
       toast(e.message, 'err');
     }
@@ -189,7 +193,16 @@ export default function LeaveApprovalsPage() {
                         <span className="stat__label">{l.leave_type} balance</span>
                         {bal === null ? (
                           <span className="faint" style={{ fontSize: '.75rem' }}>
-                            {balancesOff ? 'not visible to you' : 'loading…'}
+                            {/* `balances` is non-null once the fetch has resolved, so it
+                                is the loaded flag. Without it, an employee absent from
+                                /balances — which lists Active employees only, so a
+                                resigning one with a request still pending — sat on
+                                "loading…" forever, with nothing still in flight. */}
+                            {balancesOff
+                              ? 'not visible to you'
+                              : balances
+                                ? 'no balance on record'
+                                : 'loading…'}
                           </span>
                         ) : (
                           <span className="num mono" style={{ fontSize: '.8125rem' }}>

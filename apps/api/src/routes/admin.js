@@ -3,7 +3,7 @@
 const express = require('express');
 const { qOne, tq, tqOne } = require('../db');
 const audit = require('../audit');
-const { sendMail } = require('../mailer');
+const { sendMail, sendMailNow } = require('../mailer');
 const { reconcileLeave } = require('../leaveReconcile');
 const { addNotification } = require('../notifications');
 const { authenticate, tenant, requirePerm } = require('../middleware/auth');
@@ -49,7 +49,6 @@ router.get('/overview', requirePerm('employees.view'), async (req, res, next) =>
       FROM {s}.leave_applications la
       JOIN {s}.leave_types lt ON lt.id=la.leave_type_id
       JOIN {s}.employees e ON e.id=la.employee_id
-      WHERE la.status='Pending'
       ORDER BY la.applied_at DESC LIMIT 6`);
     const recentAudit = await tq(req.s, `SELECT actor, action, details, timestamp FROM {s}.audit_logs ORDER BY id DESC LIMIT 8`);
     res.json({ totals, todayAttendance, deptStrength, recentLeaves, recentAudit, today });
@@ -418,7 +417,11 @@ router.post('/test-email', requirePerm('settings.manage'), async (req, res, next
       || null;
     if (!to) return res.status(400).json({ error: 'Provide a "to" address (your account has no email)' });
     const smtpConfigured = !!process.env.SMTP_HOST;
-    sendMail(req.s, to,
+    /* Awaited, unlike every other mail here. This is the one message whose
+     * whole purpose is to be looked for in the Email Log, and fire-and-forget
+     * meant the screen refetched the log before the row existed — the admin
+     * got a green toast over a table that did not contain it. */
+    await sendMailNow(req.s, to,
       `[ValidureHR] Test email — ${req.company.name}`,
       `This is a test email from ValidureHR.\n\nIf you are reading this in your inbox, SMTP is configured correctly.\n\nSent: ${new Date().toISOString()}`);
     audit(req, 'TEST_EMAIL_SENT', `Test email queued to ${to}`);

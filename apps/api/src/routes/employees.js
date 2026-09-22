@@ -52,7 +52,13 @@ router.get('/meta', requirePerm('employees.view'), async (req, res, next) => {
     res.json({
       departments: await tq(req.s, 'SELECT * FROM {s}.departments ORDER BY name'),
       designations: await tq(req.s, 'SELECT * FROM {s}.designations ORDER BY title'),
-      managers: await tq(req.s, `SELECT id, emp_code, (first_name || ' ' || last_name) AS name FROM {s}.employees WHERE status='Active' ORDER BY emp_code`),
+      /* Every employee, with status, rather than the Active ones only. An
+       * employee whose manager has since left still stores that id, and a
+       * pre-filtered list left the edit form's select with no matching
+       * option — so it rendered blank and the dialog claimed they report
+       * to nobody. The client marks a non-Active option rather than
+       * hiding it. */
+      managers: await tq(req.s, `SELECT id, emp_code, status, (first_name || ' ' || last_name) AS name FROM {s}.employees ORDER BY emp_code`),
       roles,
     });
   } catch (e) { next(e); }
@@ -65,7 +71,12 @@ router.get('/', requirePerm('employees.view'), async (req, res, next) => {
     let sql = LIST_SQL;
     const args = [];
     if (search) {
-      sql += ` WHERE e.emp_code ILIKE $1 OR e.first_name ILIKE $1 OR e.last_name ILIKE $1 OR e.email ILIKE $1 OR d.name ILIKE $1`;
+      // The full name too, not only the halves: HR reads "Vikram Rao" off the
+      // Name column and types it back, and matching first_name and last_name
+      // separately fails every such search.
+      sql += ` WHERE e.emp_code ILIKE $1 OR e.first_name ILIKE $1 OR e.last_name ILIKE $1
+               OR (e.first_name || ' ' || e.last_name) ILIKE $1
+               OR e.email ILIKE $1 OR d.name ILIKE $1`;
       args.push(`%${search}%`);
     }
     sql += ' ORDER BY e.emp_code';

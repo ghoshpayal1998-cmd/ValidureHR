@@ -410,7 +410,12 @@ export default function LeaveHistoryPage() {
           danger
           busy={killing}
           title="Cancel this leave application?"
-          body={`Application #${cancelling.id} — ${cancelling.leave_type}, ${fmtDay(cancelling.from_date)} to ${fmtDay(cancelling.to_date)} (${cancelling.days} working day(s)). Cancelling withdraws it from the approvers' queue and returns the days to your balance. You can apply again at any time.`}
+          /* Cancel is offered on a Pending application only, and days are
+           * deducted at approval — so there is nothing to give back, and
+           * DELETE /leaves/:id restores a balance for an Approved leave
+           * alone. Promising a restore sent people to Leave Balance to
+           * watch for a number that was never going to move. */
+          body={`Application #${cancelling.id} — ${cancelling.leave_type}, ${fmtDay(cancelling.from_date)} to ${fmtDay(cancelling.to_date)} (${cancelling.days} working day(s)). Cancelling withdraws it from the approvers' queue. Your balance is untouched either way — days are only deducted once a request is approved. You can apply again at any time.`}
           confirmLabel="Cancel application"
           onConfirm={cancelLeave}
           onClose={() => { if (!killing) setCancelling(null); }}

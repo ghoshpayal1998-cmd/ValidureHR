@@ -797,8 +797,15 @@ function EmployeeForm({ form, setForm, meta, today, onSubmit }) {
             onChange={(ev) => set({ reporting_manager_id: ev.target.value })}
           >
             <option value="">{managers.length ? '—' : 'No employees yet'}</option>
+            {/* /employees/meta now returns leavers too, with their status.
+                A pre-filtered Active-only list left no option matching the
+                stored id when the manager had since left, so the select
+                rendered blank and the dialog claimed the employee reported
+                to nobody. A leaver is marked rather than hidden. */}
             {managers.map((m) => (
-              <option key={m.id} value={m.id}>{m.emp_code} — {m.name}</option>
+              <option key={m.id} value={m.id}>
+                {m.emp_code} — {m.name}{m.status && m.status !== 'Active' ? ` (${m.status})` : ''}
+              </option>
             ))}
           </select>
         </Field>

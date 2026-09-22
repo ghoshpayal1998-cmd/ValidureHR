@@ -52,7 +52,16 @@ export default function AdminDocumentsPage() {
    * documents.manage alone still gets the policies and offer-letter tabs;
    * they just cannot choose whose slips to look at.
    */
-  const canSeeEmployees = hasPerm('employees.view');
+  /*
+   * BOTH permissions, because the picker is only useful when both hold.
+   * /employees needs employees.view to populate it, and GET
+   * /documents/salary-slips honours ?employee_id only for documents.manage —
+   * it silently scopes the query back to the caller otherwise. Gating on
+   * employees.view alone therefore gave a user without documents.manage a
+   * working picker that answered every selection with their OWN slips, shown
+   * under whichever colleague they had just chosen.
+   */
+  const canSeeEmployees = hasPerm('employees.view') && hasPerm('documents.manage');
   const [nowYear, nowMonth] = todayIST().split('-');
 
   const [tab, setTab] = useState(TABS[0].key);
