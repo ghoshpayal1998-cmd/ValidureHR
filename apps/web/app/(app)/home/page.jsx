@@ -26,9 +26,15 @@ export default function HomePage() {
   useEffect(load, []);
 
   async function punch() {
+    /* The route requires an explicit action and answers 400 "Invalid action"
+     * without one, so sending no body made this button fail every time.
+     * Derive it exactly the way the button labels itself — a shift that has a
+     * check-in punches out, anything else punches in — so the label and the
+     * request can never disagree about what pressing it does. */
+    const action = data?.widgets?.todayPunch?.checkIn ? 'out' : 'in';
     setPunching(true);
     try {
-      const res = await api('/attendance/punch', { method: 'POST' });
+      const res = await api('/attendance/punch', { method: 'POST', body: { action } });
       toast(res?.message || 'Attendance recorded', 'ok');
       load();
     } catch (e) {
