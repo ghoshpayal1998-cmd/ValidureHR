@@ -5,6 +5,19 @@ import { BookOpen, Download, Eye } from 'lucide-react';
 import { api, fmtDate, openProtectedFile } from '@/lib/api';
 import { Empty, ErrorNote, PageHead, Skeleton, useToast } from '@/components/ui';
 
+/* A policy is whatever HR uploaded — the API accepts .pdf, .doc, .docx and
+ * images, and the row carries the stored file_name. Saving a Word handbook as
+ * "<title>.pdf" gives the browser a file it cannot open, so the extension comes
+ * off the real file and the title only supplies the readable part of the name. */
+const extensionOf = (fileName) => {
+  const match = /\.[a-z0-9]+$/i.exec(String(fileName || ''));
+  return match ? match[0].toLowerCase() : '.pdf';
+};
+const downloadNameFor = (policy) => {
+  const base = String(policy.title || 'policy').replace(/[\\/:*?"<>|]+/g, '-').trim();
+  return `${base || 'policy'}${extensionOf(policy.file_name)}`;
+};
+
 export default function PoliciesPage() {
   const toast = useToast();
   const [data, setData] = useState(null);
@@ -32,7 +45,7 @@ export default function PoliciesPage() {
       await openProtectedFile(
         `/documents/policies/${policy.id}/file`,
         download,
-        `${policy.title}.pdf`,
+        downloadNameFor(policy),
       );
       toast(download ? `Downloading ${policy.title}` : 'Opened in a new tab', 'ok');
     } catch (e) {
@@ -47,7 +60,11 @@ export default function PoliciesPage() {
   if (!data) {
     return (
       <div className="page">
-        <PageHead eyebrow="Documents" title="Company Policies" />
+        <PageHead
+          eyebrow="Documents"
+          title="Company Policies"
+          sub="Official company policy documents"
+        />
         <div className="card"><Skeleton rows={4} height={120} /></div>
       </div>
     );
@@ -100,6 +117,7 @@ export default function PoliciesPage() {
                       fontSize: '1rem',
                       fontWeight: 600,
                       marginTop: 'var(--s3)',
+                      overflowWrap: 'anywhere',
                     }}
                   >
                     {p.title}
@@ -107,7 +125,10 @@ export default function PoliciesPage() {
 
                   {/* A policy with no description just leaves the spacer to do
                    * its job — the card gets shorter, the row stays aligned. */}
-                  <p className="muted" style={{ fontSize: '.875rem', marginTop: '.25rem', flex: 1 }}>
+                  <p
+                    className="muted"
+                    style={{ fontSize: '.875rem', marginTop: '.25rem', flex: 1, overflowWrap: 'anywhere' }}
+                  >
                     {p.description}
                   </p>
 
@@ -115,12 +136,16 @@ export default function PoliciesPage() {
                     Updated: {fmtDate(p.uploaded_at)}
                   </p>
 
+                  {/* Every card repeats the same two words, so the button's own
+                    * label says nothing about which policy it opens — the
+                    * accessible name carries the title. */}
                   <div className="row" style={{ gap: 'var(--s2)', marginTop: 'var(--s4)' }}>
                     <button
                       className="btn btn--ghost btn--sm"
                       style={{ flex: 1 }}
                       onClick={() => openFile(p, false)}
                       disabled={cardBusy}
+                      aria-label={`View ${p.title}`}
                     >
                       <Eye size={15} aria-hidden="true" />
                       {viewing ? 'Opening…' : 'View'}
@@ -130,6 +155,7 @@ export default function PoliciesPage() {
                       style={{ flex: 1 }}
                       onClick={() => openFile(p, true)}
                       disabled={cardBusy}
+                      aria-label={`Download ${p.title}`}
                     >
                       <Download size={15} aria-hidden="true" />
                       {downloading ? 'Downloading…' : 'Download'}

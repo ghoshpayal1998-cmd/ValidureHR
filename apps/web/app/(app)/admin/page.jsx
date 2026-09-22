@@ -11,7 +11,7 @@ import {
   UserCheck,
   Users,
 } from 'lucide-react';
-import { api, fmtDate, fmtDateTime, fmtDay, getSelectedCompany, getUser, initials } from '@/lib/api';
+import { api, fmtDate, fmtDateTime, fmtDay, getSelectedCompany, getUser, hasPerm, initials } from '@/lib/api';
 import { Empty, ErrorNote, PageHead, Skeleton, StatusBadge } from '@/components/ui';
 
 const TILES = [
@@ -84,10 +84,16 @@ export default function AdminOverviewPage() {
     );
   }
 
-  const {
-    totals = {}, todayAttendance = [], deptStrength = [],
-    recentLeaves = [], recentAudit = [], today,
-  } = data;
+  /* A destructuring default only fires when the key is absent. An aggregate
+   * that found nothing can serialise as null instead, and `[...null]` or
+   * `null.employees` takes the whole screen down — so coerce by type. */
+  const list = (v) => (Array.isArray(v) ? v : []);
+  const totals = data.totals && typeof data.totals === 'object' ? data.totals : {};
+  const todayAttendance = list(data.todayAttendance);
+  const deptStrength = list(data.deptStrength);
+  const recentLeaves = list(data.recentLeaves);
+  const recentAudit = list(data.recentAudit);
+  const { today } = data;
 
   const attendance = [...todayAttendance].sort((a, b) => {
     const ia = ATT_ORDER.indexOf(a.status), ib = ATT_ORDER.indexOf(b.status);
@@ -97,6 +103,11 @@ export default function AdminOverviewPage() {
   const deptMax = deptStrength.reduce((m, d) => Math.max(m, d.c || 0), 0);
   const deptTotal = deptStrength.reduce((s, d) => s + (d.c || 0), 0);
 
+  /* /admin/leaves is gated on leaves.view_all, but this overview opens on
+   * employees.view — so the shortcut has to be hidden from anyone who would
+   * only land on a 403. */
+  const canSeeLeaves = hasPerm('leaves.view_all');
+
   const nothingYet =
     !totals.employees && !attendance.length && !deptStrength.length &&
     !recentLeaves.length && !recentAudit.length;
@@ -104,7 +115,7 @@ export default function AdminOverviewPage() {
   if (nothingYet) {
     return (
       <div className="page">
-        <PageHead eyebrow="Management" title="Overview" sub={`Company snapshot for ${fmtDate(today)}`} />
+        <PageHead eyebrow="Management" title="Overview" sub={`Company snapshot for ${fmtDay(today)}`} />
         <div className="card">
           <Empty
             icon={LayoutGrid}
@@ -122,7 +133,7 @@ export default function AdminOverviewPage() {
       <PageHead
         eyebrow="Management"
         title="Overview"
-        sub={`Company snapshot for ${fmtDate(today)}`}
+        sub={`Company snapshot for ${fmtDay(today)}`}
       />
 
       <div className="stack" style={{ gap: 'var(--s5)' }}>
@@ -161,11 +172,11 @@ export default function AdminOverviewPage() {
             </div>
             {attendance.length ? (
               <div className="card__body">
-                <ul className="stack" style={{ gap: 'var(--s3)', listStyle: 'none' }}>
+                <ul className="stack" role="list" style={{ gap: 'var(--s3)', listStyle: 'none', padding: 0 }}>
                   {attendance.map((row) => (
                     <li className="row row--between" key={row.status}>
                       <StatusBadge status={row.status} tone={ATT_TONE[row.status]} />
-                      <span className="num" style={{ fontSize: '.875rem', fontWeight: 600 }}>{row.c}</span>
+                      <span className="num" style={{ fontSize: '.875rem', fontWeight: 600 }}>{row.c ?? 0}</span>
                     </li>
                   ))}
                 </ul>
@@ -184,7 +195,7 @@ export default function AdminOverviewPage() {
               <h2 style={{ ...H2, marginBottom: 'var(--s4)' }}>Department strength</h2>
               {deptStrength.length ? (
                 <>
-                  <ul className="stack" style={{ gap: 'var(--s3)', listStyle: 'none' }}>
+                  <ul className="stack" role="list" style={{ gap: 'var(--s3)', listStyle: 'none', padding: 0 }}>
                     {deptStrength.map((d) => {
                       /* Employees with no department are bucketed rather than
                        * dropped — a headcount that quietly omits people is
@@ -208,7 +219,7 @@ export default function AdminOverviewPage() {
                               )}
                             </span>
                             <span className="num" style={{ fontSize: '.875rem', fontWeight: 600, flex: 'none' }}>
-                              {d.c}
+                              {d.c ?? 0}
                             </span>
                           </div>
                           <div className="meter" style={{ marginTop: 'var(--s2)' }} aria-hidden="true">
@@ -239,18 +250,24 @@ export default function AdminOverviewPage() {
             </div>
           </section>
 
-          {/* -------------------------------------- approval queue */}
+          {/* -------------------------------------- recent leave -------------
+           * recentLeaves is the latest leave of ANY status, not the pending
+           * queue — the payload carries `status` and this card tones six of
+           * them. The pending count has its own tile above. It also carries no
+           * applied_at, so the card claims no ordering it cannot show. */}
           <section className="card">
             <div className="card__head">
               <div>
-                <h2 style={H2}>Leave requests awaiting approval</h2>
-                <p className="faint" style={{ fontSize: '.75rem' }}>Most recently applied first</p>
+                <h2 style={H2}>Recent leave requests</h2>
+                <p className="faint" style={{ fontSize: '.75rem' }}>The latest requests across the company</p>
               </div>
-              <Link className="btn btn--quiet btn--sm" href="/admin/leaves">View all →</Link>
+              {canSeeLeaves && (
+                <Link className="btn btn--quiet btn--sm" href="/admin/leaves">View all →</Link>
+              )}
             </div>
             {recentLeaves.length ? (
               <div className="card__body">
-                <ul className="stack" style={{ gap: 'var(--s3)', listStyle: 'none' }}>
+                <ul className="stack" role="list" style={{ gap: 'var(--s3)', listStyle: 'none', padding: 0 }}>
                   {recentLeaves.map((l) => (
                     <li
                       key={l.id}
@@ -261,10 +278,15 @@ export default function AdminOverviewPage() {
                     >
                       <div className="row row--between" style={{ gap: 'var(--s3)' }}>
                         <span className="person">
-                          <span className="avatar avatar--sm">{initials(l.employee_name)}</span>
+                          {/* initials() defaults only on undefined — a null
+                            * name would throw inside .trim() and take the
+                            * page down with it. */}
+                          <span className="avatar avatar--sm">{initials(l.employee_name || '')}</span>
                           <span style={{ minWidth: 0 }}>
-                            <span className="person__name" style={{ display: 'block' }}>{l.employee_name}</span>
-                            <span className="person__meta">{l.emp_code}</span>
+                            <span className="person__name" style={{ display: 'block' }}>
+                              {l.employee_name || 'Unnamed employee'}
+                            </span>
+                            <span className="person__meta">{l.emp_code || '—'}</span>
                           </span>
                         </span>
                         <StatusBadge status={leaveLabel(l.status)} tone={LEAVE_TONE[l.status]} />
@@ -273,7 +295,7 @@ export default function AdminOverviewPage() {
                         <span className="mono">{l.leave_code}</span>
                         {' · '}
                         <span className="mono">{fmtDate(l.from_date)} → {fmtDate(l.to_date)}</span>
-                        {' '}({l.days}d)
+                        {' '}({l.days ?? 0}d)
                       </p>
                     </li>
                   ))}
@@ -282,8 +304,8 @@ export default function AdminOverviewPage() {
             ) : (
               <Empty
                 icon={ClipboardCheck}
-                title="No pending requests"
-                body="Leave applications waiting on a decision queue up here, newest first."
+                title="No leave requests yet"
+                body="Leave applied for anywhere in the company shows up here with its dates and where it has got to."
               />
             )}
           </section>
@@ -298,7 +320,7 @@ export default function AdminOverviewPage() {
             </div>
             {recentAudit.length ? (
               <div className="card__body">
-                <ul className="stack" style={{ gap: 'var(--s4)', listStyle: 'none' }}>
+                <ul className="stack" role="list" style={{ gap: 'var(--s4)', listStyle: 'none', padding: 0 }}>
                   {recentAudit.map((a, i) => (
                     <li
                       key={`${a.timestamp}-${a.action}-${i}`}
@@ -309,7 +331,7 @@ export default function AdminOverviewPage() {
                         <p className="muted" style={{ fontSize: '.75rem', marginTop: '.15rem' }}>{a.details}</p>
                       )}
                       <p className="faint" style={{ fontSize: '.6875rem', marginTop: '.25rem' }}>
-                        {a.actor} · {fmtDateTime(a.timestamp)}
+                        {a.actor || 'System'} · {fmtDateTime(a.timestamp)}
                       </p>
                     </li>
                   ))}

@@ -2,22 +2,38 @@
 
 import { useEffect, useState } from 'react';
 import { Download, Eye, FileBadge, FileText } from 'lucide-react';
-import { api, fmtDate, openProtectedFile } from '@/lib/api';
+import { api, fmtDate, hasPerm, openProtectedFile } from '@/lib/api';
 import { Empty, ErrorNote, PageHead, Skeleton, useToast } from '@/components/ui';
 
 /*
- * The API hands back exactly five fields per letter — id, employee_id,
+ * The API hands back exactly six fields per letter — id, employee_id,
  * title, file_name, is_revised, uploaded_at — and nothing about the terms
- * inside the PDF. So this screen does not try to preview the letter: it
- * names it, dates it, says whether it is the original or a revision, and
+ * inside the document. So this screen does not try to preview the letter:
+ * it names it, dates it, says whether it is the original or a revision, and
  * gets out of the way of the file itself.
  *
- * Ordering comes from the server (uploaded_at DESC), which is why a
- * revision sits above the original without this page sorting anything.
+ * One wrinkle: with documents.manage the same route returns EVERY employee's
+ * letters, each row carrying two extra fields (emp_code, employee_name) that
+ * are absent from an ordinary employee's own list. So the page asks
+ * hasPerm() what it is looking at rather than calling someone else's letter
+ * "yours", and names the employee on the rows that carry one.
+ *
+ * Ordering comes from the server (uploaded_at DESC, grouped by emp_code for
+ * the manage view), which is why a revision sits above the original without
+ * this page sorting anything.
  */
+
+/* Uploads are accepted as PDF, DOC/DOCX, JPG, PNG or WEBP, so the saved name
+ * has to follow the stored file rather than assume a PDF — a .docx letter
+ * saved as "….pdf" simply will not open. */
+function extOf(fileName) {
+  const m = /\.[a-zA-Z0-9]{1,8}$/.exec(String(fileName || ''));
+  return m ? m[0].toLowerCase() : '';
+}
 
 export default function OfferLetterPage() {
   const toast = useToast();
+  const manages = hasPerm('documents.manage');
   const [letters, setLetters] = useState(null);
   const [error, setError] = useState('');
   /* One key, not one flag per button: "12:view" means the View button on

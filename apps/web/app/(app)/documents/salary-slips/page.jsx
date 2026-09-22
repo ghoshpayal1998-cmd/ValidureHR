@@ -64,7 +64,11 @@ export default function SalarySlipsPage() {
   if (!slips) {
     return (
       <div className="page">
-        <PageHead eyebrow="Documents" title="Salary Slips" />
+        <PageHead
+          eyebrow="Documents"
+          title="Salary Slips"
+          sub="View, download or print your month-wise salary slips"
+        />
         {/* Skeleton cards rather than one block, so the grid does not
             reflow under the reader when the slips land. */}
         <div className="grid grid--3">
@@ -106,25 +110,39 @@ export default function SalarySlipsPage() {
                         <span className="stat__icon" style={{ flex: 'none' }}>
                           <FileText size={18} aria-hidden="true" />
                         </span>
-                        <span style={{ minWidth: 0 }}>
-                          <span style={{ display: 'block', fontSize: '.9375rem', fontWeight: 600 }}>
+                        <div style={{ minWidth: 0 }}>
+                          {/* A card title is a heading, so a year of slips is a
+                              year of stops in a screen reader's heading list
+                              rather than one undifferentiated block of text. */}
+                          <h2
+                            style={{
+                              fontFamily: 'var(--font-body)', fontSize: '.9375rem',
+                              fontWeight: 600, overflowWrap: 'anywhere',
+                            }}
+                          >
                             {slip.label}
-                          </span>
-                          {/* Slips uploaded as ready-made PDFs carry no amount,
-                              so the sub-line falls back to a plain description. */}
-                          <span className="faint" style={{ display: 'block', fontSize: '.75rem' }}>
-                            {slip.net_pay === null || slip.net_pay === undefined ? (
-                              'Salary slip document'
-                            ) : (
-                              <>
-                                Net Pay:{' '}
-                                <span className="mono" style={{ color: 'var(--muted)', fontWeight: 600 }}>
-                                  {money(slip.net_pay)}
-                                </span>
-                              </>
-                            )}
-                          </span>
-                        </span>
+                          </h2>
+                          {/* `period` is worked out per slip from the company's
+                              cycle start day — "25 Aug – 24 Sep 2026" on a 25th
+                              cycle, "September 2026" on a calendar one. Which
+                              dates a month's slip actually pays is the thing
+                              employees ask about most, so it goes on the card
+                              instead of being assumed. */}
+                          <p className="faint" style={{ fontSize: '.75rem', marginTop: '.15rem' }}>
+                            {slip.period
+                              || (slip.source === 'uploaded' ? 'Uploaded PDF' : 'Salary slip document')}
+                          </p>
+                          {/* Slips uploaded as ready-made PDFs carry no amounts,
+                              so the net pay line is absent rather than blank. */}
+                          {slip.net_pay === null || slip.net_pay === undefined ? null : (
+                            <p className="faint" style={{ fontSize: '.75rem', marginTop: '.15rem' }}>
+                              Net pay:{' '}
+                              <span className="mono" style={{ color: 'var(--fg)', fontWeight: 600 }}>
+                                {money(slip.net_pay)}
+                              </span>
+                            </p>
+                          )}
+                        </div>
                       </div>
 
                       <div className="row" style={{ gap: 'var(--s2)', marginTop: 'auto' }}>
@@ -149,19 +167,24 @@ export default function SalarySlipsPage() {
               })}
             </div>
 
+            {/* The cycle start day is a company setting, not a constant, so
+                this line points at the dates on each card instead of naming a
+                cycle that would be wrong for anyone not on 25→24. */}
             <p className="faint" style={{ fontSize: '.75rem' }}>
-              Slips are issued for the 25th-to-24th payroll cycle and stay available for as long as
-              you are on the rolls.
+              Each slip covers one payroll cycle — the dates it pays are on the card and on the
+              slip itself. Slips stay available for as long as you are on the rolls.
             </p>
           </>
         ) : (
           /* Nothing issued yet — a new joiner in their first month, for
              instance, or an employee whose first payroll run is still open. */
-          <Empty
-            icon={Inbox}
-            title="No salary slips available yet."
-            body="Each month’s slip appears here once the payroll run for that cycle has been approved and paid."
-          />
+          <div className="card">
+            <Empty
+              icon={Inbox}
+              title="No salary slips yet"
+              body="Each month’s slip appears here once the payroll run for that cycle has been approved and paid."
+            />
+          </div>
         )}
       </div>
     </div>
