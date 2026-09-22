@@ -55,7 +55,7 @@ export default function OfferLetterPage() {
       await openProtectedFile(
         `/documents/offer-letters/${letter.id}/file`,
         download,
-        `${letter.title}.pdf`,
+        `${letter.title}${extOf(letter.file_name) || '.pdf'}`,
       );
       toast(download ? 'Offer letter downloaded' : 'Opened in a new tab', 'ok');
     } catch (e) {
@@ -65,12 +65,18 @@ export default function OfferLetterPage() {
     }
   }
 
+  /* documents.manage gets the whole company's letters back, not just their
+   * own, so the subtitle must not claim otherwise. */
+  const sub = manages
+    ? 'Appointment letters across the company'
+    : 'Your employment offer letter(s)';
+
   if (error) return <div className="page"><ErrorNote error={error} onRetry={load} /></div>;
 
   if (!letters) {
     return (
       <div className="page">
-        <PageHead eyebrow="Documents" title="Offer Letter" sub="Your employment offer letter(s)" />
+        <PageHead eyebrow="Documents" title="Offer Letter" sub={sub} />
         <div className="grid grid--2" style={{ maxWidth: '48rem', gap: 'var(--s4)' }}>
           <div className="card"><Skeleton rows={3} /></div>
           <div className="card"><Skeleton rows={3} /></div>
@@ -81,7 +87,7 @@ export default function OfferLetterPage() {
 
   return (
     <div className="page">
-      <PageHead eyebrow="Documents" title="Offer Letter" sub="Your employment offer letter(s)" />
+      <PageHead eyebrow="Documents" title="Offer Letter" sub={sub} />
 
       {/* ------------------------------------------------ the letters
           Deliberately narrow: one column on a phone, two from 640px and
@@ -125,6 +131,17 @@ export default function OfferLetterPage() {
                   >
                     {l.title}
                   </h2>
+
+                  {/* With documents.manage the route returns every employee's
+                      letters, so without this the whole company's letters look
+                      alike and there is no way to tell whose is whose. */}
+                  {manages && (l.employee_name || l.emp_code) && (
+                    <p className="person__meta" style={{ marginTop: 'var(--s1)' }}>
+                      {l.employee_name}
+                      {l.employee_name && l.emp_code ? ' · ' : ''}
+                      {l.emp_code}
+                    </p>
+                  )}
 
                   {/* uploaded_at arrives as "YYYY-MM-DD HH:MM:SS"; fmtDate takes
                       the string apart instead of parsing it, so the day cannot
