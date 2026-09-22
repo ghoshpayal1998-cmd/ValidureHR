@@ -688,6 +688,13 @@ legend {
   h1 { font-size: 1.5rem; }
   .toasts { left: var(--s4); right: var(--s4); bottom: var(--s4); }
 }
+/* The hamburger and the rail's close button exist only while the rail is
+   off-canvas. */
+[data-mobile-only] { display: none !important; }
+@media (max-width: 900px) {
+  [data-mobile-only] { display: inline-flex !important; }
+}
+
 /* shell.js hides the name block beside the avatar on narrow screens */
 .hide-sm { display: block; }
 @media (max-width: 640px) { .hide-sm { display: none; } }

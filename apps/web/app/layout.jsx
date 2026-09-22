@@ -24,7 +24,10 @@ const THEME_BOOT = `try{var t=localStorage.getItem('vhr.theme');if(t)document.do
 
 export default function RootLayout({ children }) {
   return (
-    <html lang="en">
+    /* suppressHydrationWarning: the boot script below sets data-theme on
+       this element before React hydrates, so the server HTML deliberately
+       differs from the client. Without this, that intent reads as a bug. */
+    <html lang="en" suppressHydrationWarning>
       <head>
         <script dangerouslySetInnerHTML={{ __html: THEME_BOOT }} />
       </head>
