@@ -1,0 +1,148 @@
+'use client';
+
+import { useEffect, useState } from 'react';
+import { Download, Eye, FileBadge, FileText } from 'lucide-react';
+import { api, fmtDate, openProtectedFile } from '@/lib/api';
+import { Empty, ErrorNote, PageHead, Skeleton, useToast } from '@/components/ui';
+
+/*
+ * The API hands back exactly five fields per letter — id, employee_id,
+ * title, file_name, is_revised, uploaded_at — and nothing about the terms
+ * inside the PDF. So this screen does not try to preview the letter: it
+ * names it, dates it, says whether it is the original or a revision, and
+ * gets out of the way of the file itself.
+ *
+ * Ordering comes from the server (uploaded_at DESC), which is why a
+ * revision sits above the original without this page sorting anything.
+ */
+
+export default function OfferLetterPage() {
+  const toast = useToast();
+  const [letters, setLetters] = useState(null);
+  const [error, setError] = useState('');
+  /* One key, not one flag per button: "12:view" means the View button on
+   * letter 12 is in flight, so only that button goes quiet. */
+  const [busy, setBusy] = useState('');
+
+  const load = () => {
+    setError('');
+    api('/documents/offer-letters').then(setLetters).catch((e) => setError(e.message));
+  };
+  useEffect(load, []);
+
+  /* The file sits behind the auth header, so a plain href 404s — it has to
+   * be fetched as a blob. Nothing is being changed here, so there is no
+   * refetch afterwards; there would be nothing new to read. */
+  async function openFile(letter, download) {
+    setBusy(`${letter.id}:${download ? 'dl' : 'view'}`);
+    try {
+      await openProtectedFile(
+        `/documents/offer-letters/${letter.id}/file`,
+        download,
+        `${letter.title}.pdf`,
+      );
+      toast(download ? 'Offer letter downloaded' : 'Opened in a new tab', 'ok');
+    } catch (e) {
+      toast(e.message, 'err');
+    } finally {
+      setBusy('');
+    }
+  }
+
+  if (error) return <div className="page"><ErrorNote error={error} onRetry={load} /></div>;
+
+  if (!letters) {
+    return (
+      <div className="page">
+        <PageHead eyebrow="Documents" title="Offer Letter" sub="Your employment offer letter(s)" />
+        <div className="grid grid--2" style={{ maxWidth: '48rem', gap: 'var(--s4)' }}>
+          <div className="card"><Skeleton rows={3} /></div>
+          <div className="card"><Skeleton rows={3} /></div>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="page">
+      <PageHead eyebrow="Documents" title="Offer Letter" sub="Your employment offer letter(s)" />
+
+      {/* ------------------------------------------------ the letters
+          Deliberately narrow: one column on a phone, two from 640px and
+          never more, the whole grid capped at 48rem and left-aligned.
+          The space left over to its right is the point, not an accident. */}
+      <div className="grid grid--2" style={{ maxWidth: '48rem', gap: 'var(--s4)' }}>
+        {letters.length === 0 ? (
+          /* Sits in the first cell rather than across the page: an absent
+             letter is a small fact, and plenty of people who joined before
+             the portal existed will only ever see this. */
+          <div className="card">
+            <Empty
+              icon={FileText}
+              title="No offer letter uploaded yet"
+              body="Letters signed before the portal went live are often still on paper. Ask the People team and they will add yours — it will appear here, with any later revision above it."
+            />
+          </div>
+        ) : (
+          letters.map((l) => {
+            const tone = l.is_revised ? 'warn' : 'ok';
+            const viewing = busy === `${l.id}:view`;
+            const downloading = busy === `${l.id}:dl`;
+            return (
+              <article className="card" key={l.id}>
+                <div className="card__body">
+                  <div className="row row--between" style={{ alignItems: 'flex-start' }}>
+                    <span
+                      className="stat__icon"
+                      style={{ background: `var(--${tone}-soft)`, color: `var(--${tone})`, flex: 'none' }}
+                    >
+                      <FileBadge size={22} aria-hidden="true" />
+                    </span>
+                    <span className={`badge badge--${tone}`}>{l.is_revised ? 'Revised' : 'Original'}</span>
+                  </div>
+
+                  <h2
+                    style={{
+                      fontFamily: 'var(--font-body)', fontSize: '.9375rem', fontWeight: 600,
+                      marginTop: 'var(--s3)', overflowWrap: 'anywhere',
+                    }}
+                  >
+                    {l.title}
+                  </h2>
+
+                  {/* uploaded_at arrives as "YYYY-MM-DD HH:MM:SS"; fmtDate takes
+                      the string apart instead of parsing it, so the day cannot
+                      slip on a server whose clock is not IST. */}
+                  <p className="faint" style={{ fontSize: '.75rem', marginTop: '.25rem' }}>
+                    Uploaded: <span className="mono">{fmtDate(l.uploaded_at)}</span>
+                  </p>
+
+                  <div className="row" style={{ gap: 'var(--s2)', marginTop: 'var(--s4)' }}>
+                    <button
+                      className="btn btn--ghost btn--sm"
+                      style={{ flex: '1 1 0' }}
+                      onClick={() => openFile(l, false)}
+                      disabled={viewing || downloading}
+                    >
+                      <Eye size={15} aria-hidden="true" />
+                      {viewing ? 'Opening…' : 'View'}
+                    </button>
+                    <button
+                      className="btn btn--ghost btn--sm"
+                      style={{ flex: '1 1 0' }}
+                      onClick={() => openFile(l, true)}
+                      disabled={viewing || downloading}
+                    >
+                      <Download size={15} aria-hidden="true" />
+                      {downloading ? 'Downloading…' : 'Download PDF'}
+                    </button>
+                  </div>
+                </div>
+              </article>
+            );
+          })
+        )}
+      </div>
+    </div>
+  );
+}
