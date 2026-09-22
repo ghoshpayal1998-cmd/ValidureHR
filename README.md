@@ -12,41 +12,87 @@ VHR/
 
 ## Running it
 
-**The app and marketing site**
+Needs Node 20.6+ (for `--env-file`) and a Postgres. Verified end to end
+on Node 24 with Postgres 16.
+
+### 1. A database
+
+```bash
+docker run -d --name vhr-postgres -e POSTGRES_USER=validurehr -e POSTGRES_PASSWORD=validurehr -e POSTGRES_DB=validurehr -p 5432:5432 postgres:16-alpine
+```
+
+Any Postgres will do — point `DATABASE_URL` at it instead. Stop and
+start the container again later with `docker stop vhr-postgres` /
+`docker start vhr-postgres`; the data survives.
+
+### 2. The API
+
+```bash
+cd backend && npm install
+```
+
+It reads `backend/.env`, which is gitignored and already generated on
+this machine. On a fresh checkout, copy `.env.example` and set at
+least these — the API refuses to boot otherwise, on purpose:
+
+| | |
+|---|---|
+| `JWT_SECRET` | 32+ chars, and not one of the values published in this repo |
+| `ADMIN_PASSWORD` | 12+ chars, not a documented default |
+| `DATABASE_URL` | defaults to the docker line above |
+
+Generate a secret with:
+
+```bash
+node -e "console.log(require('crypto').randomBytes(48).toString('base64url'))"
+```
+
+Then create the schema and fill it:
+
+```bash
+cd backend && npm run init && npm run seed:validure && npm run dev
+```
+
+`init` creates the platform schema and the `admin` account from
+`ADMIN_PASSWORD`. `seed:validure` creates Validure Solutions Pvt. Ltd.
+with the same 24 people, leave types, shift pattern and September
+attendance the mockup shows, so nothing renders empty. It is safe to
+re-run — it drops and recreates only that one company.
+
+The API listens on <http://localhost:5050>.
+
+**Logins** — any employee code with the password the seeder prints
+(`Validure@123`):
+
+| | | |
+|---|---|---|
+| `VS-0101` | Vikram Rao | OWNER |
+| `VS-0104` | Sneha Nair | HR |
+| `VS-0113` | Ananya Iyer | EMPLOYEE |
+
+Platform admin is `admin` with your `ADMIN_PASSWORD`.
+
+### 3. The web app
 
 ```bash
 cd frontend && npm install && npm run dev
 ```
 
-<http://localhost:3000> — the marketing homepage. The product lives
-under `/login` and the routes below it, and proxies `/api/*` to the
-backend on port 5050 (`API_PROXY_URL` to change that).
+<http://localhost:3000> — the marketing homepage. `/api/*` proxies to
+port 5050 (`API_PROXY_URL` to change that).
 
-**The API**
+**The product screens are not built yet.** Only the marketing site
+exists so far; the API and its data are ready for them.
 
-```bash
-cd backend && npm install && npm run init && npm run seed:validure
-```
-
-`init` creates the platform schema and the admin account from
-`ADMIN_PASSWORD`. `seed:validure` creates Validure Solutions Pvt. Ltd.
-with the same 24 people, leave types, shift pattern and September
-attendance the mockup shows — so every screen has something in it on
-first boot instead of an empty state. Sign in with any employee code
-(`VS-0101` Vikram Rao, `VS-0104` Sneha Nair, `VS-0113` Ananya Iyer)
-and the password the seeder prints.
-
-Needs a Postgres reachable at `DATABASE_URL`.
-
-**The mockup**
+### The mockup
 
 ```bash
 cd mockup && python -m http.server 4173
 ```
 
-Still worth keeping running: it is the design reference the app is
-built against, and it answers "what should this screen look like"
-faster than the app does.
+Worth keeping running: it is the design reference the app is built
+against, and it answers "what should this screen look like" faster
+than the app does.
 
 ## Design
 

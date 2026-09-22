@@ -40,35 +40,35 @@ const DESIGNATIONS = [
   'Full Stack Developer', 'Mobile Developer',
 ];
 
-/* first, last, designation, department, joined, role, manager (by name).
+/* first, last, designation, department, joined, dob, role, manager (by name).
  * Managers are named rather than coded: employee codes here are derived
  * from list position, so a hand-written code silently points at whoever
  * happens to sit at that index. */
 const PEOPLE = [
-  ['Vikram', 'Rao', 'Engineering Manager', 'Engineering', '2021-02-08', 'OWNER', null],
-  ['Sneha', 'Nair', 'HR Manager', 'People', '2020-11-02', 'HR', 'Vikram Rao'],
-  ['Karthik', 'Subramanian', 'Tech Lead', 'Engineering', '2020-08-24', 'DIRECTOR', 'Vikram Rao'],
-  ['Rahul', 'Chatterjee', 'Solution Architect', 'Delivery', '2021-09-06', 'DIRECTOR', 'Vikram Rao'],
-  ['Ananya', 'Iyer', 'Senior Software Engineer', 'Engineering', '2023-04-17', 'EMPLOYEE', 'Vikram Rao'],
-  ['Priya', 'Sharma', 'QA Lead', 'Quality', '2022-07-11', 'EMPLOYEE', 'Vikram Rao'],
-  ['Rohan', 'Mehta', 'DevOps Engineer', 'Infrastructure', '2023-01-23', 'EMPLOYEE', 'Aditya Verma'],
-  ['Arjun', 'Kulkarni', 'Full Stack Developer', 'Engineering', '2023-09-04', 'EMPLOYEE', 'Vikram Rao'],
-  ['Kavya', 'Reddy', 'UI/UX Designer', 'Design', '2024-02-19', 'EMPLOYEE', 'Vikram Rao'],
-  ['Siddharth', 'Joshi', 'Data Engineer', 'Data', '2022-10-10', 'EMPLOYEE', 'Aditya Verma'],
-  ['Meera', 'Krishnan', 'Business Analyst', 'Delivery', '2024-06-03', 'EMPLOYEE', 'Rahul Chatterjee'],
-  ['Aditya', 'Verma', 'Cloud Architect', 'Infrastructure', '2021-05-17', 'EMPLOYEE', 'Vikram Rao'],
-  ['Divya', 'Menon', 'Software Engineer', 'Engineering', '2025-01-13', 'EMPLOYEE', 'Karthik Subramanian'],
-  ['Ishita', 'Bose', 'Content Strategist', 'Marketing', '2024-08-12', 'EMPLOYEE', 'Vikram Rao'],
-  ['Nikhil', 'Agarwal', 'Software Engineer', 'Engineering', '2024-11-18', 'EMPLOYEE', 'Karthik Subramanian'],
-  ['Pooja', 'Desai', 'Finance Executive', 'Finance', '2023-06-05', 'EMPLOYEE', 'Vikram Rao'],
-  ['Tanvi', 'Shah', 'QA Engineer', 'Quality', '2025-03-10', 'EMPLOYEE', 'Priya Sharma'],
-  ['Manish', 'Gupta', 'Sales Manager', 'Sales', '2022-03-28', 'EMPLOYEE', 'Vikram Rao'],
-  ['Lakshmi', 'Pillai', 'Talent Acquisition', 'People', '2024-04-15', 'EMPLOYEE', 'Sneha Nair'],
-  ['Gaurav', 'Singh', 'Mobile Developer', 'Engineering', '2023-11-20', 'EMPLOYEE', 'Karthik Subramanian'],
-  ['Riya', 'Malhotra', 'Product Manager', 'Product', '2022-01-17', 'EMPLOYEE', 'Vikram Rao'],
-  ['Abhishek', 'Pandey', 'Support Engineer', 'Support', '2025-05-26', 'EMPLOYEE', 'Rahul Chatterjee'],
-  ['Shruti', 'Kapoor', 'Marketing Executive', 'Marketing', '2025-02-03', 'EMPLOYEE', 'Ishita Bose'],
-  ['Deepak', 'Nambiar', 'Database Administrator', 'Data', '2022-12-12', 'EMPLOYEE', 'Vikram Rao'],
+  ['Vikram', 'Rao', 'Engineering Manager', 'Engineering', '2021-02-08', '1984-03-12', 'OWNER', null],
+  ['Sneha', 'Nair', 'HR Manager', 'People', '2020-11-02', '1986-11-30', 'HR', 'Vikram Rao'],
+  ['Karthik', 'Subramanian', 'Tech Lead', 'Engineering', '2020-08-24', '1983-07-19', 'DIRECTOR', 'Vikram Rao'],
+  ['Rahul', 'Chatterjee', 'Solution Architect', 'Delivery', '2021-09-06', '1982-09-05', 'DIRECTOR', 'Vikram Rao'],
+  ['Ananya', 'Iyer', 'Senior Software Engineer', 'Engineering', '2023-04-17', '1993-06-24', 'EMPLOYEE', 'Vikram Rao'],
+  ['Priya', 'Sharma', 'QA Lead', 'Quality', '2022-07-11', '1989-02-14', 'EMPLOYEE', 'Vikram Rao'],
+  ['Rohan', 'Mehta', 'DevOps Engineer', 'Infrastructure', '2023-01-23', '1994-12-01', 'EMPLOYEE', 'Aditya Verma'],
+  ['Arjun', 'Kulkarni', 'Full Stack Developer', 'Engineering', '2023-09-04', '1995-08-17', 'EMPLOYEE', 'Vikram Rao'],
+  ['Kavya', 'Reddy', 'UI/UX Designer', 'Design', '2024-02-19', '1997-04-09', 'EMPLOYEE', 'Vikram Rao'],
+  ['Siddharth', 'Joshi', 'Data Engineer', 'Data', '2022-10-10', '1985-10-22', 'EMPLOYEE', 'Aditya Verma'],
+  ['Meera', 'Krishnan', 'Business Analyst', 'Delivery', '2024-06-03', '1996-01-28', 'EMPLOYEE', 'Rahul Chatterjee'],
+  ['Aditya', 'Verma', 'Cloud Architect', 'Infrastructure', '2021-05-17', '1987-05-03', 'EMPLOYEE', 'Vikram Rao'],
+  ['Divya', 'Menon', 'Software Engineer', 'Engineering', '2025-01-13', '1999-09-16', 'EMPLOYEE', 'Karthik Subramanian'],
+  ['Ishita', 'Bose', 'Content Strategist', 'Marketing', '2024-08-12', '1998-03-27', 'EMPLOYEE', 'Vikram Rao'],
+  ['Nikhil', 'Agarwal', 'Software Engineer', 'Engineering', '2024-11-18', '1999-11-08', 'EMPLOYEE', 'Karthik Subramanian'],
+  ['Pooja', 'Desai', 'Finance Executive', 'Finance', '2023-06-05', '1992-07-15', 'EMPLOYEE', 'Vikram Rao'],
+  ['Tanvi', 'Shah', 'QA Engineer', 'Quality', '2025-03-10', '2000-02-21', 'EMPLOYEE', 'Priya Sharma'],
+  ['Manish', 'Gupta', 'Sales Manager', 'Sales', '2022-03-28', '1988-06-11', 'EMPLOYEE', 'Vikram Rao'],
+  ['Lakshmi', 'Pillai', 'Talent Acquisition', 'People', '2024-04-15', '1996-10-04', 'EMPLOYEE', 'Sneha Nair'],
+  ['Gaurav', 'Singh', 'Mobile Developer', 'Engineering', '2023-11-20', '1995-05-19', 'EMPLOYEE', 'Karthik Subramanian'],
+  ['Riya', 'Malhotra', 'Product Manager', 'Product', '2022-01-17', '1990-08-26', 'EMPLOYEE', 'Vikram Rao'],
+  ['Abhishek', 'Pandey', 'Support Engineer', 'Support', '2025-05-26', '2001-01-30', 'EMPLOYEE', 'Rahul Chatterjee'],
+  ['Shruti', 'Kapoor', 'Marketing Executive', 'Marketing', '2025-02-03', '1999-06-07', 'EMPLOYEE', 'Ishita Bose'],
+  ['Deepak', 'Nambiar', 'Database Administrator', 'Data', '2022-12-12', '1991-12-13', 'EMPLOYEE', 'Vikram Rao'],
 ];
 
 const LEAVE_TYPES = [
@@ -162,15 +162,15 @@ const SEPT = 'PPPPPWWPPPPPWWPLPPPWWP'.split('');
    * manager has not landed yet is linked in a second pass. */
   const pending = [];
   for (let i = 0; i < PEOPLE.length; i++) {
-    const [first, last, desig, dept, doj, role, mgr] = PEOPLE[i];
+    const [first, last, desig, dept, doj, dob, role, mgr] = PEOPLE[i];
     const code = empCode(i);
     const email = `${first}.${last}`.toLowerCase() + '@' + DOMAIN;
     const emp = await tqOne(SCHEMA, `
       INSERT INTO {s}.employees
-        (emp_code, first_name, last_name, phone, email, doj, department_id, designation_id)
-      VALUES ($1,$2,$3,$4,$5,$6,$7,$8) RETURNING id`,
+        (emp_code, first_name, last_name, phone, email, doj, dob, department_id, designation_id)
+      VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9) RETURNING id`,
       [code, first, last, '+91 98450 ' + String(10000 + i * 431).slice(0, 5),
-       email, doj, await deptId(dept), await desigId(desig)]);
+       email, doj, dob, await deptId(dept), await desigId(desig)]);
 
     const user = await tqOne(SCHEMA,
       `INSERT INTO {s}.users (username, email, password_hash, role_id, employee_id)

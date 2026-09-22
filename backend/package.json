@@ -4,15 +4,15 @@
   "description": "ValidureHR - HRMS REST API",
   "main": "src/server.js",
   "scripts": {
-    "start": "node src/init.js && node src/server.js",
-    "dev": "node --watch src/server.js",
-    "init": "node src/init.js",
-    "seed:demo": "node src/seed.js",
-    "reset:admin": "node src/resetAdmin.js",
+    "start": "node --env-file-if-exists=.env src/init.js && node --env-file-if-exists=.env src/server.js",
+    "dev": "node --env-file-if-exists=.env --watch src/server.js",
+    "init": "node --env-file-if-exists=.env src/init.js",
+    "seed:demo": "node --env-file-if-exists=.env src/seed.js",
+    "reset:admin": "node --env-file-if-exists=.env src/resetAdmin.js",
     "test": "node --test \"test/unit/*.test.js\" \"test/security/*.test.js\"",
     "test:unit": "node --test \"test/unit/*.test.js\"",
     "test:security": "node --test \"test/security/*.test.js\"",
-    "seed:validure": "node src/seedValidure.js"
+    "seed:validure": "node --env-file-if-exists=.env src/seedValidure.js"
   },
   "dependencies": {
     "bcryptjs": "^2.4.3",
