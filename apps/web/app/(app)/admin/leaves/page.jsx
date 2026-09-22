@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { Ban, CalendarOff, Check, ChevronLeft, ChevronRight, Inbox, Paperclip, X } from 'lucide-react';
-import { api, fmtDate, fmtDay, hasPerm, initials, openProtectedFile } from '@/lib/api';
+import { api, fmtDate, fmtDay, getUser, hasPerm, initials, openProtectedFile } from '@/lib/api';
 import { ConfirmModal, Empty, ErrorNote, Field, Modal, PageHead, Skeleton, StatusBadge, useToast } from '@/components/ui';
 
 /* The five filters, in the order HR works through them: the approval inbox
@@ -32,6 +32,15 @@ const MONTH_NAMES = ['January', 'February', 'March', 'April', 'May', 'June',
 export default function AdminLeavesPage() {
   const toast = useToast();
   const canApprove = hasPerm('leaves.approve');
+  /* The API refuses a self-approval unless the approver is a company admin
+   * role: see the 403 in routes/leaves.js, which exempts OWNER and DIRECTOR.
+   * Mirroring that rule here keeps HR from being offered a button that
+   * answers "You cannot approve your own leave application". The session
+   * carries emp_code but no employee id, and every leave row carries
+   * emp_code too, so that is what the two are matched on. */
+  const me = getUser();
+  const selfCode = me?.employee?.emp_code || null;
+  const maySelfApprove = !!me?.admin || ['OWNER', 'DIRECTOR'].includes(String(me?.role || '').toUpperCase());
 
   const [status, setStatus] = useState('Pending');
   const [rows, setRows] = useState(null);
@@ -214,6 +223,10 @@ export default function AdminLeavesPage() {
                     {rows.map((l) => {
                       const approving = busy === `approve-${l.id}`;
                       const canCancel = l.status !== 'Cancelled' && l.status !== 'Rejected';
+                      /* Cancel stays: DELETE /leaves/:id explicitly allows the
+                       * owner to withdraw their own request. */
+                      const isOwn = !!selfCode && l.emp_code === selfCode;
+                      const canDecide = canApprove && (maySelfApprove || !isOwn);
                       return (
                         <tr key={l.id}>
                           <td className="faint mono">#{l.id}</td>
@@ -290,7 +303,7 @@ export default function AdminLeavesPage() {
                           <td className="num">
                             {canApprove && (
                               <div className="row" style={{ gap: 'var(--s1)', justifyContent: 'flex-end', flexWrap: 'nowrap' }}>
-                                {l.status === 'Pending' && (
+                                {l.status === 'Pending' && canDecide && (
                                   <>
                                     <button
                                       className="iconbtn"
