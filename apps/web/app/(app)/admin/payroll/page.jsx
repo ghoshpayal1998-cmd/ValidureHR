@@ -104,6 +104,10 @@ export default function AdminPayrollPage() {
 
   const loadCycle = () => {
     setCycleError('');
+    /* Cleared before the fetch, not just on failure. Keeping the old cycle on
+     * screen meant the period label — and the export confirmation that quotes
+     * it — went on naming the month the user had just navigated away from. */
+    setCycle(null);
     setLoadingCycle(true);
     api(`/payroll/lop/${year}/${month}`)
       .then(setCycle)
@@ -364,8 +368,11 @@ export default function AdminPayrollPage() {
             </div>
             <div className="card__foot">
               <p className="faint" style={{ fontSize: '.75rem' }}>
-                The cycle runs the 25th to the 24th, so a month’s sheet is paid against the previous
-                month’s closing days. The export downloads <span className="mono">{csvName}</span> — the
+                {/* The cycle is a per-company setting, so it is read off the
+                    period the API returns rather than asserted here — this
+                    used to claim "the 25th to the 24th" to every tenant. */}
+                {period?.label && <>This sheet covers <b>{period.label}</b>, the payroll cycle set in Settings. </>}
+                The export downloads <span className="mono">{csvName}</span> — the
                 full salary sheet, bank account numbers included, and every export is written to the
                 audit log.
               </p>

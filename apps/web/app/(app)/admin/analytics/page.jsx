@@ -51,7 +51,18 @@ const LEAVE_ORDER = ['Approved', 'Pending', 'Manager Approved', 'HR Approved', '
 
 /* StatusBadge already tones Approved / Pending / Rejected. The two mid-flight
  * approval states it has never seen need saying out loud. */
-const LEAVE_TONE = { 'Manager Approved': 'info', 'HR Approved': 'info', Cancelled: 'neutral' };
+/* The badge label carries the count ("Approved: 41"), and StatusBadge keys its
+ * own tone map off the whole status string — so a tone has to be named here
+ * for EVERY status, not only the mid-flight approval states. Otherwise the
+ * three that matter most all render as the same neutral grey. */
+const LEAVE_TONE = {
+  Approved: 'ok',
+  'Manager Approved': 'info',
+  'HR Approved': 'info',
+  Pending: 'warn',
+  Rejected: 'err',
+  Cancelled: 'neutral',
+};
 
 /* A 403 from this route is a role fact, not a fault: HR simply does not carry
  * analytics.view. It reads as its own state rather than as a red error card. */
@@ -230,10 +241,17 @@ export default function AdminAnalyticsPage() {
 
   /* Rates are clamped before they are drawn: a column taller than the plot
    * would paint over the value label above it. */
-  const trend = attendanceTrend.map((t) => ({
-    month: t.month,
-    rate: Math.max(0, Math.min(100, Math.round(num(t.rate)))),
-  }));
+  /* `working` is the month's denominator. A month where nothing was ever
+   * marked has none, and drawing it as 0% reads as total absence rather than
+   * as no data — so those months are dropped from the chart instead. A real
+   * all-absent month still has working > 0 and is still drawn. */
+  const trend = attendanceTrend
+    .filter((t) => num(t.working) > 0)
+    .map((t) => ({
+      month: t.month,
+      rate: Math.max(0, Math.min(100, Math.round(num(t.rate)))),
+    }));
+  const trendMonthsDropped = attendanceTrend.length - trend.length;
 
   const leaveRows = leaveByType.map((l) => ({
     key: l.code || l.name,
@@ -245,8 +263,12 @@ export default function AdminAnalyticsPage() {
   /* The query already orders by headcount descending; sorting again keeps the
    * chart honest if that ever changes server-side. */
   const deptRows = [...deptHeadcount]
-    .map((d) => ({ key: d.name, name: d.name, value: num(d.c) }))
+    .map((d) => ({ key: d.name, name: d.name, value: num(d.c), unassigned: !!d.unassigned }))
     .sort((a, b) => b.value - a.value);
+  /* Everyone active is counted, but "Unassigned" is a bucket, not a team — so
+   * the headcount includes it and the department count does not. */
+  const deptPeople = deptRows.reduce((t, d) => t + d.value, 0);
+  const deptCount = deptRows.filter((d) => !d.unassigned).length;
 
   const statuses = [...leaveStatusSplit].sort((a, b) => {
     const ia = LEAVE_ORDER.indexOf(a.status), ib = LEAVE_ORDER.indexOf(b.status);
@@ -344,6 +366,14 @@ export default function AdminAnalyticsPage() {
                 Present + WFH (half days count 0.5) as a share of working days. The scale runs
                 0–100%. Each point covers that month’s payroll cycle, not the calendar month —
                 a cycle is named for the month it ends in.
+                {trendMonthsDropped > 0 && (
+                  <>
+                    {' '}{trendMonthsDropped} earlier{' '}
+                    {trendMonthsDropped === 1 ? 'cycle has' : 'cycles have'} no attendance marked at
+                    all and {trendMonthsDropped === 1 ? 'is' : 'are'} left out rather than drawn as
+                    0%.
+                  </>
+                )}
               </p>
             </div>
           ) : (
@@ -426,9 +456,12 @@ export default function AdminAnalyticsPage() {
                 label="Active headcount by department"
               />
               <p className="faint" style={{ fontSize: '.75rem', marginTop: 'var(--s3)' }}>
-                {deptRows.reduce((s, d) => s + d.value, 0)} active employees across
-                {' '}{deptRows.length} departments. A department with nobody in it still appears,
-                so an empty team is visible rather than missing.
+                {deptPeople} active employees across {deptCount}
+                {' '}{deptCount === 1 ? 'department' : 'departments'}. A department with nobody in it
+                still appears, so an empty team is visible rather than missing
+                {deptRows.some((d) => d.unassigned)
+                  ? ', and anyone without a department is counted under Unassigned'
+                  : ''}.
               </p>
             </div>
           ) : (

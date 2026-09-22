@@ -81,7 +81,15 @@ router.get('/analytics', requirePerm('analytics.view'), async (req, res, next) =
           COALESCE(SUM(CASE WHEN status IN ('Present','WFH') THEN 1 WHEN status='Half Day' THEN 0.5 ELSE 0 END), 0) AS present,
           COALESCE(SUM(CASE WHEN status IN ('Present','WFH','Half Day','Absent','Leave') THEN 1 ELSE 0 END), 0) AS working
         FROM {s}.attendance WHERE date BETWEEN $1 AND $2`, [from, to]);
-      attendanceTrend.push({ month: ym, rate: agg.working ? Math.round((agg.present / agg.working) * 100) : 0 });
+      /* `working` travels with the rate so the client can tell a month with no
+       * attendance at all from a genuine 0% one. Without it, a company that
+       * has not started marking attendance was drawn as six months of total
+       * absence rather than as no data. */
+      attendanceTrend.push({
+        month: ym,
+        working: Number(agg.working) || 0,
+        rate: agg.working ? Math.round((agg.present / agg.working) * 100) : 0,
+      });
     }
     const leaveByType = await tq(req.s, `
       SELECT lt.name, lt.code, COALESCE(SUM(la.days), 0) AS days, COUNT(la.id)::int AS applications
@@ -92,6 +100,13 @@ router.get('/analytics', requirePerm('analytics.view'), async (req, res, next) =
       SELECT d.name, COUNT(e.id)::int c FROM {s}.departments d
       LEFT JOIN {s}.employees e ON e.department_id=d.id AND e.status='Active'
       GROUP BY d.id, d.name ORDER BY c DESC`);
+    /* The same gap /overview already patches: a department-only query drops
+     * every active employee whose department_id is NULL, so the bars summed
+     * to fewer people than the company has — and this screen prints that sum
+     * as its headline "N active employees", disagreeing with Overview. */
+    const deptUnassigned = (await tqOne(req.s,
+      `SELECT COUNT(*)::int c FROM {s}.employees WHERE status='Active' AND department_id IS NULL`)).c;
+    if (deptUnassigned > 0) deptHeadcount.push({ name: 'Unassigned', c: deptUnassigned, unassigned: true });
     // "This month" here is the running cycle, same as the dashboard counters.
     const nowCycle = cycleForDate(todayIso(), startDay);
     const nowRange = cycleRange(nowCycle.year, nowCycle.month, startDay);

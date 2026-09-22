@@ -44,7 +44,12 @@ const DAY = /^\d{4}-(0[1-9]|1[0-2])-(0[1-9]|[12]\d|3[01])$/;
 
 function cycleLabel(period) {
   if (!period || !DAY.test(String(period.from)) || !DAY.test(String(period.to))) return '';
-  return `${fmtDay(period.from, false)} – ${fmtDay(period.to)}`;
+  /* The single trailing year belongs to BOTH ends, so it can only be dropped
+   * from the start when the two ends share it. A cycle crossing new year
+   * otherwise reads "25 Dec – 24 Jan 2026", dating the start a year late on a
+   * payroll figure. Same rule as cycleLabel in apps/api/src/cycle.js. */
+  const sameYear = String(period.from).slice(0, 4) === String(period.to).slice(0, 4);
+  return `${fmtDay(period.from, !sameYear)} – ${fmtDay(period.to)}`;
 }
 
 /* ---------------------------------------------------------------- shape */
