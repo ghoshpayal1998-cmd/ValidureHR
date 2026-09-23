@@ -73,6 +73,8 @@
 .section--surface { background: var(--surface); }
 .section__head { max-width: 46rem; display: grid; gap: var(--s4); }
 .section__head h2 { font-size: clamp(1.9rem, 3.2vw, 2.9rem); }
+.section__head h1 { font-size: clamp(2.2rem, 4.4vw, 3.4rem); }
+.section__head h1 .tint { color: var(--accent); }
 
 /* ------------------------------------------------------------ hero */
 .hero {
@@ -303,4 +305,244 @@
 @media (max-width: 560px) {
   .sitefoot__in { grid-template-columns: 1fr; }
   .hero__cta .btn { flex: 1 1 auto; }
+}
+
+/* ============================================================
+   Pricing
+   Three plans, a comparison table and the onboarding we do.
+   The recommended plan is lifted rather than recoloured: it is
+   an object, and DESIGN.md lets objects lift.
+   ============================================================ */
+
+.plans {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: var(--s5);
+  margin-top: var(--s10);
+  align-items: start;
+}
+
+/* Every card has the same eight rows — flag, name, line, price, terms,
+   minimum, button, list — so subgrid pins each one to a shared baseline
+   across the row. Without it a description that wraps to a third line in
+   one column drops that column's price below its neighbours, which is the
+   single comparison this table exists to make. Tuning the copy lengths
+   would fix it at one width and break it at the next. */
+@supports (grid-template-rows: subgrid) {
+  .plans {
+    grid-template-rows: repeat(8, auto);
+    row-gap: 0;
+    align-items: stretch;
+  }
+  .plan {
+    grid-row: span 8;
+    grid-template-rows: subgrid;
+    row-gap: var(--s4);
+  }
+}
+
+.plan {
+  display: grid;
+  gap: var(--s4);
+  align-content: start;
+  padding: var(--s6);
+  border: 1px solid var(--line);
+  border-radius: var(--r-lg);
+  background: var(--raised);
+  box-shadow: var(--shadow-card);
+}
+/* Inset ring rather than a thicker border, so the recommended card keeps
+   the same box as its neighbours and the row does not shift. */
+.plan--rec {
+  border-color: var(--accent);
+  box-shadow: var(--shadow-pop), inset 0 0 0 1px var(--accent);
+}
+
+.plan__flag {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: 500;
+  letter-spacing: .14em;
+  text-transform: uppercase;
+  color: var(--accent-strong);
+}
+.plan__name { font-size: 1.25rem; }
+.plan__line { font-size: .875rem; color: var(--muted); text-wrap: pretty; }
+
+.plan__price {
+  display: flex;
+  align-items: baseline;
+  gap: var(--s3);
+  margin-top: var(--s2);
+  padding-top: var(--s5);
+  border-top: 1px solid var(--line);
+}
+.plan__amt {
+  font-family: var(--font-head);
+  font-size: clamp(2.2rem, 4vw, 2.75rem);
+  font-weight: 680;
+  letter-spacing: -.03em;
+  line-height: 1;
+  font-variant-numeric: tabular-nums;
+}
+.plan__unit { font-size: .75rem; line-height: 1.25; color: var(--faint); }
+.plan__terms { font-size: .8125rem; color: var(--muted); text-wrap: pretty; }
+.plan__terms b { font-weight: 600; color: var(--fg); }
+.plan__min {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: .04em;
+  color: var(--faint);
+}
+
+.plan__cta { width: 100%; justify-content: center; }
+
+.plan__list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: grid;
+  gap: var(--s3);
+  padding-top: var(--s5);
+  border-top: 1px solid var(--line);
+}
+.plan__list li { display: flex; gap: var(--s3); font-size: .875rem; }
+.plan__list svg { flex: none; color: var(--accent-strong); margin-top: .15rem; }
+.plan__list .plan__inherit {
+  font-weight: 600;
+  font-size: .8125rem;
+  color: var(--fg);
+}
+/* Named rather than implied: a plan that withholds payroll should say so
+   where the buyer is reading, not only in the table further down. */
+.plan__list .plan__lacks { font-size: .8125rem; color: var(--muted); font-style: italic; }
+
+.plans__foot {
+  margin-top: var(--s6);
+  font-size: .8125rem;
+  color: var(--faint);
+  text-wrap: pretty;
+}
+
+/* ------------------------------------------------------------ tables */
+/* Scrollable on a phone, and focusable so a keyboard can reach the scroll. */
+.tablewrap {
+  margin-top: var(--s8);
+  overflow-x: auto;
+  border: 1px solid var(--line);
+  border-radius: var(--r-lg);
+  background: var(--raised);
+}
+.tablewrap:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+.cmp { width: 100%; min-width: 34rem; }
+.cmp th, .cmp td { vertical-align: middle; }
+/* The product's table header is a 10px uppercase mono eyebrow, which is right
+   for a column called "Hrs" and wrong for twenty rows of sentences and for a
+   plan's name. Both are content here, so both read as body text. */
+/* .table th is (0,1,1), so a lone class here loses to it and the override
+   silently does nothing. Qualified with the element to clear it. */
+.cmp th.cmp__h,
+.cmp th.cmp__f,
+.cmp--money th[scope='row'] {
+  font-family: var(--font-body);
+  text-transform: none;
+  letter-spacing: normal;
+  color: var(--fg);
+}
+.cmp th.cmp__h { font-size: .875rem; font-weight: 600; text-align: center; }
+.cmp th.cmp__f { font-size: .875rem; font-weight: 400; text-align: left; text-wrap: pretty; }
+.cmp__c { width: 8.5rem; }
+.cmp__c { text-align: center; }
+.cmp__yes { color: var(--accent-strong); }
+/* --muted, not --faint: the dash carries meaning, so it has to clear the
+   3:1 that WCAG 1.4.11 asks of a non-text indicator. */
+.cmp__no { color: var(--muted); }
+.cmp--money { min-width: 30rem; }
+.cmp--money th[scope='row'] { font-size: .9375rem; font-weight: 600; font-variant-numeric: tabular-nums; }
+
+/* ------------------------------------------------------------ setup */
+.setup {
+  list-style: none;
+  padding: 0;
+  margin: var(--s10) 0 0;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--s6) var(--s8);
+}
+.setup__item {
+  display: flex;
+  gap: var(--s4);
+  padding-top: var(--s5);
+  border-top: 2px solid var(--line);
+}
+.setup__n {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: .16em;
+  color: var(--accent-strong);
+  padding-top: .15rem;
+}
+.setup__item h3 { font-family: var(--font-body); font-size: 1rem; font-weight: 600; }
+.setup__item p { font-size: .875rem; color: var(--muted); margin-top: var(--s2); }
+.setup__foot {
+  margin-top: var(--s10);
+  max-width: 62ch;
+  font-size: 1.0625rem;
+  color: var(--muted);
+  text-wrap: pretty;
+}
+
+/* ------------------------------------------------------------ faq */
+.faq { margin-top: var(--s8); max-width: 54rem; border-top: 1px solid var(--line); }
+.faq__item { border-bottom: 1px solid var(--line); }
+.faq__item summary {
+  cursor: pointer;
+  list-style: none;
+  padding: var(--s5) var(--s10) var(--s5) 0;
+  position: relative;
+  font-weight: 600;
+  font-size: 1rem;
+  min-height: 24px;
+}
+.faq__item summary::-webkit-details-marker { display: none; }
+/* A plus that becomes a minus — drawn in CSS so there is no icon to load
+   and no state for JavaScript to get wrong. */
+.faq__item summary::after,
+.faq__item summary::before {
+  content: '';
+  position: absolute;
+  right: var(--s3);
+  top: 50%;
+  width: 11px;
+  height: 1.5px;
+  background: var(--muted);
+  transition: transform var(--dur-ui) var(--ease-out);
+}
+.faq__item summary::before { transform: translateY(-50%) rotate(90deg); }
+.faq__item summary::after { transform: translateY(-50%); }
+.faq__item[open] summary::before { transform: translateY(-50%) rotate(0deg); }
+.faq__item summary:hover { color: var(--accent); }
+.faq__item summary:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: -2px;
+  border-radius: var(--r-sm);
+}
+.faq__item p {
+  padding: 0 var(--s10) var(--s6) 0;
+  margin-top: calc(var(--s2) * -1);
+  color: var(--muted);
+  max-width: 64ch;
+  text-wrap: pretty;
+}
+
+/* ------------------------------------------------------------ responsive */
+@media (max-width: 1000px) {
+  /* Two across. DOM order is kept so the plans still read cheapest first;
+     the accent ring is what marks the recommendation, not position. */
+  .plans { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+@media (max-width: 720px) {
+  .plans, .setup { grid-template-columns: minmax(0, 1fr); }
 }

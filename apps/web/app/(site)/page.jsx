@@ -7,7 +7,7 @@ import {
 export const metadata = {
   title: 'ValidureHR — HR that runs on time',
   description:
-    'Attendance, leave, payroll and documents for the whole company, in one place. Night-shift aware, biometric-ready, and built for Indian payroll.',
+    'Attendance, leave, payroll and documents for the whole company. We create it, load your people and hand over the logins. Night-shift aware, biometric-ready, and built for Indian payroll.',
 };
 
 const FEATURES = [
@@ -44,10 +44,10 @@ const FEATURES = [
 ];
 
 const STEPS = [
-  { n: '01', title: 'Add the company', body: 'Departments, designations, leave types and the holiday calendar. Each company gets its own isolated schema.' },
-  { n: '02', title: 'Bring people in', body: 'Employees, reporting lines and salary structures. Everyone gets a login and their own document shelf.' },
-  { n: '03', title: 'Connect a reader, if you use one', body: 'Optional. Map biometric IDs to employees once and punches sync on a schedule. Companies without a reader skip this — people punch in from the app.' },
-  { n: '04', title: 'Run the month', body: 'Approve leave as it comes, then close payroll against the attendance it depends on. Export the salary sheet.' },
+  { n: '01', who: 'We', title: 'We create the company', body: 'Its own database schema, with your departments, designations, leave types and holiday calendar already in it. Nothing is shared with anyone else on the platform.' },
+  { n: '02', who: 'We', title: 'We bring your people in', body: 'Employees, reporting lines, leave balances and salary structures. Everyone gets a login and their own document shelf.' },
+  { n: '03', who: 'We', title: 'We connect your reader', body: 'Optional. Biometric IDs map to employees once and punches sync on a schedule. Without a reader, people punch in from the app instead.' },
+  { n: '04', who: 'You', title: 'You run the month', body: 'Approve leave as it comes, then close payroll against the attendance it depends on. Export the salary sheet. This is the only part that was ever your job.' },
 ];
 
 export default function Home() {
@@ -60,9 +60,9 @@ export default function Home() {
             <p className="eyebrow">Human Resource Platform</p>
             <h1>HR that runs<br />on <span className="tint">time.</span></h1>
             <p className="hero__lede">
-              Attendance, leave, payroll and documents for the whole company —
-              in one place, engineered to the same standard as everything else
-              Validure builds.
+              Attendance, leave, payroll and documents for the whole company.
+              We create it, configure it to your rules and load your people —
+              so the first time you sign in, it already works.
             </p>
             <div className="hero__cta">
               <a className="btn btn--primary btn--lg" href="#contact">
@@ -139,8 +139,8 @@ export default function Home() {
         <div className="wrap">
           <div className="statstrip">
             {[
-              ['1', 'Installation, however many companies'],
-              ['0', 'Shared tables between them'],
+              ['0', 'Setup work on your side'],
+              ['1', 'Schema per company, never shared'],
               ['19:00', 'Shift start the payroll cycle respects'],
               ['25th', 'Or the 1st — the cycle is yours to set'],
             ].map(([n, label]) => (
@@ -187,14 +187,15 @@ export default function Home() {
             <p className="eyebrow">How it works</p>
             <h2>Four steps to a working company.</h2>
             <p className="lede">
-              In this order. We do the first three with you.
+              Three of them are ours. You arrive at the fourth, and the company
+              is already set up, populated and running.
             </p>
           </div>
 
           <div className="steps">
-            {STEPS.map(({ n, title, body }, i) => (
-              <div className="step" key={n} data-on={i === 0 ? 'true' : 'false'}>
-                <span className="step__n">{n}</span>
+            {STEPS.map(({ n, who, title, body }) => (
+              <div className="step" key={n} data-on={who === 'You' ? 'true' : 'false'}>
+                <span className="step__n">{n} · {who}</span>
                 <h3>{title}</h3>
                 <p>{body}</p>
               </div>
@@ -223,8 +224,8 @@ export default function Home() {
                   'A punch recorded at 04:03 belongs to the shift that began at 19:00 the day before, and the calendar shows it there.'],
                 [Fingerprint, 'Biometric readers, mapped once',
                   'Device IDs map to employees once and then sync on a schedule. If a reader goes quiet, someone is told rather than finding out on payday.'],
-                [Building2, 'Several companies, properly separated',
-                  'Each company gets its own database schema. Switching between them is deliberate, and nothing leaks across.'],
+                [Building2, 'More than one company? Each one is separate',
+                  'Run three entities and you get three companies, each provisioned by us with its own schema. Switching between them is deliberate, and nothing leaks across.'],
               ].map(([Icon, title, body]) => (
                 <div className="check" key={title}>
                   <Icon size={18} aria-hidden="true" />
@@ -315,13 +316,14 @@ export default function Home() {
             <p>
               Open the seeded company and run a payroll cycle against a month of
               night-shift attendance — every figure end to end, clearly labelled as
-              demo data. If it does not hold up, you have lost an afternoon.
+              demo data. The prices are published too, so you can work out what it
+              costs before you speak to anyone.
             </p>
             <div className="row row--wrap" style={{ gap: 'var(--s3)', justifyContent: 'center' }}>
               <a className="btn btn--primary btn--lg" href="mailto:info@validuresolutions.com?subject=ValidureHR%20walkthrough">
                 Book a walkthrough <ArrowRight size={17} aria-hidden="true" />
               </a>
-              <Link className="btn btn--ghost btn--lg" href="/login">Sign in</Link>
+              <Link className="btn btn--ghost btn--lg" href="/pricing">See pricing</Link>
             </div>
             <p className="faint" style={{ fontSize: '.8125rem' }}>
               info@validuresolutions.com · +91 86177 89675

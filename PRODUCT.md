@@ -99,8 +99,31 @@ point, not the headline.
   rule independently.
 - The backend is ported from F1HR, a system running in production for another
   company. The repository is private and must stay private for that reason.
-- **Undecided:** pricing, licensing, plan tiers, onboarding of a new tenant,
-  and the hosting model a buyer would get. Future work must not invent them.
+- **Onboarding is done by us, not by the buyer.** `companies.js` is guarded by
+  `requireAdmin`: only the platform admin can create a company. Validure's admin
+  provisions the schema, configures departments, leave rules, the holiday
+  calendar, the payroll cycle and the salary structures, loads the employees,
+  and hands over the logins. A customer never creates a company, and the
+  marketing must never imply self-serve signup or a free trial someone
+  activates alone. Confirmed by the user 2026-09-23.
+- **Multi-tenancy is our operational leverage, not a customer-facing feature.**
+  One installation serving many companies is why onboarding can be included
+  rather than sold as an implementation project. It is sold to a buyer only in
+  the narrow case where that buyer runs several entities and wants each one
+  provisioned separately — the Group plan.
+- **Pricing, decided 2026-09-23.** Three plans, per person per month, exclusive
+  of GST: **Attendance & Leave** ₹49 annual / ₹59 monthly (no payroll, from 25
+  people); **Payroll** ₹82 / ₹99 (from 25 people, the recommended plan);
+  **Group** ₹124 / ₹149 (from 100 people across the buyer's companies).
+  Annual billing is roughly two months free and includes setup; monthly billing
+  carries a real ₹12,000 setup fee per company. The numbers live in one array
+  in `apps/web/app/(site)/pricing/page.jsx`.
+  - The **Recommended** flag on Payroll states a first-party reason. No plan may
+    carry "Most popular" or any other claim about how other buyers chose, and no
+    crossed-out price may appear unless that price is genuinely charged to
+    someone. The ₹12,000 setup fee qualifies because monthly customers pay it.
+- **Still undecided:** licensing, and the hosting model a buyer would get.
+  Future work must not invent them.
 
 ## Brand Commitments
 

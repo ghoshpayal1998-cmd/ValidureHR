@@ -4,18 +4,19 @@ import Logo from '@/components/Logo';
 import ThemeToggle from '@/components/ThemeToggle';
 
 const NAV = [
-  ['What it does', '#features'],
-  ['How it works', '#how'],
-  ['Built for shifts', '#shifts'],
-  ['Security', '#security'],
+  ['What it does', '/#features'],
+  ['How it works', '/#how'],
+  ['Built for shifts', '/#shifts'],
+  ['Security', '/#security'],
+  ['Pricing', '/pricing'],
 ];
 
 const FOOTER = [
   ['Product', [
-    ['What it does', '#features'],
-    ['How it works', '#how'],
-    ['Built for shifts', '#shifts'],
-    ['Security', '#security'],
+    ['What it does', '/#features'],
+    ['How it works', '/#how'],
+    ['Built for shifts', '/#shifts'],
+    ['Security', '/#security'],
   ]],
   ['Company', [
     ['Validure Solutions', 'https://www.validuresolutions.com/'],
@@ -24,8 +25,9 @@ const FOOTER = [
     ['Contact', 'https://www.validuresolutions.com/#contact'],
   ]],
   ['Get started', [
+    ['Pricing', '/pricing'],
     ['Sign in', '/login'],
-    ['Book a walkthrough', '#contact'],
+    ['Book a walkthrough', '/#contact'],
   ]],
 ];
 
@@ -39,13 +41,13 @@ export default function SiteLayout({ children }) {
           <Link href="/" aria-label="ValidureHR home"><Logo size={28} /></Link>
 
           <nav className="sitenav" aria-label="Site">
-            {NAV.map(([label, href]) => <a key={href} href={href}>{label}</a>)}
+            {NAV.map(([label, href]) => <Link key={href} href={href}>{label}</Link>)}
           </nav>
 
           <div className="sitehead__cta">
             <ThemeToggle />
             <Link className="btn btn--quiet" href="/login">Sign in</Link>
-            <a className="btn btn--primary" href="#contact">
+            <a className="btn btn--primary" href="/#contact">
               <span className="cta-long">Book a walkthrough</span>
               <span className="cta-short">Book a demo</span>
             </a>
@@ -74,9 +76,9 @@ export default function SiteLayout({ children }) {
                 <ul>
                   {links.map(([label, href]) => (
                     <li key={label}>
-                      {href.startsWith('/')
-                        ? <Link href={href}>{label}</Link>
-                        : <a href={href}>{label}</a>}
+                      {href.startsWith('http')
+                        ? <a href={href}>{label}</a>
+                        : <Link href={href}>{label}</Link>}
                     </li>
                   ))}
                 </ul>
