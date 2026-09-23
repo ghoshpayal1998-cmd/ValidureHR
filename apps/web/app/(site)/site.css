@@ -145,7 +145,14 @@
   line-height: 1;
   font-variant-numeric: tabular-nums;
 }
-.statstrip span { display: block; margin-top: var(--s2); }
+.statstrip__label {
+  display: block;
+  margin-top: var(--s2);
+  font-size: .8125rem;
+  line-height: 1.45;
+  color: var(--muted);
+  text-wrap: pretty;
+}
 
 /* ------------------------------------------------------------ features */
 .features {

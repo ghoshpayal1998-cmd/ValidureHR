@@ -14,7 +14,7 @@ const FEATURES = [
   {
     icon: CalendarCheck,
     title: 'Attendance',
-    body: 'Punches arrive from the biometric reader on the floor and land on the right day — even when the shift crosses midnight. Month calendar, day sheet, and bulk corrections when the device misses someone.',
+    body: 'People punch in and out themselves, and the shift lands on the right day even when it crosses midnight. Month calendar, day sheet, and bulk corrections. Biometric readers sync in too, where a company has them.',
   },
   {
     icon: Scale,
@@ -29,7 +29,7 @@ const FEATURES = [
   {
     icon: FolderOpen,
     title: 'Documents',
-    body: 'Payslips, offer letters, appraisal letters and company policies, filed per employee and visible to the person they belong to. Generated as PDFs, not uploaded by hand.',
+    body: 'Payslips, offer letters and company policies, filed per employee and visible only to the person they belong to. Generated as PDFs, or uploaded if you already have them.',
   },
   {
     icon: LineChart,
@@ -46,7 +46,7 @@ const FEATURES = [
 const STEPS = [
   { n: '01', title: 'Add the company', body: 'Departments, designations, leave types and the holiday calendar. Each company gets its own isolated schema.' },
   { n: '02', title: 'Bring people in', body: 'Employees, reporting lines and salary structures. Everyone gets a login and their own document shelf.' },
-  { n: '03', title: 'Connect the device', body: 'Map biometric IDs to employees once. Punches sync on a schedule and alert you when a reader goes quiet.' },
+  { n: '03', title: 'Connect a reader, if you use one', body: 'Optional. Map biometric IDs to employees once and punches sync on a schedule. Companies without a reader skip this — people punch in from the app.' },
   { n: '04', title: 'Run the month', body: 'Approve leave as it comes, then close payroll against the attendance it depends on. Export the salary sheet.' },
 ];
 
@@ -71,7 +71,7 @@ export default function Home() {
               <Link className="btn btn--ghost btn--lg" href="/login">See it running</Link>
             </div>
             <p className="hero__note">
-              No card, no commitment — a conversation and a live tour of your own data.
+              No card, no commitment — a conversation, and a seeded company you can open and poke at.
             </p>
           </div>
 
@@ -139,14 +139,17 @@ export default function Home() {
         <div className="wrap">
           <div className="statstrip">
             {[
-              ['6', 'Leave types, each with its own accrual'],
-              ['9h', 'Shifts that cross midnight, handled'],
-              ['1', 'Place your payslips actually live'],
-              ['0', 'Spreadsheets in the loop'],
+              ['1', 'Installation, however many companies'],
+              ['0', 'Shared tables between them'],
+              ['19:00', 'Shift start the payroll cycle respects'],
+              ['25th', 'Or the 1st — the cycle is yours to set'],
             ].map(([n, label]) => (
               <div key={label}>
                 <b>{n}</b>
-                <span className="eyebrow eyebrow--plain">{label}</span>
+                {/* Body face, not the mono eyebrow: DESIGN.md's Annotation Rule
+                    keeps mono for things you look up, and at 11px with 0.16em
+                    tracking these wrapped to three lines on a phone. */}
+                <span className="statstrip__label">{label}</span>
               </div>
             ))}
           </div>
@@ -182,9 +185,9 @@ export default function Home() {
         <div className="wrap">
           <div className="section__head">
             <p className="eyebrow">How it works</p>
-            <h2>Running by the end of the week.</h2>
+            <h2>Four steps to a working company.</h2>
             <p className="lede">
-              Four steps, in this order. We do the first three with you.
+              In this order. We do the first three with you.
             </p>
           </div>
 
@@ -291,8 +294,8 @@ export default function Home() {
             {[
               ['Per-company isolation', 'Every company sits in its own database schema, not a shared table with a filter someone can forget.'],
               ['Permissions are granted', 'Nothing is visible by default. A screen a person has not been given does not appear in their menu.'],
-              ['Sessions expire', 'Fifteen minutes of inactivity signs you out, because HR screens get left open on shared desks.'],
-              ['Backed up, and checked', 'Backups verify themselves rather than reporting success and writing nothing.'],
+              ['Documents sit behind auth', 'A payslip is served through an authenticated endpoint. There is no link you can forward that works without signing in.'],
+              ['The API enforces it too', 'Hiding a screen is not the control. The server checks the same permission independently, so a guessed URL answers with a refusal, not data.'],
             ].map(([title, body]) => (
               <div className="check" key={title}>
                 <Check size={18} aria-hidden="true" />
@@ -310,8 +313,9 @@ export default function Home() {
             <p className="eyebrow">Get started</p>
             <h2>See it with your own numbers.</h2>
             <p>
-              Send us a month of attendance and we will show you the payroll it
-              produces. If it does not hold up, you have lost an afternoon.
+              Open the seeded company and run a payroll cycle against a month of
+              night-shift attendance — every figure end to end, clearly labelled as
+              demo data. If it does not hold up, you have lost an afternoon.
             </p>
             <div className="row row--wrap" style={{ gap: 'var(--s3)', justifyContent: 'center' }}>
               <a className="btn btn--primary btn--lg" href="mailto:info@validuresolutions.com?subject=ValidureHR%20walkthrough">
