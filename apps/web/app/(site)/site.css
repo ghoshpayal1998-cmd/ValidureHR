@@ -323,7 +323,7 @@
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: var(--s5);
-  margin-top: var(--s10);
+  margin-top: var(--s6);
   align-items: start;
 }
 
@@ -373,8 +373,14 @@
    the same box as its neighbours and the row does not shift. */
 .plan--rec {
   border-color: var(--accent);
-  box-shadow: var(--shadow-pop), inset 0 0 0 1px var(--accent);
+  background:
+    linear-gradient(var(--accent-soft), var(--accent-soft)),
+    var(--raised);
+  box-shadow: var(--shadow-pop), inset 0 0 0 2px var(--accent);
 }
+/* The two it is recommended over sit back a step. */
+.plan:not(.plan--rec) { background: var(--surface); }
+.plan:not(.plan--rec) .plan__amt { color: var(--muted); }
 
 .plan__flag {
   font-family: var(--font-mono);
@@ -397,7 +403,7 @@
 }
 .plan__amt {
   font-family: var(--font-head);
-  font-size: clamp(2.2rem, 4vw, 2.75rem);
+  font-size: clamp(2.6rem, 5vw, 3.4rem);
   font-weight: 680;
   letter-spacing: -.03em;
   line-height: 1;
@@ -618,3 +624,45 @@
 }
 .plan__more:hover { color: var(--accent); }
 .plan__nothing { font-size: .8125rem; color: var(--ok-text); font-weight: 500; }
+
+/* ------------------------------------------------------------ billing */
+/* Annual is preselected because it is the better deal, but the monthly figure
+   stays on the card underneath. Hiding the higher number until checkout is
+   drip pricing, which this page refuses everywhere else. */
+.billing {
+  display: inline-flex;
+  gap: var(--s1);
+  margin-top: var(--s8);
+  padding: var(--s1);
+  border: 1px solid var(--line);
+  border-radius: var(--r-full);
+  background: var(--surface);
+}
+.billing__opt {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--s2);
+  min-height: 36px;
+  padding-inline: var(--s5);
+  border: 0;
+  border-radius: var(--r-full);
+  background: transparent;
+  color: var(--muted);
+  font: inherit;
+  font-size: .875rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color var(--dur-micro) var(--ease-out),
+              color var(--dur-micro) var(--ease-out);
+}
+.billing__opt:hover { color: var(--fg); }
+.billing__opt.is-on { background: var(--accent); color: var(--accent-ink); }
+.billing__opt:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.billing__save {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+  opacity: .8;
+}
+.billing__opt:not(.is-on) .billing__save { color: var(--accent-strong); opacity: 1; }
