@@ -335,12 +335,12 @@
    would fix it at one width and break it at the next. */
 @supports (grid-template-rows: subgrid) {
   .plans {
-    grid-template-rows: repeat(8, auto);
+    grid-template-rows: repeat(9, auto);
     row-gap: 0;
     align-items: stretch;
   }
   .plan {
-    grid-row: span 8;
+    grid-row: span 9;
     grid-template-rows: subgrid;
     row-gap: var(--s4);
   }
@@ -355,6 +355,19 @@
   border-radius: var(--r-lg);
   background: var(--raised);
   box-shadow: var(--shadow-card);
+  /* A card is an object, and DESIGN.md lets objects lift. The reduced-motion
+     block in globals.css keeps colour transitions and drops this one. */
+  transition: transform var(--dur-ui) var(--ease-out),
+              box-shadow var(--dur-ui) var(--ease-out),
+              border-color var(--dur-ui) var(--ease-out);
+}
+.plan:hover {
+  transform: translateY(-6px);
+  box-shadow: var(--shadow-pop);
+  border-color: var(--accent);
+}
+.plan--rec:hover {
+  box-shadow: var(--shadow-pop), inset 0 0 0 1px var(--accent);
 }
 /* Inset ring rather than a thicker border, so the recommended card keeps
    the same box as its neighbours and the row does not shift. */
@@ -570,3 +583,38 @@
 .evid__code--ok { color: var(--ok-text); }
 .evid__code--no { color: var(--err-text); }
 .evid__body { color: var(--muted); font-size: .8125rem; }
+
+/* ------------------------------------------------------------ exclusions */
+/* Naming what a plan withholds is the honest half of a pricing table, and it
+   is what makes the tier above look worth the money. Derived from the same
+   matrix as the comparison table, never hand-written. */
+.plan__not {
+  padding-top: var(--s5);
+  border-top: 1px solid var(--line);
+  display: grid;
+  gap: var(--s3);
+  align-content: start;
+}
+.plan__notlabel {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: 500;
+  letter-spacing: .14em;
+  text-transform: uppercase;
+  color: var(--faint);
+}
+.plan__not ul { list-style: none; padding: 0; margin: 0; display: grid; gap: var(--s2); }
+.plan__not li { display: flex; gap: var(--s3); font-size: .8125rem; color: var(--muted); }
+.plan__not svg { flex: none; color: var(--err-text); margin-top: .12rem; opacity: .85; }
+.plan__more {
+  font-size: .75rem;
+  color: var(--muted);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  justify-self: start;
+  display: inline-flex;
+  align-items: center;
+  min-height: 24px;
+}
+.plan__more:hover { color: var(--accent); }
+.plan__nothing { font-size: .8125rem; color: var(--ok-text); font-weight: 500; }

@@ -1,0 +1,24 @@
+{
+  "name": "validure-hr",
+  "version": "1.0.0",
+  "private": true,
+  "description": "ValidureHR — HR software from Validure Solutions",
+  "workspaces": [
+    "apps/*"
+  ],
+  "scripts": {
+    "dev": "npm run dev --workspace @validurehr/web",
+    "dev:api": "npm run dev --workspace @validurehr/api",
+    "build": "npm run build --workspace @validurehr/web",
+    "start": "npm run start --workspace @validurehr/web",
+    "test": "npm test --workspace @validurehr/api",
+    "init": "npm run init --workspace @validurehr/api",
+    "seed": "npm run seed:validure --workspace @validurehr/api",
+    "mockup": "python -m http.server 4173 --directory mockup",
+    "db:up": "docker start vhr-postgres || docker run -d --name vhr-postgres -e POSTGRES_USER=validurehr -e POSTGRES_PASSWORD=validurehr -e POSTGRES_DB=validurehr -p 5432:5432 postgres:16-alpine",
+    "db:down": "docker stop vhr-postgres"
+  },
+  "engines": {
+    "node": ">=20.6"
+  }
+}

@@ -1,5 +1,5 @@
 import Link from 'next/link';
-import { Check, Minus, ArrowRight } from 'lucide-react';
+import { Check, Minus, X, ArrowRight } from 'lucide-react';
 
 export const metadata = {
   title: 'Pricing — ValidureHR',
@@ -51,7 +51,6 @@ const PLANS = [
       'Biometric reader sync',
       'Roles, permissions and audit log',
     ],
-    lacks: 'Payroll is not included.',
   },
   {
     key: 'payroll',
@@ -126,6 +125,15 @@ const FAQ = [
     'Yes. You get the salary sheets, the attendance and the documents out before the schema is dropped. Ask for it and it is yours — it is your payroll record, not our leverage.'],
 ];
 
+/* What a plan does NOT include, taken straight from FEATURES so the card and
+ * the comparison table can never disagree. Four is enough to make the gap felt;
+ * the rest is one anchor away. */
+const SHOWN = 4;
+function missingFor(index) {
+  const all = FEATURES.filter((f) => !f[index + 1]).map((f) => f[0]);
+  return { shown: all.slice(0, SHOWN), rest: Math.max(0, all.length - SHOWN) };
+}
+
 function Tick({ on, label }) {
   return on
     ? <Check size={16} className="cmp__yes" aria-label={`${label}: included`} />
@@ -150,7 +158,7 @@ export default function Pricing() {
 
           {/* ---------------------------------------------- plans */}
           <div className="plans">
-            {PLANS.map((p) => (
+            {PLANS.map((p, i) => (
               <article className={`plan${p.rec ? ' plan--rec' : ''}`} key={p.key}>
                 {/* Reserved on every card, so the flag does not push one
                     column's price 40px below the other two — comparing them
@@ -190,8 +198,37 @@ export default function Pricing() {
                       <span>{h}</span>
                     </li>
                   ))}
-                  {p.lacks && <li className="plan__lacks">{p.lacks}</li>}
                 </ul>
+
+                {(() => {
+                  const { shown, rest } = missingFor(i);
+                  if (!shown.length) {
+                    return (
+                      <div className="plan__not plan__not--none">
+                        <p className="plan__notlabel">Not included</p>
+                        <p className="plan__nothing">Nothing. This plan is everything we make.</p>
+                      </div>
+                    );
+                  }
+                  return (
+                    <div className="plan__not">
+                      <p className="plan__notlabel">Not included</p>
+                      <ul>
+                        {shown.map((m) => (
+                          <li key={m}>
+                            <X size={14} aria-hidden="true" />
+                            <span>{m}</span>
+                          </li>
+                        ))}
+                      </ul>
+                      {rest > 0 && (
+                        <a className="plan__more" href="#compare">
+                          and {rest} more — see the full table
+                        </a>
+                      )}
+                    </div>
+                  );
+                })()}
               </article>
             ))}
           </div>
