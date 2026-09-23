@@ -317,11 +317,15 @@ export default function Pricing() {
                     <td className="cmp__c"><Tick on={c} label={label} /></td>
                   </tr>
                 ))}
+                {/* Not a bare "Included": it is included on annual billing and
+                    charged on monthly, and saying otherwise here would
+                    contradict the FAQ two sections down. */}
                 <tr>
                   <th scope="row" className="cmp__f">Setup, done by us</th>
                   {PLANS.map((p) => (
-                    <td className="cmp__c mono" key={p.key} style={{ fontSize: '.75rem' }}>
-                      Included
+                    <td className="cmp__c" key={p.key} style={{ fontSize: '.8125rem' }}>
+                      Included on annual<br />
+                      <span className="faint">₹12,000 on monthly</span>
                     </td>
                   ))}
                 </tr>
