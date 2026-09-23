@@ -12,7 +12,8 @@
     "test": "node --test \"test/unit/*.test.js\" \"test/security/*.test.js\"",
     "test:unit": "node --test \"test/unit/*.test.js\"",
     "test:security": "node --test \"test/security/*.test.js\"",
-    "seed:validure": "node --env-file-if-exists=.env src/seedValidure.js"
+    "seed:validure": "node --env-file-if-exists=.env src/seedValidure.js",
+    "test:integration": "node --env-file-if-exists=.env --test \"test/integration/*.test.js\""
   },
   "dependencies": {
     "bcryptjs": "^2.4.3",
