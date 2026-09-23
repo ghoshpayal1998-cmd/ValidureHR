@@ -50,6 +50,13 @@ const STEPS = [
   { n: '04', who: 'You', title: 'You run the month', body: 'Approve leave as it comes, then close payroll against the attendance it depends on. Export the salary sheet. This is the only part that was ever your job.' },
 ];
 
+const PROOF = [
+  ['No session at all', '401', 'Authentication required'],
+  ['Signed in, but another company', '404', 'Salary slip not found'],
+  ['Same company, without documents.manage', '403', 'Not allowed'],
+  ['The employee it belongs to', '200', 'application/pdf'],
+];
+
 export default function Home() {
   return (
     <>
@@ -289,20 +296,59 @@ export default function Home() {
               This is salary, bank details and identity documents for everyone
               you employ. The boring safeguards are the point.
             </p>
+
+            <div className="checks">
+              {[
+                ['Per-company isolation', 'Every company sits in its own database schema, not a shared table with a filter someone can forget.'],
+                ['Permissions are granted', 'Nothing is visible by default. A screen a person has not been given does not appear in their menu.'],
+                ['Documents sit behind auth', 'A payslip is served through an authenticated endpoint. There is no link you can forward that works without signing in.'],
+                ['The API enforces it too', 'Hiding a screen is not the control. The server checks the same permission independently, so a guessed URL answers with a refusal, not data.'],
+              ].map(([title, body]) => (
+                <div className="check" key={title}>
+                  <Check size={18} aria-hidden="true" />
+                  <span><b>{title}</b><br /><span>{body}</span></span>
+                </div>
+              ))}
+            </div>
           </div>
 
-          <div className="checks" style={{ marginTop: 0 }}>
-            {[
-              ['Per-company isolation', 'Every company sits in its own database schema, not a shared table with a filter someone can forget.'],
-              ['Permissions are granted', 'Nothing is visible by default. A screen a person has not been given does not appear in their menu.'],
-              ['Documents sit behind auth', 'A payslip is served through an authenticated endpoint. There is no link you can forward that works without signing in.'],
-              ['The API enforces it too', 'Hiding a screen is not the control. The server checks the same permission independently, so a guessed URL answers with a refusal, not data.'],
-            ].map(([title, body]) => (
-              <div className="check" key={title}>
-                <Check size={18} aria-hidden="true" />
-                <span><b>{title}</b><br /><span>{body}</span></span>
-              </div>
-            ))}
+          {/* The claim above is worth nothing without the thing itself. One
+              request, four callers, and what the server actually answers each
+              of them. */}
+          <div className="shot">
+            <div className="shot__bar">
+              <span className="faint mono" style={{ fontSize: '.6875rem' }}>
+                GET /api/documents/salary-slips/3119/pdf
+              </span>
+            </div>
+            <div className="shot__body">
+              <table className="table evid">
+                <caption className="sr">
+                  One payslip request made by four different callers, and the
+                  status and body the server answers each of them.
+                </caption>
+                <thead>
+                  <tr><th scope="col">Who is asking</th><th scope="col">What comes back</th></tr>
+                </thead>
+                <tbody>
+                  {PROOF.map(([who, code, body]) => (
+                    <tr key={who}>
+                      <td>{who}</td>
+                      <td>
+                        <span className={`evid__code evid__code--${code === '200' ? 'ok' : 'no'}`}>{code}</span>
+                        <span className="evid__body">{body}</span>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+              <p className="faint" style={{ fontSize: '.75rem' }}>
+                The second row is the one that matters. Another company&rsquo;s payslip
+                is not refused — it is <b>absent</b>. The schema is read from your
+                session, so no id, parameter or header can name a company you are
+                not in.
+              </p>
+            </div>
           </div>
         </div>
       </section>

@@ -546,3 +546,22 @@
 @media (max-width: 720px) {
   .plans, .setup { grid-template-columns: minmax(0, 1fr); }
 }
+
+/* ------------------------------------------------------------ evidence */
+/* The security panel's request log. A status code is something you look up,
+   so it keeps the mono face per DESIGN.md's Annotation Rule; the sentence
+   beside it is prose and does not. */
+.evid td { vertical-align: top; }
+.evid__code {
+  display: inline-block;
+  min-width: 2.5rem;
+  font-family: var(--font-mono);
+  font-size: .75rem;
+  font-weight: 500;
+  font-variant-numeric: tabular-nums;
+}
+/* --ok-text / --err-text, not --ok / --err: the fill values are tuned for
+   badge backgrounds and drop under 4.5:1 as text on the card. */
+.evid__code--ok { color: var(--ok-text); }
+.evid__code--no { color: var(--err-text); }
+.evid__body { color: var(--muted); font-size: .8125rem; }
