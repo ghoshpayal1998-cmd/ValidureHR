@@ -111,17 +111,22 @@ point, not the headline.
   rather than sold as an implementation project. It is sold to a buyer only in
   the narrow case where that buyer runs several entities and wants each one
   provisioned separately — the Group plan.
-- **Pricing, decided 2026-09-23.** Three plans, per person per month, exclusive
-  of GST: **Attendance & Leave** ₹49 annual / ₹59 monthly (no payroll, from 25
-  people); **Payroll** ₹82 / ₹99 (from 25 people, the recommended plan);
-  **Group** ₹124 / ₹149 (from 100 people across the buyer's companies).
-  Annual billing is roughly two months free and includes setup; monthly billing
-  carries a real ₹12,000 setup fee per company. The numbers live in one array
-  in `apps/web/app/(site)/pricing/page.jsx`.
+- **Pricing, revised 2026-09-23.** Three plans, per person per month,
+  exclusive of GST, all from 25 people:
+  **Attendance & Leave** ₹71 annual / ₹85 monthly (no payroll);
+  **Payroll** ₹99 / ₹119 (the recommended plan);
+  **Everything** ₹124 / ₹149 (adds the employee mobile app, plus more than
+  one company). Annual billing is roughly two months free and includes setup;
+  monthly billing carries a real ₹12,000 setup fee per company. The numbers
+  live in one array in `apps/web/app/(site)/pricing/page.jsx`.
+  - The top tier is led by **the mobile app**, not by multi-tenancy. Several
+    companies is bundled there too, but it is not what the tier is sold on.
   - The **Recommended** flag on Payroll states a first-party reason. No plan may
     carry "Most popular" or any other claim about how other buyers chose, and no
     crossed-out price may appear unless that price is genuinely charged to
     someone. The ₹12,000 setup fee qualifies because monthly customers pay it.
+  - Each card names what it withholds, derived from the same feature matrix the
+    comparison table renders so the two cannot drift apart.
 - **Still undecided:** licensing, and the hosting model a buyer would get.
   Future work must not invent them.
 

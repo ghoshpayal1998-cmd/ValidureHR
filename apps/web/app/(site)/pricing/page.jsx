@@ -29,6 +29,8 @@ const FEATURES = [
   ['Loss of pay, priced the same on slip and sheet', 0, 1, 1],
   ['Salary sheet export for your bank and your CA', 0, 1, 1],
   ['Reports and analytics', 0, 1, 1],
+  ['The mobile app, for every employee', 0, 0, 1],
+  ['Punch in and apply for leave from a phone', 0, 0, 1],
   ['More than one company, each provisioned by us', 0, 0, 1],
   ['A payroll cycle set per company, not one for all', 0, 0, 1],
   ['One invoice across every company you run', 0, 0, 1],
@@ -40,9 +42,9 @@ const PLANS = [
     key: 'attendance',
     name: 'Attendance & Leave',
     line: 'For a company that needs the days right before it needs the money right.',
-    year: 49,
-    month: 59,
-    day: '1.60',
+    year: 71,
+    month: 85,
+    day: '2.40',
     min: 'From 25 people',
     highlights: [
       'Attendance, night shifts included',
@@ -57,9 +59,9 @@ const PLANS = [
     name: 'Payroll',
     rec: true,
     line: 'Everything above, plus the month actually closing — the only plan that gets you to a payslip.',
-    year: 82,
-    month: 99,
-    day: '2.70',
+    year: 99,
+    month: 119,
+    day: '3.30',
     min: 'From 25 people',
     inherits: 'Attendance & Leave',
     highlights: [
@@ -71,19 +73,19 @@ const PLANS = [
     ],
   },
   {
-    key: 'group',
-    name: 'Group',
-    line: 'For one owner running several companies, each kept properly apart.',
+    key: 'everything',
+    name: 'Everything',
+    line: 'The same system in your people’s pockets, and as many companies as you run.',
     year: 124,
     month: 149,
     day: '4.10',
-    min: 'From 100 people across your companies',
+    min: 'From 25 people',
     inherits: 'Payroll',
     highlights: [
+      'The mobile app for every employee',
+      'Punch in and apply for leave from a phone',
       'As many companies as you run',
-      'Each one provisioned by us',
       'A payroll cycle set per company',
-      'One invoice for all of them',
       'A named contact, priority turnaround',
     ],
   },
@@ -269,23 +271,18 @@ export default function Pricing() {
                 {SIZES.map((n) => (
                   <tr key={n}>
                     <th scope="row">{n}</th>
-                    {PLANS.map((p) => {
-                      const below = p.key === 'group' && n < 100;
-                      return (
-                        <td className="num mono" key={p.key}>
-                          {below
-                            ? <span className="faint" aria-label="Below this plan's minimum">—</span>
-                            : `₹${(n * p.year).toLocaleString('en-IN')}`}
-                        </td>
-                      );
-                    })}
+                    {PLANS.map((p) => (
+                      <td className="num mono" key={p.key}>
+                        {`₹${(n * p.year).toLocaleString('en-IN')}`}
+                      </td>
+                    ))}
                   </tr>
                 ))}
               </tbody>
             </table>
           </div>
           <p className="faint" style={{ fontSize: '.8125rem', marginTop: 'var(--s4)' }}>
-            Pay monthly instead and each figure rises by a fifth, plus ₹12,000
+            Pay monthly instead and each figure rises by about a fifth, plus ₹12,000
             once per company for the setup.
           </p>
         </div>
