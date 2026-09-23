@@ -72,7 +72,12 @@
 .section--tight { padding-block: clamp(3rem, 6vw, 5rem); }
 .section--surface { background: var(--surface); }
 .section__head { max-width: 46rem; display: grid; gap: var(--s4); }
-.section__head h2 { font-size: clamp(1.9rem, 3.2vw, 2.9rem); }
+/* The two .split sections (#shifts, #security) put their heading straight in
+   a column rather than in a .section__head, so they were falling back to the
+   global h2 and rendering visibly smaller than every other section heading on
+   the page — same level, different weight. Same-role type, same size. */
+.section__head h2,
+.split > div > h2 { font-size: clamp(1.9rem, 3.2vw, 2.9rem); }
 .section__head h1 { font-size: clamp(2.2rem, 4.4vw, 3.4rem); }
 .section__head h1 .tint { color: var(--accent); }
 

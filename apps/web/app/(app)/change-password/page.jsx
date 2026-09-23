@@ -229,7 +229,15 @@ export default function ChangePasswordPage() {
 
             {/* noValidate: the screen paints the service's own copy rather than
                 letting the browser bubble a different wording over it. */}
-            <form onSubmit={onSubmit} noValidate>
+            {/* method="post" matters for the path where React has not
+                hydrated yet — a bad chunk, a script error, or simply a
+                person pressing Enter on a slow connection before the
+                handler is attached. Without it the browser falls back to
+                its default GET and puts the password in the URL, the
+                history, the Referer header and any proxy log on the way.
+                submit() calls preventDefault first, so this never fires
+                once the page is live. */}
+            <form method="post" onSubmit={onSubmit} noValidate>
               <div className="stack" style={{ gap: 'var(--s5)' }}>
                 <Field id="cur-pw" label="Current password" required>
                   <div className="pwwrap">

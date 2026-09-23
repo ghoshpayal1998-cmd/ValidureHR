@@ -115,7 +115,15 @@ function LoginForm() {
                 </div>
               )}
 
-              <form onSubmit={submit}>
+              {/* method="post" matters for the path where React has not
+                  hydrated yet — a bad chunk, a script error, or simply a
+                  person pressing Enter on a slow connection before the
+                  handler is attached. Without it the browser falls back to
+                  its default GET and puts the password in the URL, the
+                  history, the Referer header and any proxy log on the way.
+                  submit() calls preventDefault first, so this never fires
+                  once the page is live. */}
+              <form method="post" onSubmit={submit}>
                 <div className="stack">
                   <div className="field">
                     <label className="label" htmlFor="identifier">
