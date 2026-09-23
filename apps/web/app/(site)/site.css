@@ -9,6 +9,13 @@
 
 .site {
   --site-max: 74rem;
+  /* Used by .section since this file was written, defined nowhere until now:
+     padding-block resolved to 0px and five of seven sections collapsed onto
+     their neighbours, with the tinted bands ending flush against text. This
+     is the marketing rhythm DESIGN.md already specifies. */
+  --section-y: clamp(4.5rem, 9vw, 8rem);
+  /* How far an anchor jump must clear the sticky header. */
+  --anchor-offset: calc(var(--header-h) + var(--s6));
   display: flex;
   flex-direction: column;
   min-height: 100dvh;
@@ -59,6 +66,9 @@
 
 /* ------------------------------------------------------------ sections */
 .section { padding-block: var(--section-y); }
+/* Without this an anchor lands at y=0, behind the sticky header — two of the
+   four nav links scrolled to a heading the reader could not see. */
+.section, .hero { scroll-margin-top: var(--anchor-offset); }
 .section--tight { padding-block: clamp(3rem, 6vw, 5rem); }
 .section--surface { background: var(--surface); }
 .section__head { max-width: 46rem; display: grid; gap: var(--s4); }
@@ -172,7 +182,9 @@
 .step[data-on='true'] { border-top-color: var(--accent); }
 .step__n {
   font-family: var(--font-mono); font-size: 11px; font-weight: 500;
-  letter-spacing: .16em; color: var(--accent);
+  /* --accent-strong, not --accent: at 11px on the tinted band the lighter
+     value measured 4.23:1, under the 4.5:1 this product binds. */
+  letter-spacing: .16em; color: var(--accent-strong);
 }
 .step h3 { font-family: var(--font-body); font-size: 1rem; font-weight: 600; }
 .step p { font-size: .875rem; color: var(--muted); }
@@ -208,13 +220,18 @@
 /* ------------------------------------------------------------ footer */
 .sitefoot { margin-top: auto; border-top: 1px solid var(--line); padding-block: var(--s10); }
 .sitefoot__in { display: grid; grid-template-columns: 1.4fr repeat(3, 1fr); gap: var(--s8); }
-.sitefoot h4 {
+.sitefoot h3 {
   font-family: var(--font-mono); font-size: 10px; font-weight: 500;
   letter-spacing: .14em; text-transform: uppercase; color: var(--faint);
   margin-bottom: var(--s4);
 }
 .sitefoot ul { list-style: none; padding: 0; display: grid; gap: var(--s3); }
-.sitefoot a { font-size: .875rem; color: var(--muted); }
+/* 24px minimum, per WCAG 2.2 AA 2.5.8 — these were 18px boxes in a column.
+   Inline-flex rather than padding so the row keeps its measured height. */
+.sitefoot a {
+  font-size: .875rem; color: var(--muted);
+  display: inline-flex; align-items: center; min-height: 24px;
+}
 .sitefoot a:hover { color: var(--accent); }
 .sitefoot__legal {
   margin-top: var(--s10); padding-top: var(--s5);
@@ -231,8 +248,37 @@
   .sitefoot__in { grid-template-columns: 1fr 1fr; }
 }
 @media (max-width: 720px) {
-  .sitenav { display: none; }
   .features, .steps { grid-template-columns: minmax(0, 1fr); }
+
+  /* The nav used to be display:none here with no replacement anywhere in the
+     DOM — no hamburger, no disclosure. On a page that runs to eight viewport
+     heights on a phone, that left scrolling as the only way to move. It drops
+     to a scrollable strip under the header instead, which needs no JavaScript
+     and no open/closed state to get wrong. */
+  .sitehead__in {
+    height: auto;
+    flex-wrap: wrap;
+    padding-block: var(--s3);
+    row-gap: var(--s3);
+  }
+  .sitenav {
+    order: 3;
+    width: 100%;
+    margin-left: 0;
+    gap: var(--s5);
+    overflow-x: auto;
+    overscroll-behavior-x: contain;
+    scrollbar-width: none;
+  }
+  .sitenav::-webkit-scrollbar { display: none; }
+  .sitenav a {
+    white-space: nowrap;
+    display: inline-flex;
+    align-items: center;
+    min-height: 32px;
+  }
+  /* The header is two rows tall here, so anchors need to clear more. */
+  .site { --anchor-offset: calc(var(--header-h) + var(--s10)); }
 }
 @media (max-width: 620px) {
   /* Sign in is still reachable from the footer and the closing CTA, so

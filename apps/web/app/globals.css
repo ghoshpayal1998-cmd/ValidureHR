@@ -30,13 +30,21 @@
   --line: #0b15261a;
   --line-strong: #0b15263d;
 
-  /* status */
+  /* status
+     Each hue has a FILL value and a TEXT value, because the same colour
+     cannot do both jobs. --ok and --warn are tuned to read as a status on a
+     meter or a border; set as 12px label text on their own 8% tint they
+     measured 3.53:1 and 2.99:1 against --surface, under the 4.5:1 this
+     product now binds. The -text variants are darkened until they clear it
+     (5.22 and 4.86 worst case), which is what --err-text was already for. */
   --ok: #0e8a5f;
+  --ok-text: #0b6c4a;
   --ok-soft: #0e8a5f14;
   --err: #d6453d;
   --err-text: #b93a32;
   --err-soft: #d6453d14;
   --warn: #b7791f;          /* (+) pending / awaiting approval */
+  --warn-text: #8a5a14;     /* (+) */
   --warn-soft: #b7791f14;   /* (+) */
   --info: #2b6cb0;          /* (+) informational chips */
   --info-soft: #2b6cb014;   /* (+) */
@@ -114,13 +122,70 @@ table { border-collapse: collapse; width: 100%; }
 }
 :focus:not(:focus-visible) { outline: none; }
 
+/* ------------------------------------------------------------------------
+   The surfaces we did not draw.
+   Selection, the caret, form-control tints and the scrollbar all ship with
+   browser defaults that belong to no design system. Theming them from the
+   palette costs nothing and is the difference between a page that was built
+   and one that was assembled.
+   ------------------------------------------------------------------------ */
+::selection { background: var(--accent); color: var(--accent-ink); }
+html { caret-color: var(--accent); accent-color: var(--accent); }
+
+/* Firefox */
+html { scrollbar-color: var(--line-strong) transparent; scrollbar-width: thin; }
+
+/* WebKit. The transparent border plus background-clip leaves the thumb
+   inset from the track rather than filling the gutter edge to edge. */
+::-webkit-scrollbar { width: 12px; height: 12px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb {
+  background: var(--line-strong);
+  background-clip: content-box;
+  border: 3px solid transparent;
+  border-radius: var(--r-full);
+}
+::-webkit-scrollbar-thumb:hover { background: var(--faint); background-clip: content-box; }
+::-webkit-scrollbar-corner { background: transparent; }
+
+/*
+ * Reduced motion removes MOVEMENT, not feedback.
+ *
+ * The blanket `transition-duration: .01ms` this replaces took out all twelve
+ * transitions in the system, nine of which only change a colour and cause no
+ * vestibular symptom at all — so hover, focus and the input focus ring simply
+ * stopped responding. Worse, it froze `spin` and `shimmer`, which are the
+ * button spinner and the loading skeleton: the person who asked for less
+ * motion lost their progress indicators, and a skeleton that stops shimmering
+ * reads as broken rather than loading.
+ *
+ * So travel is removed and colour is kept, and the two status animations
+ * carry the same "still working" signal as a pulse in place.
+ */
+@keyframes reduced-pulse { 0%, 100% { opacity: 1 } 50% { opacity: .5 } }
+
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after {
+    /* Colour still responds; nothing travels. */
+    transition-property: background-color, background, border-color, color,
+                         fill, stroke, opacity, box-shadow, outline-color !important;
+    transition-duration: var(--dur-micro) !important;
     animation-duration: .01ms !important;
     animation-iteration-count: 1 !important;
-    transition-duration: .01ms !important;
     scroll-behavior: auto !important;
   }
+
+  /* The two animations that report state rather than decorate it. */
+  .btn .spin,
+  .skel {
+    animation-name: reduced-pulse !important;
+    animation-duration: 1.6s !important;
+    animation-timing-function: var(--ease-inout) !important;
+    animation-iteration-count: infinite !important;
+  }
+  /* The skeleton's travel is a moving gradient, so the gradient goes too —
+     the pulse alone carries it. */
+  .skel { background: var(--surface) !important; }
 }
 
 /* ============================================================ type */
@@ -368,8 +433,8 @@ p { text-wrap: pretty; }
 /* Every status carries a dot as well as a hue — colour alone
    is not a signal for colour-blind users. */
 .badge::before { content: ''; width: 5px; height: 5px; border-radius: 50%; background: currentColor; flex: none; }
-.badge--ok { background: var(--ok-soft); color: var(--ok); }
-.badge--warn { background: var(--warn-soft); color: var(--warn); }
+.badge--ok { background: var(--ok-soft); color: var(--ok-text); }
+.badge--warn { background: var(--warn-soft); color: var(--warn-text); }
 .badge--err { background: var(--err-soft); color: var(--err-text); }
 .badge--info { background: var(--info-soft); color: var(--info); }
 .badge--neutral { background: var(--surface); color: var(--muted); }
@@ -609,7 +674,10 @@ legend {
 }
 .skip {
   position: absolute; left: var(--s4); top: -3rem; z-index: var(--z-toast);
-  background: var(--accent); color: #fff;
+  /* --accent-ink, not white: the dark theme lightens --accent to #3bbfd4,
+     where white measures 2.19:1. The ink token is #fff in light and #06202a
+     in dark, which is exactly this problem already solved once. */
+  background: var(--accent); color: var(--accent-ink);
   padding: var(--s2) var(--s4); border-radius: var(--r-sm);
   font-size: .875rem; font-weight: 600;
   transition: top var(--dur-micro) var(--ease-out);
@@ -743,9 +811,12 @@ legend {
     --line: #ffffff17;
     --line-strong: #ffffff30;
 
-    --ok: #46d79b;      --ok-soft: #46d79b1f;
+    /* On ink these already measure 7.05 and 6.87 as label text, so the
+       -text variants are the fill values themselves — the split exists to
+       rescue the light theme, not to darken a dark one. */
+    --ok: #46d79b;      --ok-text: #46d79b;   --ok-soft: #46d79b1f;
     --err: #ff7a72;     --err-text: #ff9a94;  --err-soft: #ff7a721f;
-    --warn: #e5b45c;    --warn-soft: #e5b45c1f;
+    --warn: #e5b45c;    --warn-text: #e5b45c; --warn-soft: #e5b45c1f;
     --info: #7ab3ee;    --info-soft: #7ab3ee1f;
 
     /* Shadows read as almost nothing on dark; deepen them and let

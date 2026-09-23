@@ -68,7 +68,9 @@ export default function SiteLayout({ children }) {
 
             {FOOTER.map(([title, links]) => (
               <div key={title}>
-                <h4>{title}</h4>
+                {/* h3, not h4: the last heading before this is the h2 in
+                    the closing section, and jumping to h4 skips a level. */}
+                <h3>{title}</h3>
                 <ul>
                   {links.map(([label, href]) => (
                     <li key={label}>

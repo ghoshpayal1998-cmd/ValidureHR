@@ -76,8 +76,15 @@ export default function Home() {
           </div>
 
           {/* A real slice of the product, not a stock photograph. */}
-          <div className="shot" aria-hidden="true">
-            <div className="shot__bar">
+          {/* A picture of the product, so it is described rather than hidden —
+              role=img gives it one accessible name and stops a screen reader
+              walking mock data as though it were the reader's own. */}
+          <div
+            className="shot"
+            role="img"
+            aria-label="The ValidureHR dashboard: 19 of 24 people present, the shift live, and three leave requests awaiting approval."
+          >
+            <div className="shot__bar" aria-hidden="true">
               <span className="shot__dot" /><span className="shot__dot" /><span className="shot__dot" />
               <span className="faint mono" style={{ fontSize: '.6875rem', marginLeft: 'var(--s2)' }}>
                 Today · 21 Sep 2026
@@ -224,7 +231,10 @@ export default function Home() {
             </div>
           </div>
 
-          <div className="shot" aria-hidden="true">
+          {/* NOT aria-hidden: this table and its caption are the strongest
+              argument on the page, and hiding them put the evidence out of
+              reach of exactly the readers most likely to need the product. */}
+          <div className="shot">
             <div className="shot__bar">
               <span className="faint mono" style={{ fontSize: '.6875rem' }}>
                 Attendance · September 2026 · BIOMAX-BLR-01
@@ -232,6 +242,11 @@ export default function Home() {
             </div>
             <div className="shot__body">
               <table className="table">
+                <caption className="sr">
+                  Example attendance for four night shifts. Each row is entered against
+                  the date the shift started, even though the punch-out falls after
+                  midnight on the following calendar date.
+                </caption>
                 <thead>
                   <tr><th>Date</th><th>In</th><th>Out</th><th className="num">Hrs</th></tr>
                 </thead>
