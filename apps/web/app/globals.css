@@ -19,6 +19,10 @@
   --bg: #f7f9fb;
   --raised: #fff;
   --surface: #edf2f7;
+  /* One step BEHIND --raised, in whichever direction the theme runs. --surface
+     cannot do this: it is darker than --raised on light and lighter on dark,
+     so using it to recess a card inverts the hierarchy in dark mode. */
+  --recessed: #eef2f7;
   --overlay: #f7f9fbd9;
 
   /* ink */
@@ -802,6 +806,7 @@ legend {
     --bg: #0b1526;              /* the brand ink itself */
     --raised: #131f33;
     --surface: #1c2a42;
+    --recessed: #0e1826;
     --overlay: #0b1526d9;
 
     --fg: #e8eef6;              /* 15.8:1 */
@@ -843,6 +848,7 @@ legend {
   --bg: #0b1526;
   --raised: #131f33;
   --surface: #1c2a42;
+  --recessed: #0e1826;
   --overlay: #0b1526d9;
 
   --fg: #e8eef6;

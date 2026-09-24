@@ -60,7 +60,7 @@ export default function Pricing() {
   return (
     <>
       {/* ------------------------------------------------ head */}
-      <section className="section section--tight">
+      <section className="section section--tight section--wash">
         <div className="wrap">
           <div className="section__head">
             <p className="eyebrow">Pricing</p>
@@ -126,7 +126,7 @@ export default function Pricing() {
       </section>
 
       {/* ------------------------------------------------ setup */}
-      <section className="section" id="setup">
+      <section className="section section--wash" id="setup">
         <div className="wrap">
           <div className="section__head">
             <p className="eyebrow">Onboarding</p>

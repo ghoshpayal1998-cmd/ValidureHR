@@ -164,7 +164,7 @@ export default function Home() {
       </section>
 
       {/* ------------------------------------------------ features */}
-      <section className="section" id="features">
+      <section className="section section--wash" id="features">
         <div className="wrap">
           <div className="section__head">
             <p className="eyebrow">What it does</p>
@@ -212,7 +212,7 @@ export default function Home() {
       </section>
 
       {/* ------------------------------------------------ shifts */}
-      <section className="section" id="shifts">
+      <section className="section section--wash" id="shifts">
         <div className="wrap split">
           <div>
             <p className="eyebrow">Built for shifts</p>
