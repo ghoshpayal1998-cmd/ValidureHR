@@ -1,6 +1,6 @@
 const jwt = require('jsonwebtoken');
 const { qOne, tq, tqOne } = require('../db');
-const { ALL_KEYS, parsePerms } = require('../permissions');
+const { ALL_KEYS, parsePerms, planEntitlements } = require('../permissions');
 const { requireJwtSecret } = require('../config');
 
 // Throws at require() time if the secret is missing, too short, or one of the
@@ -68,7 +68,15 @@ async function tenant(req, res, next) {
     // their individual grants say. There is deliberately no role that bypasses
     // this: a director who needs to manage employees is given the permission,
     // not an exemption from the check.
-    req.perms = new Set([...parsePerms(u.role_perms), ...grants.map((g) => g.permission)]);
+    const granted = new Set([...parsePerms(u.role_perms), ...grants.map((g) => g.permission)]);
+
+    // ...and then the plan caps it. The company's OWNER role lists every key,
+    // so without this intersection a company on Basic would still run payroll
+    // and the three tiers would be a picture on a website. Downgrading a plan
+    // takes the capability away without touching a single role.
+    const entitled = planEntitlements(company.plan);
+    req.plan = company.plan;
+    req.perms = new Set([...granted].filter((k) => entitled.has(k)));
     next();
   } catch (e) { next(e); }
 }

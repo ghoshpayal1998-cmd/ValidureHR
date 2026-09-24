@@ -113,10 +113,9 @@ export default function PlanCards() {
                   )}
                 </div>
               ) : (
-                <div className="plan__not plan__not--none">
-                  <p className="plan__notlabel">Not included</p>
-                  <p className="plan__nothing">Nothing. This plan is everything we make.</p>
-                </div>
+                /* Reserved so the subgrid rows still line up across all three
+                   cards; the plan's own list above already names every point. */
+                <div className="plan__not plan__not--none" aria-hidden="true" />
               )}
             </article>
           );

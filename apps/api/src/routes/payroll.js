@@ -16,7 +16,7 @@ const { getCycleStartDay, cycleRange, cycleDates, cycleLabel } = require('../cyc
 const router = express.Router();
 router.use(authenticate, tenant);
 
-router.get('/structures', requirePerm('documents.manage'), async (req, res, next) => {
+router.get('/structures', requirePerm('payroll.manage'), async (req, res, next) => {
   try {
     const q = `
       SELECT 
@@ -47,7 +47,7 @@ router.get('/structures', requirePerm('documents.manage'), async (req, res, next
   }
 });
 
-router.put('/structures/:id', requirePerm('documents.manage'), async (req, res, next) => {
+router.put('/structures/:id', requirePerm('payroll.manage'), async (req, res, next) => {
   try {
     const eid = parseInt(req.params.id, 10);
     const { basic, hra, special_allowance, conveyance, pf_deduction, esic_deduction, tax_deduction, bank_name, bank_account_no, bank_ifsc, pan_no } = req.body;
@@ -121,7 +121,7 @@ router.get('/lop/:year/:month', requirePerm('documents.manage'), async (req, res
   }
 });
 
-router.get('/export/:year/:month', requirePerm('documents.manage'), async (req, res, next) => {
+router.get('/export/:year/:month', requirePerm('payroll.manage'), async (req, res, next) => {
   try {
     const { year, month } = req.params;
     const y = parseInt(year, 10);

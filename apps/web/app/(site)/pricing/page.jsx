@@ -17,11 +17,11 @@ const SETUP = [
   ['Build your leave rules',
     'Every leave type you use, its monthly accrual rate, and the opening balance each person carries in.'],
   ['Set your payroll cycle',
-    'The 25th to the 24th, the 1st to the 31st, or whatever yours actually is. Payroll and Everything.'],
+    'The 25th to the 24th, the 1st to the 31st, or whatever yours actually is. Essential and Advanced.'],
   ['Build the salary structures',
-    'Basic, HRA, allowances, PF, professional tax and TDS, per person or per designation. Payroll and Everything.'],
+    'Basic, HRA, allowances, PF, professional tax and TDS, per person or per designation. Essential and Advanced.'],
   ['Run the first cycle beside you',
-    'Against a real month of your own attendance, until the figures agree with what you expected. Payroll and Everything.'],
+    'Against a real month of your own attendance, until the figures agree with what you expected. Essential and Advanced.'],
 ];
 
 const FAQ = [

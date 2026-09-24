@@ -69,6 +69,13 @@ ALTER TABLE admins ADD COLUMN IF NOT EXISTS locked_until TEXT;
 -- device-time feature per tenant: the sync ingest, the day-view columns, the
 -- employee self-view and the Device Mapping panel. Asked at company creation.
 ALTER TABLE companies ADD COLUMN IF NOT EXISTS has_device_attendance BOOLEAN NOT NULL DEFAULT FALSE;
+-- What the company has bought. A ceiling on effective permissions, not a grant
+-- (see planEntitlements in permissions.js). Existing rows default to the middle
+-- tier: every company created before plans existed was sold the whole product,
+-- and silently demoting them to Basic would take payroll away from a live
+-- customer on a deploy.
+ALTER TABLE companies ADD COLUMN IF NOT EXISTS plan TEXT NOT NULL DEFAULT 'essential'
+  CHECK (plan IN ('basic','essential','advanced'));
 
 CREATE TABLE IF NOT EXISTS user_directory (
   id INTEGER GENERATED ALWAYS AS IDENTITY PRIMARY KEY,

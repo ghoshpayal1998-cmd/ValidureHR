@@ -12,7 +12,12 @@ import {
   ConfirmModal, Empty, ErrorNote, Field, Modal, PageHead, Skeleton, StatusBadge, useToast,
 } from '@/components/ui';
 
-const BLANK = { name: '', slug: '', has_device_attendance: false, error: '' };
+const BLANK = {
+  name: '', slug: '', plan: 'essential', has_device_attendance: false,
+  owner_email: '', owner_first: '', owner_last: '', owner_code: '',
+  owner_dob: '', owner_doj: '',
+  error: '',
+};
 
 /*
  * The server derives the slug the same way whenever the field is left empty:
@@ -57,6 +62,9 @@ export default function PlatformCompaniesPage() {
   const [form, setForm] = useState(null);             // create: { ...BLANK }
   const [edit, setEdit] = useState(null);             // { company, status }
   const [confirming, setConfirming] = useState(null); // { kind, company }
+  /* The one and only copy of a generated password, held until it is dismissed.
+   * Losing it means resetting the account, so it does not vanish on a toast. */
+  const [handover, setHandover] = useState(null);
   const [busy, setBusy] = useState(false);
 
   const load = () => {
@@ -114,10 +122,35 @@ export default function PlatformCompaniesPage() {
           /* Undefined drops out of the JSON, which is what lets the server
            * derive the slug from the name itself. */
           slug: typed || undefined,
+          plan: form.plan,
           has_device_attendance: form.has_device_attendance,
+          owner: form.owner_email.trim()
+            ? {
+              email: form.owner_email.trim(),
+              first_name: form.owner_first.trim() || undefined,
+              last_name: form.owner_last.trim() || undefined,
+              emp_code: form.owner_code.trim() || undefined,
+              dob: form.owner_dob || undefined,
+              doj: form.owner_doj || undefined,
+            }
+            : undefined,
         },
       });
-      toast(res?.message || `Company "${name}" created`, 'ok');
+
+      /* The generated password is in this response and nowhere else once the
+       * toast fades, so say plainly whether the mail carrying it actually left
+       * — and show it either way. */
+      if (res?.warning) {
+        toast(res.warning, 'warn');
+      } else if (res?.owner) {
+        setHandover(res.owner);
+        toast(res.owner.emailed
+          ? `Company created. Credentials emailed to ${res.owner.email}.`
+          : `Company created, but the email did not send — copy the password below.`,
+        res.owner.emailed ? 'ok' : 'warn');
+      } else {
+        toast(res?.message || `Company "${name}" created`, 'ok');
+      }
       setForm(null);
       load();
     } catch (e) {
@@ -437,6 +470,37 @@ export default function PlatformCompaniesPage() {
         </section>
       </div>
 
+      {/* ------------------------------------------ credential handover */}
+      {handover && (
+        <Modal
+          title="Hand these over"
+          sub="The password is shown once. It is not stored anywhere in readable form."
+          onClose={() => setHandover(null)}
+          footer={
+            <button className="btn btn--primary" onClick={() => setHandover(null)}>Done</button>
+          }
+        >
+          <div className="stack" style={{ gap: 'var(--s4)' }}>
+            {!handover.emailed && (
+              <p className="badge badge--warn" style={{ alignSelf: 'start' }}>
+                The email did not send — copy this before closing
+              </p>
+            )}
+            <table className="table">
+              <tbody>
+                <tr><th scope="row">Username</th><td className="mono">{handover.username}</td></tr>
+                <tr><th scope="row">Email</th><td className="mono">{handover.email}</td></tr>
+                <tr><th scope="row">Password</th><td className="mono">{handover.password}</td></tr>
+              </tbody>
+            </table>
+            <p className="faint" style={{ fontSize: '.8125rem' }}>
+              They must change it at first sign-in. If this window closes before you copy it, use
+              Reset password on the company&rsquo;s Employees screen — the password cannot be read back.
+            </p>
+          </div>
+        </Modal>
+      )}
+
       {/* ------------------------------------------------ create */}
       {form && (
         <Modal
@@ -489,6 +553,23 @@ export default function PlatformCompaniesPage() {
               </p>
             )}
 
+            <Field
+              id="f-plan"
+              label="Plan"
+              help="What the company has bought. It caps what anyone in the company can reach: Basic stops short of the payroll cycle and the reporting, whatever a role says. Changeable later."
+            >
+              <select
+                id="f-plan"
+                className="input"
+                value={form.plan}
+                onChange={(ev) => setForm({ ...form, plan: ev.target.value })}
+              >
+                <option value="basic">Basic — attendance, leave, documents, payslips</option>
+                <option value="essential">Essential — adds the payroll cycle and reporting</option>
+                <option value="advanced">Advanced — adds the mobile app and more than one company</option>
+              </select>
+            </Field>
+
             <div className="field">
               <div className="checkline">
                 <input
@@ -504,6 +585,57 @@ export default function PlatformCompaniesPage() {
                 HR, and the Device Mapping panel.
               </p>
             </div>
+
+            <hr className="rule" />
+
+            <p className="eyebrow">The first login</p>
+            <p className="faint" style={{ fontSize: '.75rem', marginTop: 'calc(var(--s3) * -1)' }}>
+              Optional, but a company with no users cannot be handed to anyone. Fill this in and the
+              owner account is created with the company and emailed its password.
+            </p>
+
+            <Field id="f-oemail" label="Owner email">
+              <input
+                id="f-oemail"
+                className="input"
+                type="email"
+                placeholder="owner@acme.com"
+                value={form.owner_email}
+                onChange={(ev) => setForm({ ...form, owner_email: ev.target.value })}
+              />
+            </Field>
+
+            <div className="grid grid--2" style={{ gap: 'var(--s4)' }}>
+              <Field id="f-ofirst" label="First name">
+                <input id="f-ofirst" className="input" placeholder="Priya"
+                  value={form.owner_first}
+                  onChange={(ev) => setForm({ ...form, owner_first: ev.target.value })} />
+              </Field>
+              <Field id="f-olast" label="Last name">
+                <input id="f-olast" className="input" placeholder="Sharma"
+                  value={form.owner_last}
+                  onChange={(ev) => setForm({ ...form, owner_last: ev.target.value })} />
+              </Field>
+            </div>
+
+            <div className="grid grid--2" style={{ gap: 'var(--s4)' }}>
+              <Field id="f-odob" label="Date of birth" help="Required — the employee record will not accept a blank.">
+                <input id="f-odob" className="input" type="date"
+                  value={form.owner_dob}
+                  onChange={(ev) => setForm({ ...form, owner_dob: ev.target.value })} />
+              </Field>
+              <Field id="f-odoj" label="Date of joining" help="Defaults to today.">
+                <input id="f-odoj" className="input" type="date"
+                  value={form.owner_doj}
+                  onChange={(ev) => setForm({ ...form, owner_doj: ev.target.value })} />
+              </Field>
+            </div>
+
+            <Field id="f-ocode" label="Employee code" help="Their username. Defaults to ADMIN-001.">
+              <input id="f-ocode" className="input mono" placeholder="ADMIN-001"
+                value={form.owner_code}
+                onChange={(ev) => setForm({ ...form, owner_code: ev.target.value })} />
+            </Field>
 
             <p className="faint" style={{ fontSize: '.75rem' }}>
               Creating a company provisions its schema, its uploads folder, the four system roles

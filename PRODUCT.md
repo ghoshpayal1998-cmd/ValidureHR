@@ -127,6 +127,25 @@ point, not the headline.
     someone. The ₹12,000 setup fee qualifies because monthly customers pay it.
   - Each card names what it withholds, derived from the same feature matrix the
     comparison table renders so the two cannot drift apart.
+- **Plans are enforced, as of 2026-09-24.** `companies.plan` holds `basic`,
+  `essential` or `advanced`, and `tenant()` intersects a caller's granted
+  permissions with that plan's entitlements. A plan is a **ceiling, not a
+  grant**: effective = (role ∪ user grants) ∩ plan. Roles are never rewritten
+  by a plan change, so a downgrade is reversible and a hand-scoped role
+  survives it. Platform admins are exempt — support must reach any company.
+  - `payroll.manage` was split out of `documents.manage` for this. Basic sells
+    payslips and LOP; Essential sells the cycle, the structures and the export.
+    One key could not express that boundary, so before the split nothing
+    stopped a Basic company running payroll.
+  - Advanced entitles the same keys as Essential. Its extras — the mobile app
+    and more than one company — are not permission keys: the app is a client
+    that would have to identify itself, and company count is how many we
+    provision. **Neither is enforced by the server today.**
+- **There is still no self-serve purchase.** No signup, checkout, payment
+  provider or seat counting exists, and the "from 25 people" minimum is not
+  enforced anywhere. Onboarding is `POST /api/companies`, which since
+  2026-09-24 optionally creates the first OWNER login in the same call and
+  emails the password. That matches the site, which only ever says "talk to us".
 - **Still undecided:** licensing, and the hosting model a buyer would get.
   Future work must not invent them.
 

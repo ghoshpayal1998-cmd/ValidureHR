@@ -623,7 +623,7 @@
   min-height: 24px;
 }
 .plan__more:hover { color: var(--accent); }
-.plan__nothing { font-size: .8125rem; color: var(--ok-text); font-weight: 500; }
+.plan__not--none { border-top: 0; padding-top: 0; }
 
 /* ------------------------------------------------------------ billing */
 /* Annual is preselected because it is the better deal, but the monthly figure
