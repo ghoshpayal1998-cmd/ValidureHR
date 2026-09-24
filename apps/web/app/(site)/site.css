@@ -523,8 +523,10 @@
 .cmp__c { width: 8.5rem; }
 .cmp__c { text-align: center; }
 .cmp__yes { color: var(--accent-strong); }
-/* --muted, not --faint: the dash carries meaning, so it has to clear the
-   3:1 that WCAG 1.4.11 asks of a non-text indicator. */
+/* A cross, not a dash — a dash reads as "no data" as easily as "not included".
+   Muted rather than red: twenty rows of alarm colour would make the cheapest
+   plan look broken instead of smaller. Still clears the 3:1 that WCAG 1.4.11
+   asks of a non-text indicator. */
 .cmp__no { color: var(--muted); }
 .cmp--money { min-width: 30rem; }
 .cmp--money th[scope='row'] { font-size: .9375rem; font-weight: 600; font-variant-numeric: tabular-nums; }

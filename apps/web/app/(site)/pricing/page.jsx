@@ -1,5 +1,5 @@
 import Link from 'next/link';
-import { Check, Minus, ArrowRight } from 'lucide-react';
+import { Check, X, ArrowRight } from 'lucide-react';
 import { FEATURES, PLANS, SIZES } from './plans';
 import PlanCards from './PlanCards';
 
@@ -53,7 +53,7 @@ function missingFor(index) {
 function Tick({ on, label }) {
   return on
     ? <Check size={16} className="cmp__yes" aria-label={`${label}: included`} />
-    : <Minus size={16} className="cmp__no" aria-label={`${label}: not included`} />;
+    : <X size={16} className="cmp__no" aria-label={`${label}: not included`} />;
 }
 
 export default function Pricing() {
