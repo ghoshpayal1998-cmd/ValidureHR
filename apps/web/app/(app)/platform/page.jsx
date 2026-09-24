@@ -3,7 +3,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import {
-  Building2, ClipboardCheck, LogIn, Pencil, Plus, Search, ShieldCheck, ShieldOff, Trash2, Users,
+  Building2, ClipboardCheck, LogIn, Pencil, Plus, Search, ShieldCheck, ShieldOff, SlidersHorizontal, Trash2, Users,
 } from 'lucide-react';
 import {
   api, fmtDay, getSelectedCompany, getUser, setSelectedCompany,
@@ -65,6 +65,10 @@ export default function PlatformCompaniesPage() {
   /* The one and only copy of a generated password, held until it is dismissed.
    * Losing it means resetting the account, so it does not vanish on a toast. */
   const [handover, setHandover] = useState(null);
+  /* { company, plan, grant:Set, revoke:Set } — the whole intended state of one
+   * company's access, edited as a matrix and saved in one call. */
+  const [access, setAccess] = useState(null);
+  const [catalogue, setCatalogue] = useState(null);
   const [busy, setBusy] = useState(false);
 
   const load = () => {
@@ -187,6 +191,62 @@ export default function PlatformCompaniesPage() {
        * the header every later request rides on has to go with it. */
       if (working?.id === company.id) { setSelectedCompany(null); setWorking(null); }
       setConfirming(null);
+      load();
+    } catch (e) {
+      toast(e.message, 'err');
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  /*
+   * Open the access matrix for a company. The catalogue (every permission key,
+   * and what each plan includes by default) is fetched once and reused: it is
+   * the same for every company and does not change between page loads.
+   */
+  async function openAccess(company) {
+    try {
+      const cat = catalogue || await api('/companies/entitlements');
+      if (!catalogue) setCatalogue(cat);
+      const ov = company.overrides || { grant: [], revoke: [] };
+      setAccess({
+        company,
+        plan: company.plan || 'essential',
+        grant: new Set(ov.grant || []),
+        revoke: new Set(ov.revoke || []),
+      });
+    } catch (e) {
+      toast(e.message, 'err');
+    }
+  }
+
+  /* One switch per key. A key the plan already includes is turned off by
+   * revoking it; one it does not is turned on by granting it. Storing the
+   * intent rather than the result is what lets a later plan change re-evaluate
+   * without silently keeping an override nobody remembers setting. */
+  function toggleKey(key, wanted) {
+    const planHas = (catalogue?.plans?.[access.plan] || []).includes(key);
+    const grant = new Set(access.grant);
+    const revoke = new Set(access.revoke);
+    grant.delete(key); revoke.delete(key);
+    if (wanted && !planHas) grant.add(key);
+    if (!wanted && planHas) revoke.add(key);
+    setAccess({ ...access, grant, revoke });
+  }
+
+  async function saveAccess() {
+    setBusy(true);
+    try {
+      const res = await api(`/companies/${access.company.id}`, {
+        method: 'PUT',
+        body: {
+          plan: access.plan,
+          grant: [...access.grant],
+          revoke: [...access.revoke],
+        },
+      });
+      toast(res?.message || 'Access updated', 'ok');
+      setAccess(null);
       load();
     } catch (e) {
       toast(e.message, 'err');
@@ -416,6 +476,14 @@ export default function PlatformCompaniesPage() {
                           </button>
                           <button
                             className="iconbtn"
+                            onClick={() => openAccess(c)}
+                            aria-label={`Access and plan for ${c.name}`}
+                            title="Access & plan"
+                          >
+                            <SlidersHorizontal size={16} aria-hidden="true" />
+                          </button>
+                          <button
+                            className="iconbtn"
                             onClick={() => setEdit({ company: c, status: c.status })}
                             aria-label={`Edit ${c.name}`}
                             title="Edit company"
@@ -469,6 +537,93 @@ export default function PlatformCompaniesPage() {
           </div>
         </section>
       </div>
+
+      {/* ------------------------------------------------ access matrix */}
+      {access && catalogue && (
+        <Modal
+          title="Access"
+          sub={`What ${access.company.name} can reach — the plan, and anything set by hand on top of it`}
+          onClose={() => !busy && setAccess(null)}
+          footer={
+            <>
+              <button className="btn btn--ghost" onClick={() => setAccess(null)} disabled={busy}>Cancel</button>
+              <button className="btn btn--primary" onClick={saveAccess} disabled={busy}>
+                {busy ? 'Saving…' : 'Save access'}
+              </button>
+            </>
+          }
+        >
+          <div className="stack" style={{ gap: 'var(--s5)' }}>
+            <Field id="a-plan" label="Plan" help="Sets the defaults below. Changing it does not discard anything you have set by hand.">
+              <select
+                id="a-plan"
+                className="input"
+                value={access.plan}
+                onChange={(ev) => setAccess({ ...access, plan: ev.target.value })}
+              >
+                <option value="basic">Basic</option>
+                <option value="essential">Essential</option>
+                <option value="advanced">Advanced</option>
+              </select>
+            </Field>
+
+            <div className="tablewrap">
+              <table className="table">
+                <caption className="sr">
+                  Every permission key, whether this company&rsquo;s plan includes it, and whether it
+                  has been granted or withheld by hand.
+                </caption>
+                <thead>
+                  <tr><th scope="col">Capability</th><th scope="col">On the plan</th><th scope="col">Allowed</th></tr>
+                </thead>
+                <tbody>
+                  {catalogue.permissions.map((perm) => {
+                    const planHas = (catalogue.plans[access.plan] || []).includes(perm.key);
+                    const granted = access.grant.has(perm.key);
+                    const revoked = access.revoke.has(perm.key);
+                    const on = revoked ? false : (granted || planHas);
+                    return (
+                      <tr key={perm.key}>
+                        <th scope="row" style={{ fontWeight: 400 }}>
+                          <span style={{ display: 'block' }}>{perm.label}</span>
+                          <span className="faint mono" style={{ fontSize: '11px' }}>{perm.key}</span>
+                        </th>
+                        <td>
+                          <span className={`badge ${planHas ? 'badge--ok' : ''}`}>
+                            {planHas ? 'included' : 'not included'}
+                          </span>
+                        </td>
+                        <td>
+                          <span className="checkline">
+                            <input
+                              id={`ent-${perm.key}`}
+                              type="checkbox"
+                              checked={on}
+                              onChange={(ev) => toggleKey(perm.key, ev.target.checked)}
+                            />
+                            <label htmlFor={`ent-${perm.key}`}>
+                              {granted && <span className="badge badge--warn">granted by hand</span>}
+                              {revoked && <span className="badge badge--err">withheld by hand</span>}
+                              {!granted && !revoked && <span className="faint" style={{ fontSize: '.75rem' }}>from the plan</span>}
+                            </label>
+                          </span>
+                        </td>
+                      </tr>
+                    );
+                  })}
+                </tbody>
+              </table>
+            </div>
+
+            <p className="faint" style={{ fontSize: '.75rem' }}>
+              A capability switched on that the plan does not include is recorded as a deliberate
+              grant, and one switched off that the plan does include is recorded as deliberately
+              withheld. Both are written to the company&rsquo;s audit log. This caps what anyone in the
+              company can reach — it never hands a user a permission their role was not given.
+            </p>
+          </div>
+        </Modal>
+      )}
 
       {/* ------------------------------------------ credential handover */}
       {handover && (

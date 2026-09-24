@@ -1,6 +1,6 @@
 const jwt = require('jsonwebtoken');
 const { qOne, tq, tqOne } = require('../db');
-const { ALL_KEYS, parsePerms, planEntitlements } = require('../permissions');
+const { ALL_KEYS, parsePerms, effectiveEntitlements } = require('../permissions');
 const { requireJwtSecret } = require('../config');
 
 // Throws at require() time if the secret is missing, too short, or one of the
@@ -74,8 +74,11 @@ async function tenant(req, res, next) {
     // so without this intersection a company on Basic would still run payroll
     // and the three tiers would be a picture on a website. Downgrading a plan
     // takes the capability away without touching a single role.
-    const entitled = planEntitlements(company.plan);
+    // The plan, widened or narrowed by whatever this company was granted or
+    // withheld individually.
+    const entitled = effectiveEntitlements(company.plan, company.entitlement_overrides);
     req.plan = company.plan;
+    req.entitled = entitled;
     req.perms = new Set([...granted].filter((k) => entitled.has(k)));
     next();
   } catch (e) { next(e); }

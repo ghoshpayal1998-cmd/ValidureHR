@@ -116,6 +116,42 @@ const PLAN_ENTITLEMENTS = {
   advanced: [...ALL_KEYS],
 };
 
+/*
+ * Per-company overrides on top of the plan.
+ *
+ * The plan is the default, not a cage: a Basic customer can be given one
+ * Advanced capability without being moved to Advanced and billed for it, and a
+ * capability can be withheld from a company that nominally has it.
+ *
+ * Stored as JSON on companies.entitlement_overrides:
+ *   { "grant": ["payroll.manage"], "revoke": ["analytics.view"] }
+ *
+ * Parsed defensively for the same reason roles.permissions is: a hand-edited
+ * or malformed value must mean "no override", never a crash and never a key
+ * that is not in the catalogue. Revoke wins over grant, so a key listed in
+ * both is withheld — the safer reading of a contradiction.
+ */
+function parseOverrides(raw) {
+  const empty = { grant: [], revoke: [] };
+  if (!raw) return empty;
+  let o = raw;
+  if (typeof raw === 'string') {
+    try { o = JSON.parse(raw); } catch { return empty; }
+  }
+  if (!o || typeof o !== 'object' || Array.isArray(o)) return empty;
+  const clean = (v) => (Array.isArray(v) ? v.filter((k) => KEY_SET.has(k)) : []);
+  return { grant: clean(o.grant), revoke: clean(o.revoke) };
+}
+
+/** What a company may reach: its plan, widened and narrowed by its overrides. */
+function effectiveEntitlements(plan, overridesRaw) {
+  const set = new Set(planEntitlements(plan));
+  const { grant, revoke } = parseOverrides(overridesRaw);
+  for (const k of grant) set.add(k);
+  for (const k of revoke) set.delete(k);
+  return set;
+}
+
 const normalisePlan = (raw) => {
   const v = String(raw || '').trim().toLowerCase();
   return PLAN_KEYS.includes(v) ? v : null;
@@ -133,4 +169,5 @@ module.exports = {
   PERMISSIONS, ALL_KEYS, SYSTEM_ROLES, parsePerms,
   COMPANY_ADMIN_ROLES, COMPANY_ADMIN_PERMISSIONS, isCompanyAdminRole,
   PLAN_KEYS, DEFAULT_PLAN, PLAN_ENTITLEMENTS, planEntitlements, normalisePlan,
+  parseOverrides, effectiveEntitlements,
 };

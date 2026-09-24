@@ -5,7 +5,8 @@ const fs = require('fs');
 const path = require('path');
 const { q, qOne, tq, tqOne, pool, createTenantSchema, assertSchema } = require('../db');
 const bcrypt = require('bcryptjs');
-const { normalisePlan, DEFAULT_PLAN, SYSTEM_ROLES } = require('../permissions');
+const { normalisePlan, DEFAULT_PLAN, SYSTEM_ROLES, PERMISSIONS, ALL_KEYS,
+  parseOverrides, planEntitlements, effectiveEntitlements } = require('../permissions');
 const { generateTempPassword } = require('../passwords');
 const { sendMailNow } = require('../mailer');
 const { ensureCompanyDirs, UPLOADS_ROOT } = require('../storage');
@@ -23,6 +24,22 @@ const DEFAULT_LEAVE_TYPES = [
   ['Comp Off', 'CO', 0],
 ];
 
+/*
+ * GET /api/companies/entitlements — the permission catalogue plus what each
+ * plan includes by default, so the console can show a company's effective
+ * access and mark which of it came from the plan and which was set by hand.
+ */
+router.get('/entitlements', async (req, res) => {
+  res.json({
+    permissions: PERMISSIONS,
+    plans: {
+      basic: [...planEntitlements('basic')],
+      essential: [...planEntitlements('essential')],
+      advanced: [...planEntitlements('advanced')],
+    },
+  });
+});
+
 // GET /api/companies
 router.get('/', async (req, res, next) => {
   try {
@@ -32,6 +49,10 @@ router.get('/', async (req, res, next) => {
         c.employees = (await tqOne(c.schema_name, 'SELECT COUNT(*)::int c FROM {s}.employees')).c;
         c.pending_leaves = (await tqOne(c.schema_name, `SELECT COUNT(*)::int c FROM {s}.leave_applications WHERE status='Pending'`)).c;
       } catch { c.employees = 0; c.pending_leaves = 0; }
+      // What this company can actually reach, and how much of that was set by
+      // hand rather than by its plan.
+      c.overrides = parseOverrides(c.entitlement_overrides);
+      c.entitlements = [...effectiveEntitlements(c.plan, c.entitlement_overrides)];
     }
     res.json(companies);
   } catch (e) { next(e); }
@@ -149,13 +170,14 @@ Please sign in and change your password immediately.`);
 // PUT /api/companies/:id { status, plan } — suspend / activate, or change plan
 router.put('/:id', async (req, res, next) => {
   try {
-    const { status } = req.body || {};
-    const plan = normalisePlan((req.body || {}).plan);
+    const body = req.body || {};
+    const { status } = body;
+    const plan = normalisePlan(body.plan);
 
-    // Either field on its own, so changing a plan does not require restating
-    // the status and accidentally reactivating a suspended company.
-    if (status === undefined && !plan) {
-      return res.status(400).json({ error: 'Provide a status or a plan' });
+    // Any field on its own, so changing a plan does not require restating the
+    // status and accidentally reactivating a suspended company.
+    if (status === undefined && !plan && body.grant === undefined && body.revoke === undefined) {
+      return res.status(400).json({ error: 'Provide a status, a plan, or an entitlement override' });
     }
     if (status !== undefined && !['Active', 'Suspended'].includes(status)) {
       return res.status(400).json({ error: 'Invalid status' });
@@ -164,14 +186,29 @@ router.put('/:id', async (req, res, next) => {
       return res.status(400).json({ error: 'Plan must be basic, essential or advanced' });
     }
 
+    /*
+     * Overrides arrive as the whole intended state, not as a delta: the console
+     * shows every key with a switch, so it always knows the full picture, and
+     * "set this to exactly that" cannot drift the way repeated add/remove calls
+     * can when two admins are looking at the same screen.
+     */
+    let overrides;
+    if (body.grant !== undefined || body.revoke !== undefined) {
+      const bad = [...(body.grant || []), ...(body.revoke || [])].filter((k) => !ALL_KEYS.includes(k));
+      if (bad.length) return res.status(400).json({ error: `Not a permission key: ${bad.join(', ')}` });
+      overrides = parseOverrides({ grant: body.grant || [], revoke: body.revoke || [] });
+    }
+
     const sets = [];
     const vals = [];
     if (status !== undefined) { sets.push(`status=$${sets.length + 1}`); vals.push(status); }
     if (plan) { sets.push(`plan=$${sets.length + 1}`); vals.push(plan); }
+    if (overrides) { sets.push(`entitlement_overrides=$${sets.length + 1}`); vals.push(JSON.stringify(overrides)); }
     vals.push(req.params.id);
 
     const result = await q(
-      `UPDATE companies SET ${sets.join(', ')} WHERE id=$${vals.length} RETURNING id, name, schema_name, status, plan`,
+      `UPDATE companies SET ${sets.join(', ')} WHERE id=$${vals.length}
+        RETURNING id, name, schema_name, status, plan, entitlement_overrides`,
       vals);
     if (!result.length) return res.status(404).json({ error: 'Company not found' });
 
@@ -180,9 +217,19 @@ router.put('/:id', async (req, res, next) => {
       await tq(c.schema_name, `INSERT INTO {s}.audit_logs (actor, action, details) VALUES ($1,'PLAN_CHANGED',$2)`,
         [req.user.username, `Plan set to ${plan}`]);
     }
+    if (overrides) {
+      // Overriding a plan is a commercial decision someone will ask about
+      // later, so it is written into the company's own audit trail.
+      const g = overrides.grant.length ? `granted ${overrides.grant.join(', ')}` : '';
+      const r = overrides.revoke.length ? `withheld ${overrides.revoke.join(', ')}` : '';
+      await tq(c.schema_name, `INSERT INTO {s}.audit_logs (actor, action, details) VALUES ($1,'ENTITLEMENTS_CHANGED',$2)`,
+        [req.user.username, [g, r].filter(Boolean).join('; ') || 'overrides cleared']);
+    }
     const parts = [];
     if (status !== undefined) parts.push(`Company ${status === 'Active' ? 'activated' : 'suspended'}`);
     if (plan) parts.push(`plan set to ${plan}`);
+    if (overrides) parts.push('entitlements updated');
+    c.entitlements = [...effectiveEntitlements(c.plan, c.entitlement_overrides)];
     res.json({ message: parts.join(', '), company: c });
   } catch (e) { next(e); }
 });

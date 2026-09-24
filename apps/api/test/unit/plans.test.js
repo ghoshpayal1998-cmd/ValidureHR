@@ -90,3 +90,57 @@ test('HR can run payroll when the plan allows it', () => {
   assert.ok(SYSTEM_ROLES.HR.includes('payroll.manage'));
   assert.ok(!SYSTEM_ROLES.EMPLOYEE.includes('payroll.manage'));
 });
+
+/* ---------------------------------------------------------- overrides ---- */
+
+const { parseOverrides, effectiveEntitlements } = require('../../src/permissions');
+
+test('a granted key lifts a company above its plan without changing the plan', () => {
+  // The point of the feature: give one Basic customer one Advanced capability
+  // without moving them onto Advanced and billing them for it.
+  const e = effectiveEntitlements('basic', '{"grant":["payroll.manage"]}');
+  assert.ok(e.has('payroll.manage'));
+  assert.ok(e.has('documents.manage'), 'and the rest of Basic is untouched');
+});
+
+test('a revoked key is withheld even when the plan includes it', () => {
+  const e = effectiveEntitlements('advanced', '{"revoke":["analytics.view"]}');
+  assert.ok(!e.has('analytics.view'));
+  assert.ok(e.has('payroll.manage'));
+});
+
+test('revoke beats grant — a contradiction resolves to withheld', () => {
+  const e = effectiveEntitlements('basic', '{"grant":["payroll.manage"],"revoke":["payroll.manage"]}');
+  assert.ok(!e.has('payroll.manage'));
+});
+
+test('a malformed override means no override, never a crash and never a stray key', () => {
+  const base = [...effectiveEntitlements('basic', null)].sort();
+  for (const bad of ['not json', '[]', '{}', 'null', '', undefined, 42, '{"grant":"payroll.manage"}']) {
+    assert.deepEqual([...effectiveEntitlements('basic', bad)].sort(), base, `"${String(bad)}" changed the result`);
+  }
+});
+
+test('overrides cannot invent a permission key', () => {
+  const e = effectiveEntitlements('basic', '{"grant":["wat.nope","payroll.manage"]}');
+  assert.ok(!e.has('wat.nope'));
+  assert.ok(e.has('payroll.manage'), 'the real key alongside it still applies');
+});
+
+test('parseOverrides always returns two arrays', () => {
+  for (const raw of [null, 'x', '{"grant":null}', { revoke: ['analytics.view'] }]) {
+    const o = parseOverrides(raw);
+    assert.ok(Array.isArray(o.grant) && Array.isArray(o.revoke));
+  }
+  assert.deepEqual(parseOverrides({ revoke: ['analytics.view'] }).revoke, ['analytics.view']);
+});
+
+test('an override never grants a permission a role was not given', () => {
+  // The entitlement set is a ceiling. The middleware intersects it with the
+  // user's granted permissions, so this is the property that matters: an
+  // EMPLOYEE at a company granted every key still holds nothing.
+  const entitled = effectiveEntitlements('advanced', '{"grant":["payroll.manage"]}');
+  const employeeGrants = new Set(SYSTEM_ROLES.EMPLOYEE);
+  const effective = [...employeeGrants].filter((k) => entitled.has(k));
+  assert.deepEqual(effective, [], 'an EMPLOYEE still has no permissions');
+});

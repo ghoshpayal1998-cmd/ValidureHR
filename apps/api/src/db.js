@@ -76,6 +76,10 @@ ALTER TABLE companies ADD COLUMN IF NOT EXISTS has_device_attendance BOOLEAN NOT
 -- customer on a deploy.
 ALTER TABLE companies ADD COLUMN IF NOT EXISTS plan TEXT NOT NULL DEFAULT 'essential'
   CHECK (plan IN ('basic','essential','advanced'));
+-- Per-company exceptions to the plan: {"grant":[...],"revoke":[...]}. The plan
+-- is the default, not a cage — a Basic customer can be given one Advanced
+-- capability without being moved onto Advanced and billed for it.
+ALTER TABLE companies ADD COLUMN IF NOT EXISTS entitlement_overrides TEXT NOT NULL DEFAULT '{"grant":[],"revoke":[]}';
 
 CREATE TABLE IF NOT EXISTS user_directory (
   id INTEGER GENERATED ALWAYS AS IDENTITY PRIMARY KEY,

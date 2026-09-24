@@ -141,6 +141,17 @@ point, not the headline.
     and more than one company — are not permission keys: the app is a client
     that would have to identify itself, and company count is how many we
     provision. **Neither is enforced by the server today.**
+- **A plan is a default, not a cage.** `companies.entitlement_overrides` holds
+  `{"grant":[],"revoke":[]}`, applied on top of the plan, so one customer can be
+  given a capability their plan excludes without being moved to a higher plan
+  and billed for it — or have one withheld that their plan includes. Revoke
+  beats grant. A malformed value means no override, never a crash. The platform
+  console edits this as a matrix and every change is written to the company's
+  own audit log.
+  - This still cannot hand a user a permission their role was not given: the
+    entitlement set is a ceiling that `tenant()` intersects with the caller's
+    granted permissions, so an EMPLOYEE at a fully entitled company holds
+    nothing.
 - **There is still no self-serve purchase.** No signup, checkout, payment
   provider or seat counting exists, and the "from 25 people" minimum is not
   enforced anywhere. Onboarding is `POST /api/companies`, which since
