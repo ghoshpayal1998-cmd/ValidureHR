@@ -1,22 +1,20 @@
 /*
- * Two <img> rather than one re-coloured file: the master logo is an
- * auto-traced 18-step gradient, so there is no single fill to swap and a
- * CSS filter would muddy the teal. CSS shows whichever variant suits the
- * active theme (see .brandmark in globals.css).
+ * One file, both themes.
+ *
+ * There used to be a light and a dark variant here. There should not be: the
+ * emblem is the supplied artwork, and it reads on the dark surface unchanged —
+ * the silver rim separates every form, so the navy behaves as depth rather
+ * than vanishing into the background. Recolouring a logo to suit a background
+ * is not a dark mode, it is a different logo.
+ *
+ * The wordmark beside it is HTML text, so it themes itself.
  */
 export default function Logo({ size = 28, wordmark = true, className = '' }) {
   return (
     <span className={`brandlock ${className}`}>
       <img
-        className="brandmark brandmark--light"
+        className="brandmark"
         src="/brand/validure-mark.svg"
-        alt=""
-        width={size}
-        height={size}
-      />
-      <img
-        className="brandmark brandmark--dark"
-        src="/brand/validure-mark-dark.svg"
         alt=""
         width={size}
         height={size}

@@ -900,7 +900,6 @@ legend {
    ============================================================ */
 .brandlock { display: flex; align-items: center; gap: .55rem; min-width: 0; }
 .brandmark { flex: none; object-fit: contain; }
-.brandmark--dark { display: none; }
 .brandword {
   font-family: var(--font-head);
   font-weight: 680;
@@ -910,9 +909,5 @@ legend {
 }
 .brandword em { font-style: normal; color: var(--accent); }
 
-:root[data-theme='dark'] .brandmark--light { display: none; }
-:root[data-theme='dark'] .brandmark--dark { display: block; }
 @media (prefers-color-scheme: dark) {
-  :root:not([data-theme='light']) .brandmark--light { display: none; }
-  :root:not([data-theme='light']) .brandmark--dark { display: block; }
 }
