@@ -1,0 +1,812 @@
+<!DOCTYPE html><html lang="en"><head>
+<meta charset="utf-8">
+<meta content="width=device-width, initial-scale=1.0" name="viewport">
+<title>Validure HR - Platform Admin Console</title>
+<!-- Tailwind CSS v3 with Forms & Container Queries -->
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<!-- Google Font: Plus Jakarta Sans -->
+<link href="https://fonts.googleapis.com" rel="preconnect">
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect">
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet"><link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<!-- Tailwind Configuration -->
+<script data-purpose="tailwind-config">
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            brand: {
+              navy: '#081B47',
+              navyDeep: '#0F2A5A',
+              teal: '#118A9F',
+              tealBright: '#1597A8',
+              tealSoft: '#D9F1F3',
+              bgLight: '#F6F9FB',
+              textMain: '#172033',
+              textMuted: '#667085',
+              border: '#E2E8EF',
+            }
+          },
+          fontFamily: {
+            sans: ['"Plus Jakarta Sans"', 'ui-sans-serif', 'system-ui', 'sans-serif'],
+          }
+        }
+      }
+    };
+  </script>
+<!-- Global Custom Styles -->
+<style data-purpose="custom-enhancements">
+    body {
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+    }
+    /* Subtle custom scrollbars */
+    ::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+    ::-webkit-scrollbar-track {
+      background: #F1F5F9;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: #CBD5E1;
+      border-radius: 9999px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: #94A3B8;
+    }
+  </style>
+</head>
+<body class="bg-brand-bgLight text-brand-textMain min-h-screen flex antialiased">
+<!-- BEGIN: LeftSidebar -->
+<aside class="w-64 border-r border-brand-border bg-white flex flex-col justify-between py-5 px-3 shrink-0 h-screen sticky top-0 overflow-y-auto" data-purpose="left-navigation">
+<!-- Top Brand & Tenant Selector Container -->
+<div class="space-y-5">
+<!-- Brand Logo Header -->
+<div class="px-2 flex items-center gap-3">
+<img alt="Validure Logo" class="h-8 w-auto object-contain shrink-0" src="https://lh3.googleusercontent.com/aida-public/AB6AXuADJJhNnwNFimzjR9N8ub0WnT94N2_tgT_OMAfNbery55rJpqRoTSM-DxpyP2EBlCr4V6BcZddzQKkzHVgv9kbJkf8M_M4-Xu2stXDus5ZsR8N1FEBJHDXZk8EoLzaxY-uWmwmCME3CDmHCw3SNSoE_SmE2Hm48ijCcKYPgj4GGdt4KC8lAWRzLaLKG2pkM8nmEvcgd3TmySfqdnYQZqB0x7HU7GochNsOchlysMsydlNnf4zwjqW1PfJvVjoCeMDs">
+<div class="leading-tight">
+<div class="font-extrabold text-base tracking-tight text-brand-navy flex items-center gap-1.5">
+            VALIDURE <span class="text-brand-teal font-black">HR</span>
+</div>
+<p class="text-[10px] text-brand-textMuted tracking-wider font-semibold uppercase">Platform Console</p>
+</div>
+</div>
+<!-- Mode / Context Switcher Indicator -->
+<div class="bg-brand-bgLight border border-brand-border rounded-xl p-2.5 mx-1" data-purpose="tenant-mode-indicator">
+<div class="flex items-center justify-between text-xs mb-1">
+<span class="text-[11px] font-semibold text-brand-textMuted uppercase tracking-wider">Scope</span>
+<span class="inline-flex items-center gap-1 text-[10px] font-semibold text-brand-teal bg-white border border-brand-tealSoft px-1.5 py-0.5 rounded">
+<span class="w-1.5 h-1.5 rounded-full bg-brand-teal"></span> Multi-tenant
+          </span>
+</div>
+<p class="text-xs font-semibold text-brand-navy truncate">Platform Management</p>
+<p class="text-[11px] text-brand-textMuted truncate">3 Isolated Organizations</p>
+</div>
+<!-- Navigation Links -->
+<nav class="space-y-6" data-purpose="sidebar-links">
+<!-- WORKSPACE SECTION -->
+<div>
+<div class="text-[11px] font-bold text-brand-textMuted tracking-wider uppercase mb-2 px-3">
+            WORKSPACE
+          </div>
+<ul class="space-y-1">
+<!-- Nav Item: Overview -->
+<li class="">
+<a class="flex items-center gap-3 px-3 py-2 text-sm font-medium rounded-lg text-brand-textMuted hover:text-brand-navy hover:bg-brand-bgLight transition-colors" href="#">
+<svg class="w-4 h-4 text-brand-textMuted" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+<path d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path>
+</svg>
+<span class="">Overview</span>
+</a>
+</li>
+<!-- Nav Item: Companies (ACTIVE) -->
+<li class="">
+<a class="flex items-center justify-between px-3 py-2 text-sm font-semibold rounded-lg bg-brand-tealSoft text-brand-teal" href="#">
+<div class="flex items-center gap-3">
+<svg class="w-4 h-4 text-brand-teal" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+<path d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path>
+</svg>
+<span class="">Companies</span>
+</div>
+<span class="text-xs bg-white text-brand-teal font-bold px-2 py-0.5 rounded-full border border-brand-teal/20">3</span>
+</a>
+</li>
+<!-- Nav Item: Employees -->
+<li class="">
+<a class="flex items-center gap-3 px-3 py-2 text-sm font-medium rounded-lg text-brand-textMuted hover:text-brand-navy hover:bg-brand-bgLight transition-colors" href="#">
+<svg class="w-4 h-4 text-brand-textMuted" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+<path d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path>
+</svg>
+<span class="">Employees</span>
+</a>
+</li>
+<!-- Nav Item: Attendance -->
+<li class="">
+<a class="flex items-center gap-3 px-3 py-2 text-sm font-medium rounded-lg text-brand-textMuted hover:text-brand-navy hover:bg-brand-bgLight transition-colors" href="#">
+<svg class="w-4 h-4 text-brand-textMuted" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+<path d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path>
+</svg>
+<span class="">Attendance</span>
+</a>
+</li>
+<!-- Nav Item: Leave Management -->
+<li class="">
+<a class="flex items-center gap-3 px-3 py-2 text-sm font-medium rounded-lg text-brand-textMuted hover:text-brand-navy hover:bg-brand-bgLight transition-colors" href="#">
+<svg class="w-4 h-4 text-brand-textMuted" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+<path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path>
+</svg>
+<span class="">Leave Management</span>
+</a>
+</li>
+<!-- Nav Item: Leave Balances -->
+<li class="">
+<a class="flex items-center gap-3 px-3 py-2 text-sm font-medium rounded-lg text-brand-textMuted hover:text-brand-navy hover:bg-brand-bgLight transition-colors" href="#">
+<svg class="w-4 h-4 text-brand-textMuted" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+<path d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path>
+</svg>
+<span class="">Leave Balances</span>
+</a>
+</li>
+<!-- Nav Item: Payroll -->
+<li class="">
+<a class="flex items-center gap-3 px-3 py-2 text-sm font-medium rounded-lg text-brand-textMuted hover:text-brand-navy hover:bg-brand-bgLight transition-colors" href="#">
+<svg class="w-4 h-4 text-brand-textMuted" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+<path d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path>
+</svg>
+<span class="">Payroll</span>
+</a>
+</li>
+<!-- Nav Item: Documents -->
+<li class="">
+<a class="flex items-center gap-3 px-3 py-2 text-sm font-medium rounded-lg text-brand-textMuted hover:text-brand-navy hover:bg-brand-bgLight transition-colors" href="#">
+<svg class="w-4 h-4 text-brand-textMuted" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+<path d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path>
+</svg>
+<span class="">Documents</span>
+</a>
+</li>
+<!-- Nav Item: Reports -->
+<li class="">
+<a class="flex items-center gap-3 px-3 py-2 text-sm font-medium rounded-lg text-brand-textMuted hover:text-brand-navy hover:bg-brand-bgLight transition-colors" href="#">
+<svg class="w-4 h-4 text-brand-textMuted" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+<path d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path>
+</svg>
+<span class="">Reports</span>
+</a>
+</li>
+<!-- Nav Item: Analytics -->
+<li class="">
+<a class="flex items-center gap-3 px-3 py-2 text-sm font-medium rounded-lg text-brand-textMuted hover:text-brand-navy hover:bg-brand-bgLight transition-colors" href="#">
+<svg class="w-4 h-4 text-brand-textMuted" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+<path d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path>
+</svg>
+<span class="">Analytics</span>
+</a>
+</li>
+</ul>
+</div>
+<!-- ADMINISTRATION SECTION -->
+<div><div class="text-[11px] font-bold text-brand-textMuted tracking-wider uppercase mb-2 px-3">
+  ADMINISTRATION &amp; ACCOUNT
+</div>
+<ul class="space-y-1">
+  <li class="">
+    <a class="flex items-center gap-3 px-3 py-2 text-sm font-medium rounded-lg text-brand-textMuted hover:text-brand-navy hover:bg-brand-bgLight transition-colors" href="#">
+      <span class="material-symbols-outlined text-brand-textMuted text-[20px]">account_circle</span>
+      <span class="">My Account</span>
+    </a>
+  </li>
+  <li class="">
+    <a class="flex items-center gap-3 px-3 py-2 text-sm font-medium rounded-lg text-brand-textMuted hover:text-brand-navy hover:bg-brand-bgLight transition-colors" href="#">
+      <span class="material-symbols-outlined text-brand-textMuted text-[20px]">admin_panel_settings</span>
+      <span class="">Roles &amp; Access</span>
+    </a>
+  </li>
+  <li class="">
+    <a class="flex items-center gap-3 px-3 py-2 text-sm font-medium rounded-lg text-brand-textMuted hover:text-brand-navy hover:bg-brand-bgLight transition-colors" href="#">
+      <span class="material-symbols-outlined text-brand-textMuted text-[20px]">lock_reset</span>
+      <span class="">Change Password</span>
+    </a>
+  </li>
+  <li class="">
+    <a class="flex items-center gap-3 px-3 py-2 text-sm font-medium rounded-lg text-brand-textMuted hover:text-brand-navy hover:bg-brand-bgLight transition-colors" href="#">
+      <span class="material-symbols-outlined text-brand-textMuted text-[20px]">settings</span>
+      <span class="">Settings</span>
+    </a>
+  </li>
+</ul></div>
+</nav>
+</div>
+<!-- Sidebar Footer Actions -->
+<div class="border-t border-brand-border pt-4 mt-6 space-y-1" data-purpose="sidebar-footer"><a class="flex items-center gap-2 px-3 py-2 text-xs font-semibold text-rose-600 hover:bg-rose-50 rounded-lg transition-colors" href="#">
+  <svg class="w-4 h-4 text-rose-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+    <path d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path>
+  </svg>
+  <span class="">Sign out</span>
+</a></div>
+</aside>
+<!-- END: LeftSidebar -->
+<!-- BEGIN: MainContentWrapper -->
+<div class="flex-1 flex flex-col min-w-0 overflow-x-hidden">
+<!-- BEGIN: TopHeader -->
+<header class="h-16 border-b border-brand-border bg-white px-8 flex items-center justify-between sticky top-0 z-20" data-purpose="top-navbar">
+<!-- Left: Breadcrumb / Active Context -->
+<div class="flex items-center gap-2 text-sm">
+<span class="text-brand-textMuted font-medium">Platform Console</span>
+<span class="text-brand-border">/</span>
+<span class="text-brand-navy font-semibold">Overview &amp; Companies</span>
+</div>
+<!-- Right: User Controls & Scope Switcher -->
+<div class="flex items-center gap-4">
+<!-- View Scope Dropdown -->
+<div class="relative">
+<button class="flex items-center gap-2 text-xs font-semibold text-brand-navy bg-brand-bgLight hover:bg-slate-100 border border-brand-border px-3 py-2 rounded-lg transition-colors" data-purpose="scope-dropdown-trigger">
+<span class="w-2 h-2 rounded-full bg-emerald-500"></span>
+<span class="">View as: Platform Admin</span>
+<svg class="w-3.5 h-3.5 text-brand-textMuted" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+<path d="M19 9l-7 7-7-7" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path>
+</svg>
+</button>
+</div>
+<!-- Notification Bell -->
+<button aria-label="Notifications" class="relative p-2 text-brand-textMuted hover:text-brand-navy hover:bg-brand-bgLight rounded-lg transition-colors" data-purpose="notifications-bell">
+<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+<path d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path>
+</svg>
+<span class="absolute top-1.5 right-1.5 flex h-4 w-4 items-center justify-center rounded-full bg-rose-500 text-[10px] font-bold text-white leading-none">
+            3
+          </span>
+</button>
+<div class="h-6 w-px bg-brand-border"></div>
+<!-- User Profile Pill -->
+<div class="flex items-center gap-2.5 pl-1 cursor-pointer" data-purpose="user-profile-header">
+<div class="w-9 h-9 rounded-full bg-brand-navy text-white text-xs font-bold flex items-center justify-center ring-2 ring-brand-teal/20">
+            RP
+          </div>
+<div class="leading-tight hidden sm:block text-left">
+<div class="text-xs font-bold text-brand-navy">Rahul Paul</div>
+<div class="text-[11px] text-brand-textMuted font-medium">Platform Admin</div>
+</div>
+</div>
+</div>
+</header>
+<!-- END: TopHeader -->
+<!-- BEGIN: MainContentArea -->
+<main class="flex-1 p-8 space-y-6 max-w-7xl mx-auto w-full" data-purpose="dashboard-content">
+<!-- SECTION A: Welcome & Primary Action Header -->
+<section class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4" data-purpose="welcome-action-header">
+<div>
+<h1 class="text-2xl font-bold tracking-tight text-brand-navy">Good afternoon, Rahul</h1>
+<p class="text-sm text-brand-textMuted mt-0.5">Here's what's happening across your HR platform today.</p>
+</div>
+<div class="flex items-center gap-3">
+<button class="inline-flex items-center gap-2 border border-brand-border bg-white hover:bg-brand-bgLight text-brand-textMain font-semibold px-3.5 py-2 text-sm rounded-lg transition-colors shadow-sm">
+<svg class="w-4 h-4 text-brand-textMuted" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+<path d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path>
+</svg>
+            Export Summary
+          </button>
+<button class="inline-flex items-center gap-2 bg-brand-teal hover:bg-[#0e7486] text-white font-semibold px-4 py-2 text-sm rounded-lg shadow-sm transition-colors">
+<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+<path d="M12 4v16m8-8H4" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path>
+</svg>
+            New Company
+          </button>
+</div>
+</section>
+<!-- SECTION B: 4 Compact KPI Cards -->
+<section class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4" data-purpose="kpi-metric-cards">
+<!-- Metric Card 1: Companies -->
+<div class="bg-white border border-brand-border rounded-xl p-5 shadow-xs flex flex-col justify-between hover:border-brand-teal/50 transition-colors">
+<div class="flex items-center justify-between text-brand-textMuted">
+<span class="text-xs font-semibold uppercase tracking-wider">Companies</span>
+<div class="w-8 h-8 rounded-lg bg-brand-bgLight text-brand-navy flex items-center justify-center">
+<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+<path d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path>
+</svg>
+</div>
+</div>
+<div class="mt-3">
+<div class="text-3xl font-extrabold text-brand-navy tracking-tight">03</div>
+<div class="flex items-center justify-between mt-2 pt-2 border-t border-brand-border/60">
+<span class="text-xs text-brand-textMuted font-medium">Active tenants provisioned</span>
+<span class="inline-flex items-center gap-1 text-[11px] font-semibold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-full">
+<span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span> Healthy
+              </span>
+</div>
+</div>
+</div>
+<!-- Metric Card 2: Employees -->
+<div class="bg-white border border-brand-border rounded-xl p-5 shadow-xs flex flex-col justify-between hover:border-brand-teal/50 transition-colors">
+<div class="flex items-center justify-between text-brand-textMuted">
+<span class="text-xs font-semibold uppercase tracking-wider">Employees</span>
+<div class="w-8 h-8 rounded-lg bg-brand-bgLight text-brand-navy flex items-center justify-center">
+<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+<path d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path>
+</svg>
+</div>
+</div>
+<div class="mt-3">
+<div class="text-3xl font-extrabold text-brand-navy tracking-tight">77</div>
+<div class="flex items-center justify-between mt-2 pt-2 border-t border-brand-border/60">
+<span class="text-xs text-brand-textMuted font-medium">Across all companies</span>
+<span class="text-[11px] font-semibold text-brand-teal bg-brand-tealSoft px-2 py-0.5 rounded-full">+4 this month</span>
+</div>
+</div>
+</div>
+<!-- Metric Card 3: Active Accounts -->
+<div class="bg-white border border-brand-border rounded-xl p-5 shadow-xs flex flex-col justify-between hover:border-brand-teal/50 transition-colors">
+<div class="flex items-center justify-between text-brand-textMuted">
+<span class="text-xs font-semibold uppercase tracking-wider">Active Accounts</span>
+<div class="w-8 h-8 rounded-lg bg-brand-bgLight text-brand-navy flex items-center justify-center">
+<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+<path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path>
+</svg>
+</div>
+</div>
+<div class="mt-3">
+<div class="text-3xl font-extrabold text-brand-navy tracking-tight">74</div>
+<div class="flex items-center justify-between mt-2 pt-2 border-t border-brand-border/60">
+<span class="text-xs text-brand-textMuted font-medium">96.1% active rate</span>
+<span class="text-[11px] font-semibold text-slate-500 bg-slate-100 px-2 py-0.5 rounded-full">3 Inactive</span>
+</div>
+</div>
+</div>
+<!-- Metric Card 4: Pending Actions -->
+<div class="bg-white border border-brand-border rounded-xl p-5 shadow-xs flex flex-col justify-between hover:border-amber-400 transition-colors">
+<div class="flex items-center justify-between text-brand-textMuted">
+<span class="text-xs font-semibold uppercase tracking-wider">Pending Actions</span>
+<div class="w-8 h-8 rounded-lg bg-amber-50 text-amber-700 flex items-center justify-center">
+<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+<path d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path>
+</svg>
+</div>
+</div>
+<div class="mt-3">
+<div class="text-3xl font-extrabold text-brand-navy tracking-tight">08</div>
+<div class="flex items-center justify-between mt-2 pt-2 border-t border-brand-border/60">
+<span class="text-xs text-brand-textMuted font-medium">Requires admin review</span>
+<span class="text-[11px] font-bold text-amber-700 bg-amber-100/70 px-2 py-0.5 rounded-full">Attention</span>
+</div>
+</div>
+</div>
+</section>
+<!-- SECTION C: Needs Attention Actionable Strip -->
+<section class="bg-white border border-brand-border rounded-xl p-5 shadow-xs" data-purpose="needs-attention-container">
+<div class="flex flex-col sm:flex-row sm:items-center justify-between pb-3.5 mb-3 border-b border-brand-border gap-2">
+<div class="flex items-center gap-2.5">
+<h2 class="text-sm font-bold text-brand-navy">Needs Attention</h2>
+<span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-semibold bg-amber-100 text-amber-800">
+              3 items pending
+            </span>
+</div>
+<button class="text-xs font-semibold text-brand-teal hover:underline text-left sm:text-right">
+            Mark all as resolved
+          </button>
+</div>
+<div class="divide-y divide-brand-border/60 text-xs">
+<!-- Attention Item 1 -->
+<div class="py-2.5 flex flex-col md:flex-row md:items-center justify-between gap-2 hover:bg-brand-bgLight/60 px-2 rounded-lg transition-colors">
+<div class="flex items-center gap-3">
+<span class="px-2 py-0.5 rounded font-semibold text-[11px] bg-amber-50 text-amber-700 border border-amber-200 shrink-0">
+                Approvals
+              </span>
+<span class="text-brand-textMain font-medium">
+                2 leave requests waiting for administrative approval in <strong class="text-brand-navy font-semibold">Futurn Technologies</strong>
+</span>
+</div>
+<a class="inline-flex items-center gap-1 font-semibold text-brand-teal hover:text-brand-navy shrink-0" href="#">
+              Review requests <span aria-hidden="true" class="">→</span>
+</a>
+</div>
+<!-- Attention Item 2 -->
+<div class="py-2.5 flex flex-col md:flex-row md:items-center justify-between gap-2 hover:bg-brand-bgLight/60 px-2 rounded-lg transition-colors">
+<div class="flex items-center gap-3">
+<span class="px-2 py-0.5 rounded font-semibold text-[11px] bg-brand-tealSoft text-brand-teal border border-brand-teal/20 shrink-0">
+                Biometric Gateway
+              </span>
+<span class="text-brand-textMain font-medium">
+                12 employee attendance records pending biometric gateway batch synchronization
+              </span>
+</div>
+<a class="inline-flex items-center gap-1 font-semibold text-brand-teal hover:text-brand-navy shrink-0" href="#">
+              Sync now <span aria-hidden="true" class="">→</span>
+</a>
+</div>
+<!-- Attention Item 3 -->
+<div class="py-2.5 flex flex-col md:flex-row md:items-center justify-between gap-2 hover:bg-brand-bgLight/60 px-2 rounded-lg transition-colors">
+<div class="flex items-center gap-3">
+<span class="px-2 py-0.5 rounded font-semibold text-[11px] bg-rose-50 text-rose-700 border border-rose-200 shrink-0">
+                Tenant Alert
+              </span>
+<span class="text-brand-textMain font-medium">
+                Northbridge Analytics tenant was temporarily suspended due to billing compliance audit
+              </span>
+</div>
+<a class="inline-flex items-center gap-1 font-semibold text-rose-600 hover:text-rose-700 shrink-0" href="#">
+              Resolve issue <span aria-hidden="true" class="">→</span>
+</a>
+</div>
+</div>
+</section>
+<!-- SECTION D: Core Companies Section & High-Density Table -->
+<section class="space-y-4" data-purpose="companies-table-section">
+<!-- Header & Filter Bar -->
+<div class="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
+<div>
+<h2 class="text-lg font-bold text-brand-navy tracking-tight">Companies</h2>
+<p class="text-xs text-brand-textMuted">Each company is fully isolated with its own database schema, files, roles, and users.</p>
+</div>
+<!-- Filters -->
+<div class="flex flex-wrap items-center gap-2.5">
+<!-- Search Field -->
+<div class="relative min-w-[240px]">
+<span class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none text-brand-textMuted">
+<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+<path d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path>
+</svg>
+</span>
+<input class="w-full pl-9 pr-3 py-1.5 text-xs rounded-lg border border-brand-border bg-white text-brand-textMain placeholder-brand-textMuted focus:outline-none focus:ring-1 focus:ring-brand-teal focus:border-brand-teal" placeholder="Search by company name, code or city..." type="text">
+</div>
+<!-- Plan Dropdown -->
+<select class="text-xs rounded-lg border border-brand-border bg-white text-brand-textMain py-1.5 pl-3 pr-8 font-medium focus:ring-1 focus:ring-brand-teal focus:border-brand-teal">
+<option>All plans</option>
+<option>Enterprise</option>
+<option>Growth</option>
+<option>Starter</option>
+</select>
+<!-- Status Dropdown -->
+<select class="text-xs rounded-lg border border-brand-border bg-white text-brand-textMain py-1.5 pl-3 pr-8 font-medium focus:ring-1 focus:ring-brand-teal focus:border-brand-teal">
+<option>All status</option>
+<option>Active</option>
+<option>Suspended</option>
+</select>
+<button class="bg-brand-bgLight hover:bg-slate-200 border border-brand-border text-brand-navy font-semibold px-3 py-1.5 text-xs rounded-lg transition-colors flex items-center gap-1.5">
+<svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+<path d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path>
+</svg>
+              Filters
+            </button>
+</div>
+</div>
+<!-- Table Card -->
+<div class="bg-white border border-brand-border rounded-xl shadow-xs overflow-hidden">
+<div class="overflow-x-auto">
+<table class="w-full text-left border-collapse">
+<thead>
+<tr class="bg-brand-bgLight/80 border-b border-brand-border text-[11px] font-bold text-brand-textMuted uppercase tracking-wider">
+<th class="py-3.5 px-4" scope="col">Company</th>
+<th class="py-3.5 px-4" scope="col">Plan</th>
+<th class="py-3.5 px-4" scope="col">Employees</th>
+<th class="py-3.5 px-4" scope="col">Active Accounts</th>
+<th class="py-3.5 px-4" scope="col">Location</th>
+<th class="py-3.5 px-4" scope="col">Status</th>
+<th class="py-3.5 px-4 text-right" scope="col">Actions</th>
+</tr>
+</thead>
+<tbody class="divide-y divide-brand-border text-xs">
+<!-- ROW 1: Working Tenant (Validure Solutions) -->
+<tr class="bg-[#F0FDF4]/30 hover:bg-[#F0FDF4]/60 transition-colors">
+<td class="py-4 px-4">
+<div class="flex items-center gap-3">
+<div class="w-9 h-9 rounded-lg bg-brand-navy text-white font-bold text-xs flex items-center justify-center shrink-0">
+                        VS
+                      </div>
+<div>
+<div class="flex items-center gap-2">
+<span class="font-bold text-brand-navy text-sm">Validure Solutions Pvt. Ltd.</span>
+<span class="inline-flex items-center gap-1 text-[10px] font-bold text-brand-teal bg-brand-tealSoft border border-brand-teal/20 px-2 py-0.5 rounded-full">
+                            Working tenant
+                          </span>
+</div>
+<div class="text-[11px] text-brand-textMuted mt-0.5 flex items-center gap-2">
+<span class="">Code: <strong>VS</strong></span>
+<span class="">•</span>
+<span class="">Customer since Jun 2020</span>
+<span class="">•</span>
+<span class="text-emerald-700 font-medium">Biometric Enabled</span>
+</div>
+</div>
+</div>
+</td>
+<td class="py-4 px-4">
+<span class="inline-flex items-center px-2.5 py-1 rounded-md text-xs font-semibold bg-brand-navy/10 text-brand-navy">
+                      Enterprise
+                    </span>
+</td>
+<td class="py-4 px-4">
+<div class="font-semibold text-brand-navy">24</div>
+<div class="text-[11px] text-brand-textMuted">23 active</div>
+</td>
+<td class="py-4 px-4">
+<div class="flex items-center gap-2">
+<span class="font-semibold text-brand-navy">23 / 24</span>
+<span class="text-[11px] text-emerald-600 font-medium">(95.8%)</span>
+</div>
+<div class="w-24 bg-brand-border h-1.5 rounded-full mt-1 overflow-hidden">
+<div class="bg-emerald-500 h-1.5 rounded-full" style="width: 95.8%"></div>
+</div>
+</td>
+<td class="py-4 px-4 font-medium text-brand-navy">
+                    Bengaluru, IN
+                  </td>
+<td class="py-4 px-4">
+<span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[11px] font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200">
+<span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
+                      Active
+                    </span>
+</td>
+<td class="py-4 px-4 text-right">
+<div class="flex items-center justify-end gap-2">
+<button class="inline-flex items-center gap-1.5 bg-brand-teal hover:bg-[#0e7486] text-white font-semibold text-xs px-3 py-1.5 rounded-lg shadow-xs transition-colors">
+<span class="">Open Workspace</span>
+<svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+<path d="M14 5l7 7m0 0l-7 7m7-7H3" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path>
+</svg>
+</button>
+<button class="p-1.5 text-brand-textMuted hover:text-brand-navy hover:bg-brand-bgLight rounded-md transition-colors" title="Company Details">
+<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+<path d="M12 5v.01M12 12v.01M12 19v.01M12 6a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path>
+</svg>
+</button>
+</div>
+</td>
+</tr>
+<!-- ROW 2: Futurn Technologies -->
+<tr class="hover:bg-brand-bgLight/50 transition-colors">
+<td class="py-4 px-4">
+<div class="flex items-center gap-3">
+<div class="w-9 h-9 rounded-lg bg-sky-100 text-sky-800 font-bold text-xs flex items-center justify-center shrink-0">
+                        FT
+                      </div>
+<div>
+<div class="font-bold text-brand-navy text-sm">Futurn Technologies</div>
+<div class="text-[11px] text-brand-textMuted mt-0.5 flex items-center gap-2">
+<span class="">Code: <strong>FT</strong></span>
+<span class="">•</span>
+<span class="">Customer since Mar 2022</span>
+<span class="">•</span>
+<span class="text-emerald-700 font-medium">Biometric Enabled</span>
+</div>
+</div>
+</div>
+</td>
+<td class="py-4 px-4">
+<span class="inline-flex items-center px-2.5 py-1 rounded-md text-xs font-semibold bg-sky-50 text-sky-700 border border-sky-200">
+                      Growth
+                    </span>
+</td>
+<td class="py-4 px-4">
+<div class="font-semibold text-brand-navy">41</div>
+<div class="text-[11px] text-brand-textMuted">39 active</div>
+</td>
+<td class="py-4 px-4">
+<div class="flex items-center gap-2">
+<span class="font-semibold text-brand-navy">39 / 41</span>
+<span class="text-[11px] text-emerald-600 font-medium">(95.1%)</span>
+</div>
+<div class="w-24 bg-brand-border h-1.5 rounded-full mt-1 overflow-hidden">
+<div class="bg-emerald-500 h-1.5 rounded-full" style="width: 95.1%"></div>
+</div>
+</td>
+<td class="py-4 px-4 font-medium text-brand-navy">
+                    Pune, IN
+                  </td>
+<td class="py-4 px-4">
+<span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[11px] font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200">
+<span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
+                      Active
+                    </span>
+</td>
+<td class="py-4 px-4 text-right">
+<div class="flex items-center justify-end gap-2">
+<button class="inline-flex items-center gap-1.5 border border-brand-border hover:bg-brand-tealSoft hover:border-brand-teal/40 text-brand-teal font-semibold text-xs px-3 py-1.5 rounded-lg transition-colors">
+<span class="">Open</span>
+<svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+<path d="M14 5l7 7m0 0l-7 7m7-7H3" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path>
+</svg>
+</button>
+<button class="p-1.5 text-brand-textMuted hover:text-brand-navy hover:bg-brand-bgLight rounded-md transition-colors" title="Company Details">
+<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+<path d="M12 5v.01M12 12v.01M12 19v.01M12 6a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path>
+</svg>
+</button>
+</div>
+</td>
+</tr>
+<!-- ROW 3: Northbridge Analytics -->
+<tr class="hover:bg-brand-bgLight/50 transition-colors">
+<td class="py-4 px-4">
+<div class="flex items-center gap-3">
+<div class="w-9 h-9 rounded-lg bg-slate-100 text-slate-700 font-bold text-xs flex items-center justify-center shrink-0">
+                        NA
+                      </div>
+<div>
+<div class="font-bold text-brand-navy text-sm">Northbridge Analytics</div>
+<div class="text-[11px] text-brand-textMuted mt-0.5 flex items-center gap-2">
+<span class="">Code: <strong>NA</strong></span>
+<span class="">•</span>
+<span class="">Customer since Sep 2024</span>
+</div>
+</div>
+</div>
+</td>
+<td class="py-4 px-4">
+<span class="inline-flex items-center px-2.5 py-1 rounded-md text-xs font-semibold bg-slate-100 text-slate-700 border border-slate-200">
+                      Starter
+                    </span>
+</td>
+<td class="py-4 px-4">
+<div class="font-semibold text-brand-navy">12</div>
+<div class="text-[11px] text-brand-textMuted">12 active</div>
+</td>
+<td class="py-4 px-4">
+<div class="flex items-center gap-2">
+<span class="font-semibold text-brand-navy">12 / 12</span>
+<span class="text-[11px] text-emerald-600 font-medium">(100%)</span>
+</div>
+<div class="w-24 bg-brand-border h-1.5 rounded-full mt-1 overflow-hidden">
+<div class="bg-emerald-500 h-1.5 rounded-full" style="width: 100%"></div>
+</div>
+</td>
+<td class="py-4 px-4 font-medium text-brand-navy">
+                    Hyderabad, IN
+                  </td>
+<td class="py-4 px-4">
+<span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[11px] font-semibold bg-rose-50 text-rose-700 border border-rose-200">
+<span class="w-1.5 h-1.5 rounded-full bg-rose-500"></span>
+                      Suspended
+                    </span>
+</td>
+<td class="py-4 px-4 text-right">
+<div class="flex items-center justify-end gap-2">
+<button class="inline-flex items-center gap-1.5 border border-brand-border hover:bg-brand-bgLight text-brand-textMuted font-semibold text-xs px-3 py-1.5 rounded-lg transition-colors">
+<span class="">Manage</span>
+<svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+<path d="M14 5l7 7m0 0l-7 7m7-7H3" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path>
+</svg>
+</button>
+<button class="p-1.5 text-brand-textMuted hover:text-brand-navy hover:bg-brand-bgLight rounded-md transition-colors" title="Company Details">
+<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+<path d="M12 5v.01M12 12v.01M12 19v.01M12 6a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path>
+</svg>
+</button>
+</div>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+<!-- Table Footer / Pagination -->
+<div class="px-5 py-3.5 bg-brand-bgLight/40 border-t border-brand-border flex items-center justify-between text-xs text-brand-textMuted">
+<p class="">Showing <strong class="text-brand-navy">3</strong> of <strong class="text-brand-navy">3</strong> companies</p>
+<div class="flex items-center gap-2">
+<button class="px-2.5 py-1 rounded border border-brand-border bg-white text-slate-400 cursor-not-allowed" disabled="">Previous</button>
+<span class="px-2.5 py-1 rounded bg-brand-tealSoft text-brand-teal font-bold">1</span>
+<button class="px-2.5 py-1 rounded border border-brand-border bg-white text-slate-400 cursor-not-allowed" disabled="">Next</button>
+</div>
+</div>
+</div>
+<p class="text-[11px] text-brand-textMuted italic">
+          * Note: Selecting "Open Workspace" activates that tenant context, scoping the sidebar navigation and attendance/payroll databases directly to that organization.
+        </p>
+</section>
+<!-- SECTION E: Two-Column Split - Recent Activity & Working Tenant Quick Launch -->
+<section class="grid grid-cols-1 lg:grid-cols-12 gap-6 pt-2" data-purpose="activity-and-quick-actions">
+<!-- Left: Recent Activity Timeline (7 Columns) -->
+<div class="lg:col-span-7 bg-white border border-brand-border rounded-xl p-5 shadow-xs flex flex-col justify-between">
+<div>
+<div class="flex items-center justify-between pb-3 mb-4 border-b border-brand-border">
+<h3 class="text-sm font-bold text-brand-navy">Recent Platform Activity</h3>
+<a class="text-xs font-semibold text-brand-teal hover:underline" href="#">View Audit Log</a>
+</div>
+<ol class="relative border-l border-brand-border ml-2 space-y-4 text-xs">
+<!-- Timeline Event 1 -->
+<li class="ml-4">
+<span class="absolute -left-1.5 mt-1 h-3 w-3 rounded-full border-2 border-white bg-brand-teal"></span>
+<p class="font-semibold text-brand-navy">
+                  Rahul Paul <span class="font-normal text-brand-textMuted">provisioned new tenant configuration for</span> Futurn Technologies
+                </p>
+<time class="text-[11px] text-brand-textMuted">12 minutes ago · Platform Action</time>
+</li>
+<!-- Timeline Event 2 -->
+<li class="ml-4">
+<span class="absolute -left-1.5 mt-1 h-3 w-3 rounded-full border-2 border-white bg-emerald-500"></span>
+<p class="font-semibold text-brand-navy">
+                  Employee VS-0142 <span class="font-normal text-brand-textMuted">attendance check-in registered via</span> Biometric Gateway #2
+                </p>
+<time class="text-[11px] text-brand-textMuted">34 minutes ago · Automated Gateway</time>
+</li>
+<!-- Timeline Event 3 -->
+<li class="ml-4">
+<span class="absolute -left-1.5 mt-1 h-3 w-3 rounded-full border-2 border-white bg-sky-500"></span>
+<p class="font-semibold text-brand-navy">
+                  Leave request approved <span class="font-normal text-brand-textMuted">for Anita Roy (Senior Developer) by HR Manager</span>
+</p>
+<time class="text-[11px] text-brand-textMuted">1 hour ago · Validure Solutions</time>
+</li>
+<!-- Timeline Event 4 -->
+<li class="ml-4">
+<span class="absolute -left-1.5 mt-1 h-3 w-3 rounded-full border-2 border-white bg-indigo-500"></span>
+<p class="font-semibold text-brand-navy">
+                  September Payroll Summary export <span class="font-normal text-brand-textMuted">generated by Finance Lead</span>
+</p>
+<time class="text-[11px] text-brand-textMuted">2 hours ago · Report Generator</time>
+</li>
+</ol>
+</div>
+<div class="mt-4 pt-3 border-t border-brand-border/60 text-[11px] text-brand-textMuted flex items-center justify-between">
+<span class="">Platform status: <strong class="text-emerald-700">All services operational</strong></span>
+<span class="">v2.8.4-stable</span>
+</div>
+</div>
+<!-- Right: Active Tenant Quick Launch Card (5 Columns) -->
+<div class="lg:col-span-5 bg-white border border-brand-border rounded-xl p-5 shadow-xs flex flex-col justify-between">
+<div>
+<div class="flex items-center justify-between pb-3 mb-3 border-b border-brand-border">
+<div>
+<span class="text-[10px] font-bold tracking-wider text-brand-teal uppercase">Active Working Workspace</span>
+<h3 class="text-base font-bold text-brand-navy mt-0.5">Validure Solutions Pvt. Ltd.</h3>
+</div>
+<span class="px-2 py-1 text-[11px] font-bold bg-brand-tealSoft text-brand-teal rounded">VS-IND</span>
+</div>
+<!-- Mini Workspace Stats -->
+<div class="grid grid-cols-2 gap-2 text-xs mb-4">
+<div class="bg-brand-bgLight p-2.5 rounded-lg border border-brand-border/70">
+<span class="text-brand-textMuted block text-[11px]">Total Headcount</span>
+<span class="text-base font-bold text-brand-navy mt-0.5 block">24 Staff</span>
+</div>
+<div class="bg-brand-bgLight p-2.5 rounded-lg border border-brand-border/70">
+<span class="text-brand-textMuted block text-[11px]">Today's Presence</span>
+<span class="text-base font-bold text-emerald-700 mt-0.5 block">23 Present</span>
+</div>
+<div class="bg-brand-bgLight p-2.5 rounded-lg border border-brand-border/70">
+<span class="text-brand-textMuted block text-[11px]">Approved Leaves</span>
+<span class="text-base font-bold text-brand-navy mt-0.5 block">02 Employees</span>
+</div>
+<div class="bg-brand-bgLight p-2.5 rounded-lg border border-brand-border/70">
+<span class="text-brand-textMuted block text-[11px]">Pending HR Approvals</span>
+<span class="text-base font-bold text-amber-700 mt-0.5 block">03 Tasks</span>
+</div>
+</div>
+<!-- Direct Functional Links -->
+<div class="space-y-1.5">
+<a class="w-full flex items-center justify-between px-3 py-2 text-xs font-semibold rounded-lg bg-brand-navy text-white hover:bg-brand-navyDeep transition-colors" href="#">
+<span class="">Launch Validure HR Overview</span>
+<svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+<path d="M9 5l7 7-7 7" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path>
+</svg>
+</a>
+<a class="w-full flex items-center justify-between px-3 py-2 text-xs font-semibold rounded-lg border border-brand-border hover:bg-brand-bgLight text-brand-navy transition-colors" href="#">
+<span class="">Manage Validure Employees (24)</span>
+<svg class="w-3.5 h-3.5 text-brand-textMuted" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+<path d="M9 5l7 7-7 7" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path>
+</svg>
+</a>
+<a class="w-full flex items-center justify-between px-3 py-2 text-xs font-semibold rounded-lg border border-brand-border hover:bg-brand-bgLight text-brand-navy transition-colors" href="#">
+<span class="">Run October Payroll Cycle</span>
+<svg class="w-3.5 h-3.5 text-brand-textMuted" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+<path d="M9 5l7 7-7 7" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path>
+</svg>
+</a>
+</div>
+</div>
+<!-- Tenant Switcher Trigger -->
+<div class="pt-3 mt-3 border-t border-brand-border">
+<button class="w-full text-xs font-semibold text-brand-teal hover:text-brand-navy flex items-center justify-center gap-1.5">
+<svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+<path d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path>
+</svg>
+              Switch to Futurn Technologies or Northbridge
+            </button>
+</div>
+</div>
+</section>
+</main>
+<!-- END: MainContentArea -->
+</div>
+<!-- END: MainContentWrapper -->
+
+
+</body></html>

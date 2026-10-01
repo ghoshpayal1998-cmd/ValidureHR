@@ -1,0 +1,1215 @@
+<!DOCTYPE html><html lang="en" style=""><head>
+<meta charset="utf-8">
+<meta content="width=device-width, initial-scale=1.0" name="viewport">
+<title>Employees | Validure Solutions Pvt. Ltd.</title>
+<!-- Fonts -->
+<link href="https://fonts.googleapis.com" rel="preconnect">
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;family=Plus+Jakarta+Sans:wght@500;600;700;800&amp;family=JetBrains+Mono:wght@400;500&amp;display=swap" rel="stylesheet">
+<!-- Material Symbols -->
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<!-- Tailwind CSS -->
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          colors: {
+            "surface-container-high": "#e1e8ff",
+            "on-tertiary-fixed": "#081f21",
+            "on-secondary-container": "#006979",
+            "inverse-surface": "#273044",
+            "tertiary-container": "#0b2123",
+            "surface-container": "#e9edff",
+            "tertiary": "#000506",
+            "surface-container-highest": "#d9e2fc",
+            "error-container": "#ffdad6",
+            "tertiary-fixed": "#cfe7e9",
+            "on-primary-fixed-variant": "#354572",
+            "surface-dim": "#d1daf4",
+            "surface-variant": "#d9e2fc",
+            "secondary-fixed-dim": "#73d4eb",
+            "secondary-container": "#88e8ff",
+            "on-surface": "#121b2e",
+            "on-primary-container": "#7584b6",
+            "tertiary-fixed-dim": "#b3cbcd",
+            "background": "#f9f9ff",
+            "error": "#ba1a1a",
+            "primary": "#000316",
+            "on-surface-variant": "#45464f",
+            "inverse-primary": "#b5c5fa",
+            "primary-container": "#081b47",
+            "surface-tint": "#4d5d8c",
+            "on-secondary-fixed-variant": "#004e5b",
+            "on-error": "#ffffff",
+            "outline": "#757680",
+            "on-tertiary-fixed-variant": "#354a4c",
+            "on-primary": "#ffffff",
+            "on-error-container": "#93000a",
+            "surface": "#f9f9ff",
+            "on-secondary-fixed": "#001f26",
+            "on-secondary": "#ffffff",
+            "on-primary-fixed": "#051845",
+            "surface-bright": "#f9f9ff",
+            "secondary-fixed": "#a8edff",
+            "primary-fixed-dim": "#b5c5fa",
+            "on-tertiary-container": "#738a8c",
+            "on-tertiary": "#ffffff",
+            "outline-variant": "#c5c6d0",
+            "primary-fixed": "#dbe1ff",
+            "surface-container-low": "#f1f3ff",
+            "surface-container-lowest": "#ffffff",
+            "on-background": "#121b2e",
+            "inverse-on-surface": "#edf0ff",
+            "secondary": "#006879"
+          },
+          borderRadius: {
+            "DEFAULT": "0.25rem",
+            "lg": "0.5rem",
+            "xl": "0.75rem",
+            "full": "9999px"
+          },
+          spacing: {
+            "space-sm": "0.5rem",
+            "space-md": "1rem",
+            "space-lg": "1.5rem",
+            "margin": "2rem",
+            "gutter-sm": "1rem",
+            "margin-mobile": "1rem",
+            "gutter-lg": "2rem",
+            "margin-desktop": "3rem",
+            "space-xl": "2rem",
+            "gutter": "1.5rem",
+            "space-xs": "0.25rem"
+          },
+          fontFamily: {
+            "display-hero": ["Plus Jakarta Sans"],
+            "headline-sm": ["Plus Jakarta Sans"],
+            "button-text": ["Plus Jakarta Sans"],
+            "body-lg": ["Inter"],
+            "body-sm": ["Inter"],
+            "headline-lg-mobile": ["Plus Jakarta Sans"],
+            "label-sm": ["Inter"],
+            "headline-md": ["Plus Jakarta Sans"],
+            "body-md": ["Inter"],
+            "headline-lg": ["Plus Jakarta Sans"],
+            "label-md": ["Inter"],
+            "mono": ["JetBrains Mono", "monospace"]
+          },
+          fontSize: {
+            "display-hero": ["40px", { lineHeight: "48px", letterSpacing: "-0.02em", fontWeight: "700" }],
+            "headline-sm": ["18px", { lineHeight: "24px", letterSpacing: "0em", fontWeight: "600" }],
+            "button-text": ["14px", { lineHeight: "20px", letterSpacing: "0.005em", fontWeight: "600" }],
+            "body-lg": ["16px", { lineHeight: "24px", letterSpacing: "-0.005em", fontWeight: "400" }],
+            "body-sm": ["12px", { lineHeight: "18px", letterSpacing: "0.01em", fontWeight: "400" }],
+            "headline-lg-mobile": ["24px", { lineHeight: "32px", letterSpacing: "-0.01em", fontWeight: "600" }],
+            "label-sm": ["11px", { lineHeight: "16px", letterSpacing: "0.04em", fontWeight: "600" }],
+            "headline-md": ["22px", { lineHeight: "28px", letterSpacing: "-0.01em", fontWeight: "600" }],
+            "body-md": ["14px", { lineHeight: "20px", letterSpacing: "0em", fontWeight: "400" }],
+            "headline-lg": ["30px", { lineHeight: "38px", letterSpacing: "-0.015em", fontWeight: "600" }],
+            "label-md": ["13px", { lineHeight: "18px", letterSpacing: "0.01em", fontWeight: "500" }]
+          }
+        },
+      },
+    }
+  </script>
+<style>
+    .material-symbols-outlined {
+      font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 20;
+      font-size: 20px;
+      line-height: 1;
+      display: inline-block;
+      vertical-align: middle;
+    }
+    .custom-scroll::-webkit-scrollbar {
+      width: 5px;
+      height: 5px;
+    }
+    .custom-scroll::-webkit-scrollbar-track {
+      background: transparent;
+    }
+    .custom-scroll::-webkit-scrollbar-thumb {
+      background: #c5c6d0;
+      border-radius: 4px;
+    }
+    .custom-scroll::-webkit-scrollbar-thumb:hover {
+      background: #757680;
+    }
+  </style>
+</head>
+<body class="bg-background text-on-surface antialiased font-body-md text-body-md flex min-h-screen selection:bg-secondary-fixed selection:text-on-secondary-fixed">
+<!-- ========================================================================= -->
+<!-- SIDE NAVIGATION (Shared Component: SideNavBar)                            -->
+<!-- ========================================================================= -->
+<aside class="h-screen w-64 fixed left-0 top-0 flex flex-col justify-between bg-surface-container-lowest border-r border-outline-variant shadow-sm z-30">
+<div class="flex flex-col h-full overflow-hidden">
+<!-- Workspace Brand Lockup -->
+<div class="p-4 border-b border-outline-variant bg-surface-container-lowest">
+<div class="flex items-center gap-2.5">
+  <img src="https://lh3.googleusercontent.com/aida-public/AB6AXuD00o3AQQFBImiwjvpvKn0h1ACDwVDnRxZiyMTf2P1FEzzsWD-hoAYm52EkL8AgGIleomqoFDOf8PA-sp5hwREe0qgO9A2kDmf0Wb40EdmbkIwMfrIwckXYLFXJfu9GbXlc1npDVaSjF67-GD8AA0nyZEIg0w7XrMBpg4CZL3fz4OR6tMcD5YC82O01LWD1smhf_ZI5zluLTHj5s0TLpW7JVIKJ4VhmBq3xRE5fn8lVGJbIWw7D8v73Nd1f66P5m-k" alt="Validure Logo" class="w-9 h-9 object-contain rounded shrink-0">
+  <div>
+    <div class="flex items-center tracking-tight leading-none">
+      <span class="text-secondary font-bold text-lg">VALIDURE</span>
+      <span class="text-primary-container font-black text-lg">HR</span>
+    </div>
+    <p class="text-[9px] uppercase tracking-widest font-semibold text-secondary leading-tight mt-0.5">ENTERPRISE HRMS</p>
+  </div>
+</div>
+<!-- Tenant Switcher Badge -->
+<div class="mt-3 p-2 rounded-lg bg-surface-container-low border border-outline-variant/60 flex items-center justify-between">
+<div class="flex flex-col truncate pr-2">
+<span class="font-headline-sm text-body-sm font-semibold text-primary-container truncate">Validure Solutions Pvt. Ltd.</span>
+<span class="font-body-sm text-label-sm text-on-surface-variant flex items-center gap-1">
+<span class="w-1.5 h-1.5 rounded-full bg-secondary inline-block"></span>
+              Enterprise · Bengaluru
+            </span>
+</div>
+<button class="text-secondary hover:text-on-secondary-container p-1 rounded hover:bg-surface-container-highest transition-colors" title="Switch Tenant" type="button">
+<span class="material-symbols-outlined text-[16px]">swap_horiz</span>
+</button>
+</div>
+</div>
+<!-- Navigation Tabs -->
+<div class="flex-1 overflow-y-auto px-3 py-3 space-y-1 custom-scroll">
+<div class="px-3 py-1 font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wider font-semibold">
+          Core HR
+        </div>
+<!-- 1. Overview -->
+<a class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-on-surface-variant hover:text-on-surface hover:bg-surface-container-low font-medium transition-all duration-200" href="#">
+<span class="material-symbols-outlined text-outline">dashboard</span>
+<span class="font-label-md text-label-md">Overview</span>
+</a>
+<!-- 2. Employees (ACTIVE TAB) -->
+<a class="flex items-center justify-between px-3 py-2.5 rounded-lg bg-surface-container-low text-secondary font-semibold border-l-4 border-secondary transition-all duration-200" href="#">
+<div class="flex items-center gap-3">
+<span class="material-symbols-outlined text-secondary" style="font-variation-settings: 'FILL' 1;">group</span>
+<span class="font-label-md text-label-md">Employees</span>
+</div>
+<span class="px-2 py-0.5 text-label-sm font-semibold rounded-full bg-surface-container-highest text-secondary">24</span>
+</a>
+<!-- 3. Attendance -->
+<a class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-on-surface-variant hover:text-on-surface hover:bg-surface-container-low font-medium transition-all duration-200" href="#">
+<span class="material-symbols-outlined text-outline">how_to_reg</span>
+<span class="font-label-md text-label-md">Attendance</span>
+</a>
+<!-- 4. Leave Management -->
+<a class="flex items-center justify-between px-3 py-2.5 rounded-lg text-on-surface-variant hover:text-on-surface hover:bg-surface-container-low font-medium transition-all duration-200" href="#">
+<div class="flex items-center gap-3">
+<span class="material-symbols-outlined text-outline">event_available</span>
+<span class="font-label-md text-label-md">Leave Management</span>
+</div>
+<span class="px-1.5 py-0.2 rounded-full bg-secondary-fixed text-on-secondary-fixed font-label-sm text-[10px]">2</span>
+</a>
+<!-- 5. Leave Balances -->
+<a class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-on-surface-variant hover:text-on-surface hover:bg-surface-container-low font-medium transition-all duration-200" href="#">
+<span class="material-symbols-outlined text-outline">account_balance_wallet</span>
+<span class="font-label-md text-label-md">Leave Balances</span>
+</a>
+<!-- 6. Payroll -->
+<a class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-on-surface-variant hover:text-on-surface hover:bg-surface-container-low font-medium transition-all duration-200" href="#">
+<span class="material-symbols-outlined text-outline">payments</span>
+<span class="font-label-md text-label-md">Payroll</span>
+</a>
+<!-- 7. Documents -->
+<a class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-on-surface-variant hover:text-on-surface hover:bg-surface-container-low font-medium transition-all duration-200" href="#">
+<span class="material-symbols-outlined text-outline">folder_shared</span>
+<span class="font-label-md text-label-md">Documents</span>
+</a>
+<!-- 8. Reports -->
+<a class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-on-surface-variant hover:text-on-surface hover:bg-surface-container-low font-medium transition-all duration-200" href="#">
+<span class="material-symbols-outlined text-outline">assessment</span>
+<span class="font-label-md text-label-md">Reports</span>
+</a>
+<!-- 9. Analytics -->
+<a class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-on-surface-variant hover:text-on-surface hover:bg-surface-container-low font-medium transition-all duration-200" href="#">
+<span class="material-symbols-outlined text-outline">insights</span>
+<span class="font-label-md text-label-md">Analytics</span>
+</a>
+<div class="pt-4 px-3 py-1 font-label-sm text-[11px] text-on-surface-variant uppercase tracking-wider font-semibold">
+          Administration &amp; Account
+        </div>
+<!-- 1. My Account -->
+<a class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-on-surface-variant hover:text-on-surface hover:bg-surface-container-low font-medium transition-all duration-200" href="#">
+<span class="material-symbols-outlined text-outline">account_circle</span>
+<span class="font-label-md text-label-md">My Account</span>
+</a>
+<!-- 2. Roles & Access -->
+<a class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-on-surface-variant hover:text-on-surface hover:bg-surface-container-low font-medium transition-all duration-200" href="#">
+<span class="material-symbols-outlined text-outline">admin_panel_settings</span>
+<span class="font-label-md text-label-md">Roles &amp; Access</span>
+</a>
+<!-- 3. Change Password -->
+<a class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-on-surface-variant hover:text-on-surface hover:bg-surface-container-low font-medium transition-all duration-200" href="#">
+<span class="material-symbols-outlined text-outline">password</span>
+<span class="font-label-md text-label-md">Change Password</span>
+</a>
+<!-- 4. Settings -->
+<a class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-on-surface-variant hover:text-on-surface hover:bg-surface-container-low font-medium transition-all duration-200" href="#">
+<span class="material-symbols-outlined text-outline">settings</span>
+<span class="font-label-md text-label-md">Settings</span>
+</a>
+
+
+</div>
+<!-- User Profile & Sign Out Footer -->
+<div class="p-3 border-t border-outline-variant bg-surface-container-lowest">
+<div class="flex items-center justify-between p-2 rounded-lg bg-surface-container-low">
+<div class="flex items-center gap-2.5 min-w-0">
+<div class="w-8 h-8 rounded-full bg-primary-container text-on-primary flex items-center justify-center font-headline-sm text-label-sm font-semibold">
+              RP
+            </div>
+<div class="truncate">
+<p class="font-label-md text-label-md font-semibold text-primary truncate leading-snug">Rahul Paul</p>
+<p class="font-body-sm text-label-sm text-on-surface-variant truncate">HR Director</p>
+</div>
+</div>
+<button class="text-on-surface-variant hover:text-error p-1.5 rounded transition-colors" title="Logout" type="button">
+<span class="material-symbols-outlined text-[18px]">logout</span>
+</button>
+</div>
+</div>
+</div>
+</aside>
+<!-- ========================================================================= -->
+<!-- MAIN CONTENT CANVAS WRAPPER (Offset by sidebar width: ml-64)              -->
+<!-- ========================================================================= -->
+<div class="flex-1 ml-64 flex flex-col min-w-0 bg-background">
+<!-- TOP NAVIGATION APP BAR (Shared Component: TopNavBar) -->
+<header class="sticky top-0 h-16 w-full z-20 bg-surface-container-lowest border-b border-outline-variant flex items-center justify-between px-6 shadow-sm">
+<!-- Left: Breadcrumb Context -->
+<div class="flex items-center gap-3">
+<div class="flex items-center gap-1.5 font-label-md text-label-md text-on-surface-variant">
+<span class="text-on-surface-variant hover:text-primary transition-colors">Validure Solutions Pvt. Ltd.</span>
+<span class="material-symbols-outlined text-[14px]">chevron_right</span>
+<span class="font-semibold text-secondary">Employees</span>
+</div>
+<!-- Biometrics Status Pill -->
+<div class="ml-4 hidden lg:flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-surface-container border border-secondary-fixed text-secondary text-label-sm font-medium">
+<span class="w-2 h-2 rounded-full bg-secondary animate-pulse"></span>
+<span class="">Biometrics Live · 99.8% Uptime</span>
+</div>
+</div>
+<!-- Right: Search, Trailing Actions, Profile -->
+<div class="flex items-center gap-3">
+<!-- Quick Global Search Input -->
+<div class="relative w-64 hidden sm:block">
+<span class="absolute inset-y-0 left-0 pl-2.5 flex items-center pointer-events-none text-outline">
+<span class="material-symbols-outlined text-[18px]">search</span>
+</span>
+<input class="w-full pl-8 pr-3 py-1.5 bg-surface-container-low border border-outline-variant rounded-lg text-body-sm text-on-surface placeholder:text-on-surface-variant/70 focus:outline-none focus:border-secondary focus:ring-1 focus:ring-secondary transition-all" placeholder="Jump to record (⌘K)..." type="text">
+</div>
+<!-- Help Action -->
+<button class="p-2 text-on-surface-variant hover:text-on-surface hover:bg-surface-container-low rounded-lg transition-colors" title="Documentation &amp; Help" type="button">
+<span class="material-symbols-outlined text-[20px]">help_outline</span>
+</button>
+<!-- Notification Action with Unread Badge -->
+<div class="relative">
+<button class="p-2 text-on-surface-variant hover:text-on-surface hover:bg-surface-container-low rounded-lg transition-colors" title="Notifications" type="button">
+<span class="material-symbols-outlined text-[20px]">notifications</span>
+<span class="absolute top-1.5 right-1.5 w-2 h-2 rounded-full bg-error ring-2 ring-surface-container-lowest"></span>
+</button>
+</div>
+<div class="h-6 w-px bg-outline-variant"></div>
+<!-- Trailing User Identity -->
+<div class="flex items-center gap-2 pl-1">
+<div class="text-right hidden md:block">
+<div class="font-label-md text-label-md font-semibold text-primary leading-tight">Rahul Sharma</div>
+<div class="font-label-sm text-label-sm text-on-surface-variant">Enterprise Admin</div>
+</div>
+<div class="w-9 h-9 rounded-full bg-secondary text-on-secondary flex items-center justify-center font-headline-sm text-label-md font-semibold ring-2 ring-secondary/20">
+            RS
+          </div>
+</div>
+</div>
+</header>
+<!-- MAIN BODY CONTENT -->
+<main class="p-6 lg:p-8 space-y-6 max-w-7xl w-full mx-auto">
+<!-- PAGE HEADER -->
+<div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+<div>
+<h1 class="font-headline-lg text-headline-lg font-bold text-primary-container tracking-tight">Employees</h1>
+<p class="font-body-md text-body-md text-on-surface-variant mt-0.5">Manage enterprise personnel profiles, departmental allocations, and compliance dossiers.</p>
+</div>
+<div class="flex items-center gap-3">
+<!-- Secondary Action: Export Directory -->
+<button class="inline-flex items-center gap-2 px-3.5 py-2 rounded-lg bg-surface-container-lowest border border-outline-variant hover:bg-surface-container-low text-on-surface font-button-text text-button-text shadow-sm transition-all duration-150" type="button">
+<span class="material-symbols-outlined text-[18px] text-outline">download</span>
+<span class="">Export Directory</span>
+</button>
+<!-- Primary Action: + Add Employee -->
+<button class="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-secondary hover:bg-on-secondary-container text-on-secondary font-button-text text-button-text shadow-sm transition-all duration-150 active:scale-[0.98]" onclick="toggleAddEmployeeDrawer()" type="button">
+<span class="material-symbols-outlined text-[18px]">add</span>
+<span class="">Add Employee</span>
+</button>
+</div>
+</div>
+<!-- METRICS BENTO KPI ROW -->
+<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+<!-- KPI 1 -->
+<div class="bg-surface-container-lowest border border-outline-variant rounded-xl p-4 shadow-[0_1px_3px_rgba(8,27,71,0.04)] flex items-start justify-between">
+<div>
+<span class="font-label-md text-label-md text-on-surface-variant">Total Headcount</span>
+<div class="mt-1 font-headline-lg text-headline-lg font-bold text-primary-container">24</div>
+<div class="mt-1 flex items-center gap-1.5 font-body-sm text-body-sm text-on-surface-variant">
+<span class="w-1.5 h-1.5 rounded-full bg-secondary"></span>
+<span class="">23 Active · 1 on probation</span>
+</div>
+</div>
+<div class="p-2 rounded-lg bg-surface-container text-secondary">
+<span class="material-symbols-outlined">badge</span>
+</div>
+</div>
+<!-- KPI 2 -->
+<div class="bg-surface-container-lowest border border-outline-variant rounded-xl p-4 shadow-[0_1px_3px_rgba(8,27,71,0.04)] flex items-start justify-between">
+<div>
+<span class="font-label-md text-label-md text-on-surface-variant">Active Status</span>
+<div class="mt-1 font-headline-lg text-headline-lg font-bold text-secondary">23</div>
+<div class="mt-1 flex items-center gap-1.5 font-body-sm text-body-sm text-on-surface-variant">
+<span class="w-1.5 h-1.5 rounded-full bg-secondary"></span>
+<span class="">95.8% workforce deployment</span>
+</div>
+</div>
+<div class="p-2 rounded-lg bg-surface-container text-secondary">
+<span class="material-symbols-outlined">verified</span>
+</div>
+</div>
+<!-- KPI 3 -->
+<div class="bg-surface-container-lowest border border-outline-variant rounded-xl p-4 shadow-[0_1px_3px_rgba(8,27,71,0.04)] flex items-start justify-between">
+<div>
+<span class="font-label-md text-label-md text-on-surface-variant">Inactive / Suspended</span>
+<div class="mt-1 font-headline-lg text-headline-lg font-bold text-error">1</div>
+<div class="mt-1 flex items-center gap-1.5 font-body-sm text-body-sm text-on-surface-variant">
+<span class="w-1.5 h-1.5 rounded-full bg-error"></span>
+<span class="">Contract expired pending audit</span>
+</div>
+</div>
+<div class="p-2 rounded-lg bg-error-container text-error">
+<span class="material-symbols-outlined">person_off</span>
+</div>
+</div>
+<!-- KPI 4 -->
+<div class="bg-surface-container-lowest border border-outline-variant rounded-xl p-4 shadow-[0_1px_3px_rgba(8,27,71,0.04)] flex items-start justify-between">
+<div>
+<span class="font-label-md text-label-md text-on-surface-variant">New This Month</span>
+<div class="mt-1 font-headline-lg text-headline-lg font-bold text-primary-container">3</div>
+<div class="mt-1 flex items-center gap-1.5 font-body-sm text-body-sm text-on-surface-variant">
+<span class="w-1.5 h-1.5 rounded-full bg-secondary"></span>
+<span class="">Q3 Cohort onboardings</span>
+</div>
+</div>
+<div class="p-2 rounded-lg bg-surface-container text-secondary">
+<span class="material-symbols-outlined">person_add</span>
+</div>
+</div>
+</div>
+<!-- FILTER & TOOLBAR CARD -->
+<div class="bg-surface-container-lowest border border-outline-variant rounded-xl p-4 shadow-sm space-y-3">
+<div class="flex flex-col md:flex-row gap-3 items-center justify-between">
+<!-- Unified Search Input -->
+<div class="relative w-full md:w-80">
+<span class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-outline">
+<span class="material-symbols-outlined text-[18px]">search</span>
+</span>
+<input class="w-full pl-9 pr-3 py-2 bg-surface-container-lowest border border-outline-variant rounded-lg text-body-md text-on-surface placeholder:text-on-surface-variant/70 focus:outline-none focus:border-secondary focus:ring-1 focus:ring-secondary transition-all" placeholder="Search by name, ID, email, role..." type="text">
+</div>
+<!-- Multi-dimensional Filter Row -->
+<div class="flex flex-wrap items-center gap-2.5 w-full md:w-auto">
+<!-- Department Dropdown -->
+<select class="px-3 py-1.5 bg-surface-container-lowest border border-outline-variant rounded-lg text-label-md text-on-surface font-medium focus:border-secondary focus:ring-0">
+<option>All Departments</option>
+<option>Engineering</option>
+<option>Product</option>
+<option>Design</option>
+<option>Operations</option>
+<option>HR</option>
+</select>
+<!-- Designation Dropdown -->
+<select class="px-3 py-1.5 bg-surface-container-lowest border border-outline-variant rounded-lg text-label-md text-on-surface font-medium focus:border-secondary focus:ring-0">
+<option>All Designations</option>
+<option>Senior Architect</option>
+<option>Lead Designer</option>
+<option>DevOps Specialist</option>
+<option>Frontend Intern</option>
+</select>
+<!-- Status Dropdown -->
+<select class="px-3 py-1.5 bg-surface-container-lowest border border-outline-variant rounded-lg text-label-md text-on-surface font-medium focus:border-secondary focus:ring-0">
+<option>All Statuses</option>
+<option>Active</option>
+<option>On Leave</option>
+<option>Probation</option>
+<option>Inactive</option>
+</select>
+<!-- Location Dropdown -->
+<select class="px-3 py-1.5 bg-surface-container-lowest border border-outline-variant rounded-lg text-label-md text-on-surface font-medium focus:border-secondary focus:ring-0">
+<option>All Locations</option>
+<option>Bengaluru HQ</option>
+<option>Pune Tech Hub</option>
+<option>Hyderabad</option>
+</select>
+<button class="text-secondary hover:text-on-secondary-container font-label-sm text-label-sm font-semibold px-2 py-1 rounded hover:bg-surface-container transition-colors" type="button">
+              Reset Filters
+            </button>
+<div class="h-5 w-px bg-outline-variant hidden sm:block"></div>
+<!-- View Layout Toggle -->
+<div class="inline-flex rounded-lg border border-outline-variant p-0.5 bg-surface-container-low">
+<button class="px-2 py-1 rounded bg-surface-container-lowest text-secondary shadow-xs font-label-sm" title="Table View" type="button">
+<span class="material-symbols-outlined text-[16px]">view_list</span>
+</button>
+<button class="px-2 py-1 rounded text-on-surface-variant hover:text-on-surface font-label-sm" title="Grid Directory" type="button">
+<span class="material-symbols-outlined text-[16px]">grid_view</span>
+</button>
+</div>
+</div>
+</div>
+<!-- Filter Tags Bar -->
+<div class="flex items-center gap-2 pt-1 border-t border-outline-variant/40 text-label-sm font-label-sm">
+<span class="text-on-surface-variant">Active Filters:</span>
+<span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-surface-container text-secondary font-medium">
+            Tenant: Validure Solutions
+          </span>
+<span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-surface-container text-secondary font-medium">
+            Location: All (HQ &amp; Remote)
+          </span>
+<span class="text-outline text-[11px]">(Showing 8 of 24 records)</span>
+</div>
+</div>
+<!-- MAIN DATA TABLE CONTAINER -->
+<div class="bg-surface-container-lowest border border-outline-variant rounded-xl shadow-sm overflow-hidden">
+<div class="overflow-x-auto custom-scroll">
+<table class="w-full text-left border-collapse">
+<thead>
+<tr class="bg-surface-container-low border-b border-outline-variant text-label-sm font-label-sm text-on-surface-variant uppercase tracking-wider">
+<th class="py-3 px-4 font-semibold">Employee</th>
+<th class="py-3 px-4 font-semibold">Employee ID</th>
+<th class="py-3 px-4 font-semibold">Department</th>
+<th class="py-3 px-4 font-semibold">Designation</th>
+<th class="py-3 px-4 font-semibold">Location</th>
+<th class="py-3 px-4 font-semibold">Joining Date</th>
+<th class="py-3 px-4 font-semibold">Status</th>
+<th class="py-3 px-4 font-semibold text-right">Actions</th>
+</tr>
+</thead>
+<tbody class="divide-y divide-outline-variant/60 font-body-md text-body-md text-on-surface">
+<!-- Row 1: Priya Sharma (Target for Detailed Preview) -->
+<tr class="hover:bg-surface-container-low/50 transition-colors group cursor-pointer" onclick="openProfileDrawer('Priya Sharma', 'VS-0142', 'Lead Product Designer', 'Design', 'Bengaluru HQ', 'Active', 'priya.sharma@validure.com')">
+<td class="py-3.5 px-4">
+<div class="flex items-center gap-3">
+<div class="w-9 h-9 rounded-full bg-surface-container-high text-primary-container font-headline-sm font-semibold flex items-center justify-center text-label-md ring-1 ring-outline-variant">
+                      PS
+                    </div>
+<div>
+<div class="font-headline-sm text-body-md font-semibold text-primary group-hover:text-secondary transition-colors">Priya Sharma</div>
+<div class="font-body-sm text-body-sm text-on-surface-variant">priya.sharma@validure.com</div>
+</div>
+</div>
+</td>
+<td class="py-3.5 px-4 font-mono text-label-md text-secondary font-medium">VS-0142</td>
+<td class="py-3.5 px-4">
+<span class="inline-flex items-center px-2 py-0.5 rounded-full text-label-sm font-medium bg-surface-container-high text-primary-container">
+                    Design
+                  </span>
+</td>
+<td class="py-3.5 px-4 font-medium text-primary">Lead Product Designer</td>
+<td class="py-3.5 px-4 text-on-surface-variant flex items-center gap-1.5 mt-2">
+<span class="material-symbols-outlined text-[16px] text-outline">apartment</span>
+<span class="">Bengaluru HQ</span>
+</td>
+<td class="py-3.5 px-4 text-on-surface-variant font-label-md">Jun 14, 2021</td>
+<td class="py-3.5 px-4">
+<span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-label-sm font-semibold bg-surface-container text-secondary">
+<span class="w-1.5 h-1.5 rounded-full bg-secondary"></span>
+                    Active
+                  </span>
+</td>
+<td class="py-3.5 px-4 text-right">
+<div class="flex items-center justify-end gap-1" onclick="event.stopPropagation()">
+<button class="p-1.5 text-on-surface-variant hover:text-secondary hover:bg-surface-container rounded transition-colors" onclick="openProfileDrawer('Priya Sharma', 'VS-0142', 'Lead Product Designer', 'Design', 'Bengaluru HQ', 'Active', 'priya.sharma@validure.com')" title="View Profile" type="button">
+<span class="material-symbols-outlined text-[18px]">visibility</span>
+</button>
+<button class="p-1.5 text-on-surface-variant hover:text-primary hover:bg-surface-container rounded transition-colors" title="Edit Employee" type="button">
+<span class="material-symbols-outlined text-[18px]">edit</span>
+</button>
+<button class="p-1.5 text-on-surface-variant hover:text-primary hover:bg-surface-container rounded transition-colors" title="More Options" type="button">
+<span class="material-symbols-outlined text-[18px]">more_vert</span>
+</button>
+</div>
+</td>
+</tr>
+<!-- Row 2: Vikram Nair -->
+<tr class="hover:bg-surface-container-low/50 transition-colors group cursor-pointer" onclick="openProfileDrawer('Vikram Nair', 'VS-0089', 'Senior Backend Architect', 'Engineering', 'Bengaluru HQ', 'On Leave', 'vikram.nair@validure.com')">
+<td class="py-3.5 px-4">
+<div class="flex items-center gap-3">
+<div class="w-9 h-9 rounded-full bg-secondary-fixed text-on-secondary-fixed font-headline-sm font-semibold flex items-center justify-center text-label-md">
+                      VN
+                    </div>
+<div>
+<div class="font-headline-sm text-body-md font-semibold text-primary group-hover:text-secondary transition-colors">Vikram Nair</div>
+<div class="font-body-sm text-body-sm text-on-surface-variant">vikram.nair@validure.com</div>
+</div>
+</div>
+</td>
+<td class="py-3.5 px-4 font-mono text-label-md text-secondary font-medium">VS-0089</td>
+<td class="py-3.5 px-4">
+<span class="inline-flex items-center px-2 py-0.5 rounded-full text-label-sm font-medium bg-surface-container text-on-secondary-container">
+                    Engineering
+                  </span>
+</td>
+<td class="py-3.5 px-4 font-medium text-primary">Senior Backend Architect</td>
+<td class="py-3.5 px-4 text-on-surface-variant flex items-center gap-1.5 mt-2">
+<span class="material-symbols-outlined text-[16px] text-outline">apartment</span>
+<span class="">Bengaluru HQ</span>
+</td>
+<td class="py-3.5 px-4 text-on-surface-variant font-label-md">Mar 22, 2020</td>
+<td class="py-3.5 px-4">
+<span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-label-sm font-semibold bg-surface-container-high text-on-primary-fixed-variant">
+<span class="w-1.5 h-1.5 rounded-full bg-surface-tint"></span>
+                    On Leave
+                  </span>
+</td>
+<td class="py-3.5 px-4 text-right">
+<div class="flex items-center justify-end gap-1" onclick="event.stopPropagation()">
+<button class="p-1.5 text-on-surface-variant hover:text-secondary hover:bg-surface-container rounded transition-colors" title="View Profile" type="button">
+<span class="material-symbols-outlined text-[18px]">visibility</span>
+</button>
+<button class="p-1.5 text-on-surface-variant hover:text-primary hover:bg-surface-container rounded transition-colors" title="Edit Employee" type="button">
+<span class="material-symbols-outlined text-[18px]">edit</span>
+</button>
+<button class="p-1.5 text-on-surface-variant hover:text-primary hover:bg-surface-container rounded transition-colors" title="More Options" type="button">
+<span class="material-symbols-outlined text-[18px]">more_vert</span>
+</button>
+</div>
+</td>
+</tr>
+<!-- Row 3: Ananya Rao -->
+<tr class="hover:bg-surface-container-low/50 transition-colors group cursor-pointer" onclick="openProfileDrawer('Ananya Rao', 'VS-0205', 'Technical Product Manager', 'Product', 'Bengaluru HQ', 'Active', 'ananya.rao@validure.com')">
+<td class="py-3.5 px-4">
+<div class="flex items-center gap-3">
+<div class="w-9 h-9 rounded-full bg-surface-container-highest text-primary-container font-headline-sm font-semibold flex items-center justify-center text-label-md">
+                      AR
+                    </div>
+<div>
+<div class="font-headline-sm text-body-md font-semibold text-primary group-hover:text-secondary transition-colors">Ananya Rao</div>
+<div class="font-body-sm text-body-sm text-on-surface-variant">ananya.rao@validure.com</div>
+</div>
+</div>
+</td>
+<td class="py-3.5 px-4 font-mono text-label-md text-secondary font-medium">VS-0205</td>
+<td class="py-3.5 px-4">
+<span class="inline-flex items-center px-2 py-0.5 rounded-full text-label-sm font-medium bg-tertiary-fixed text-on-tertiary-fixed-variant">
+                    Product
+                  </span>
+</td>
+<td class="py-3.5 px-4 font-medium text-primary">Technical Product Manager</td>
+<td class="py-3.5 px-4 text-on-surface-variant flex items-center gap-1.5 mt-2">
+<span class="material-symbols-outlined text-[16px] text-outline">apartment</span>
+<span class="">Bengaluru HQ</span>
+</td>
+<td class="py-3.5 px-4 text-on-surface-variant font-label-md">Oct 04, 2023</td>
+<td class="py-3.5 px-4">
+<span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-label-sm font-semibold bg-surface-container text-secondary">
+<span class="w-1.5 h-1.5 rounded-full bg-secondary"></span>
+                    Active
+                  </span>
+</td>
+<td class="py-3.5 px-4 text-right">
+<div class="flex items-center justify-end gap-1" onclick="event.stopPropagation()">
+<button class="p-1.5 text-on-surface-variant hover:text-secondary hover:bg-surface-container rounded transition-colors" title="View Profile" type="button">
+<span class="material-symbols-outlined text-[18px]">visibility</span>
+</button>
+<button class="p-1.5 text-on-surface-variant hover:text-primary hover:bg-surface-container rounded transition-colors" title="Edit Employee" type="button">
+<span class="material-symbols-outlined text-[18px]">edit</span>
+</button>
+<button class="p-1.5 text-on-surface-variant hover:text-primary hover:bg-surface-container rounded transition-colors" title="More Options" type="button">
+<span class="material-symbols-outlined text-[18px]">more_vert</span>
+</button>
+</div>
+</td>
+</tr>
+<!-- Row 4: Sanya Kapoor -->
+<tr class="hover:bg-surface-container-low/50 transition-colors group cursor-pointer" onclick="openProfileDrawer('Sanya Kapoor', 'VS-0311', 'DevOps Specialist', 'Engineering', 'Pune Tech Hub', 'Active', 'sanya.kapoor@validure.com')">
+<td class="py-3.5 px-4">
+<div class="flex items-center gap-3">
+<div class="w-9 h-9 rounded-full bg-surface-container-high text-primary-container font-headline-sm font-semibold flex items-center justify-center text-label-md">
+                      SK
+                    </div>
+<div>
+<div class="font-headline-sm text-body-md font-semibold text-primary group-hover:text-secondary transition-colors">Sanya Kapoor</div>
+<div class="font-body-sm text-body-sm text-on-surface-variant">sanya.kapoor@validure.com</div>
+</div>
+</div>
+</td>
+<td class="py-3.5 px-4 font-mono text-label-md text-secondary font-medium">VS-0311</td>
+<td class="py-3.5 px-4">
+<span class="inline-flex items-center px-2 py-0.5 rounded-full text-label-sm font-medium bg-surface-container text-on-secondary-container">
+                    Engineering
+                  </span>
+</td>
+<td class="py-3.5 px-4 font-medium text-primary">DevOps Specialist</td>
+<td class="py-3.5 px-4 text-on-surface-variant flex items-center gap-1.5 mt-2">
+<span class="material-symbols-outlined text-[16px] text-outline">domain</span>
+<span class="">Pune Tech Hub</span>
+</td>
+<td class="py-3.5 px-4 text-on-surface-variant font-label-md">Aug 12, 2024</td>
+<td class="py-3.5 px-4">
+<span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-label-sm font-semibold bg-surface-container text-secondary">
+<span class="w-1.5 h-1.5 rounded-full bg-secondary"></span>
+                    Active
+                  </span>
+</td>
+<td class="py-3.5 px-4 text-right">
+<div class="flex items-center justify-end gap-1" onclick="event.stopPropagation()">
+<button class="p-1.5 text-on-surface-variant hover:text-secondary hover:bg-surface-container rounded transition-colors" title="View Profile" type="button">
+<span class="material-symbols-outlined text-[18px]">visibility</span>
+</button>
+<button class="p-1.5 text-on-surface-variant hover:text-primary hover:bg-surface-container rounded transition-colors" title="Edit Employee" type="button">
+<span class="material-symbols-outlined text-[18px]">edit</span>
+</button>
+<button class="p-1.5 text-on-surface-variant hover:text-primary hover:bg-surface-container rounded transition-colors" title="More Options" type="button">
+<span class="material-symbols-outlined text-[18px]">more_vert</span>
+</button>
+</div>
+</td>
+</tr>
+<!-- Row 5: Rohan Menon -->
+<tr class="hover:bg-surface-container-low/50 transition-colors group cursor-pointer" onclick="openProfileDrawer('Rohan Menon', 'VS-0284', 'People Operations Lead', 'Operations', 'Bengaluru HQ', 'Active', 'rohan.menon@validure.com')">
+<td class="py-3.5 px-4">
+<div class="flex items-center gap-3">
+<div class="w-9 h-9 rounded-full bg-primary-fixed text-on-primary-fixed font-headline-sm font-semibold flex items-center justify-center text-label-md">
+                      RM
+                    </div>
+<div>
+<div class="font-headline-sm text-body-md font-semibold text-primary group-hover:text-secondary transition-colors">Rohan Menon</div>
+<div class="font-body-sm text-body-sm text-on-surface-variant">rohan.menon@validure.com</div>
+</div>
+</div>
+</td>
+<td class="py-3.5 px-4 font-mono text-label-md text-secondary font-medium">VS-0284</td>
+<td class="py-3.5 px-4">
+<span class="inline-flex items-center px-2 py-0.5 rounded-full text-label-sm font-medium bg-surface-container-high text-on-primary-fixed-variant">
+                    Operations
+                  </span>
+</td>
+<td class="py-3.5 px-4 font-medium text-primary">People Operations Lead</td>
+<td class="py-3.5 px-4 text-on-surface-variant flex items-center gap-1.5 mt-2">
+<span class="material-symbols-outlined text-[16px] text-outline">apartment</span>
+<span class="">Bengaluru HQ</span>
+</td>
+<td class="py-3.5 px-4 text-on-surface-variant font-label-md">Jul 01, 2024</td>
+<td class="py-3.5 px-4">
+<span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-label-sm font-semibold bg-surface-container text-secondary">
+<span class="w-1.5 h-1.5 rounded-full bg-secondary"></span>
+                    Active
+                  </span>
+</td>
+<td class="py-3.5 px-4 text-right">
+<div class="flex items-center justify-end gap-1" onclick="event.stopPropagation()">
+<button class="p-1.5 text-on-surface-variant hover:text-secondary hover:bg-surface-container rounded transition-colors" title="View Profile" type="button">
+<span class="material-symbols-outlined text-[18px]">visibility</span>
+</button>
+<button class="p-1.5 text-on-surface-variant hover:text-primary hover:bg-surface-container rounded transition-colors" title="Edit Employee" type="button">
+<span class="material-symbols-outlined text-[18px]">edit</span>
+</button>
+<button class="p-1.5 text-on-surface-variant hover:text-primary hover:bg-surface-container rounded transition-colors" title="More Options" type="button">
+<span class="material-symbols-outlined text-[18px]">more_vert</span>
+</button>
+</div>
+</td>
+</tr>
+<!-- Row 6: Tanvi Deshmukh -->
+<tr class="hover:bg-surface-container-low/50 transition-colors group cursor-pointer" onclick="openProfileDrawer('Tanvi Deshmukh', 'VS-0340', 'Senior Talent Partner', 'HR', 'Bengaluru HQ', 'Active', 'tanvi.deshmukh@validure.com')">
+<td class="py-3.5 px-4">
+<div class="flex items-center gap-3">
+<div class="w-9 h-9 rounded-full bg-secondary-fixed text-on-secondary-fixed font-headline-sm font-semibold flex items-center justify-center text-label-md">
+                      TD
+                    </div>
+<div>
+<div class="font-headline-sm text-body-md font-semibold text-primary group-hover:text-secondary transition-colors">Tanvi Deshmukh</div>
+<div class="font-body-sm text-body-sm text-on-surface-variant">tanvi.deshmukh@validure.com</div>
+</div>
+</div>
+</td>
+<td class="py-3.5 px-4 font-mono text-label-md text-secondary font-medium">VS-0340</td>
+<td class="py-3.5 px-4">
+<span class="inline-flex items-center px-2 py-0.5 rounded-full text-label-sm font-medium bg-tertiary-fixed text-on-tertiary-fixed-variant">
+                    HR
+                  </span>
+</td>
+<td class="py-3.5 px-4 font-medium text-primary">Senior Talent Partner</td>
+<td class="py-3.5 px-4 text-on-surface-variant flex items-center gap-1.5 mt-2">
+<span class="material-symbols-outlined text-[16px] text-outline">apartment</span>
+<span class="">Bengaluru HQ</span>
+</td>
+<td class="py-3.5 px-4 text-on-surface-variant font-label-md">May 18, 2025</td>
+<td class="py-3.5 px-4">
+<span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-label-sm font-semibold bg-surface-container text-secondary">
+<span class="w-1.5 h-1.5 rounded-full bg-secondary"></span>
+                    Active
+                  </span>
+</td>
+<td class="py-3.5 px-4 text-right">
+<div class="flex items-center justify-end gap-1" onclick="event.stopPropagation()">
+<button class="p-1.5 text-on-surface-variant hover:text-secondary hover:bg-surface-container rounded transition-colors" title="View Profile" type="button">
+<span class="material-symbols-outlined text-[18px]">visibility</span>
+</button>
+<button class="p-1.5 text-on-surface-variant hover:text-primary hover:bg-surface-container rounded transition-colors" title="Edit Employee" type="button">
+<span class="material-symbols-outlined text-[18px]">edit</span>
+</button>
+<button class="p-1.5 text-on-surface-variant hover:text-primary hover:bg-surface-container rounded transition-colors" title="More Options" type="button">
+<span class="material-symbols-outlined text-[18px]">more_vert</span>
+</button>
+</div>
+</td>
+</tr>
+<!-- Row 7: Karthik M. (Probation) -->
+<tr class="hover:bg-surface-container-low/50 transition-colors group cursor-pointer" onclick="openProfileDrawer('Karthik M.', 'VS-0412', 'Frontend Intern', 'Engineering', 'Bengaluru HQ', 'Probation', 'karthik.m@validure.com')">
+<td class="py-3.5 px-4">
+<div class="flex items-center gap-3">
+<div class="w-9 h-9 rounded-full bg-surface-container text-on-surface font-headline-sm font-semibold flex items-center justify-center text-label-md">
+                      KM
+                    </div>
+<div>
+<div class="font-headline-sm text-body-md font-semibold text-primary group-hover:text-secondary transition-colors">Karthik M.</div>
+<div class="font-body-sm text-body-sm text-on-surface-variant">karthik.m@validure.com</div>
+</div>
+</div>
+</td>
+<td class="py-3.5 px-4 font-mono text-label-md text-secondary font-medium">VS-0412</td>
+<td class="py-3.5 px-4">
+<span class="inline-flex items-center px-2 py-0.5 rounded-full text-label-sm font-medium bg-surface-container text-on-secondary-container">
+                    Engineering
+                  </span>
+</td>
+<td class="py-3.5 px-4 font-medium text-primary">Frontend Intern</td>
+<td class="py-3.5 px-4 text-on-surface-variant flex items-center gap-1.5 mt-2">
+<span class="material-symbols-outlined text-[16px] text-outline">apartment</span>
+<span class="">Bengaluru HQ</span>
+</td>
+<td class="py-3.5 px-4 text-on-surface-variant font-label-md">Sep 01, 2026</td>
+<td class="py-3.5 px-4">
+<span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-label-sm font-semibold bg-surface-container text-primary-container border border-outline-variant">
+<span class="w-1.5 h-1.5 rounded-full bg-primary-container"></span>
+                    Probation
+                  </span>
+</td>
+<td class="py-3.5 px-4 text-right">
+<div class="flex items-center justify-end gap-1" onclick="event.stopPropagation()">
+<button class="p-1.5 text-on-surface-variant hover:text-secondary hover:bg-surface-container rounded transition-colors" title="View Profile" type="button">
+<span class="material-symbols-outlined text-[18px]">visibility</span>
+</button>
+<button class="p-1.5 text-on-surface-variant hover:text-primary hover:bg-surface-container rounded transition-colors" title="Edit Employee" type="button">
+<span class="material-symbols-outlined text-[18px]">edit</span>
+</button>
+<button class="p-1.5 text-on-surface-variant hover:text-primary hover:bg-surface-container rounded transition-colors" title="More Options" type="button">
+<span class="material-symbols-outlined text-[18px]">more_vert</span>
+</button>
+</div>
+</td>
+</tr>
+<!-- Row 8: Rajesh Kulkarni (Inactive) -->
+<tr class="hover:bg-surface-container-low/50 transition-colors group cursor-pointer" onclick="openProfileDrawer('Rajesh Kulkarni', 'VS-0034', 'Systems Admin', 'Infrastructure', 'Hyderabad', 'Inactive', 'rajesh.k@validure.com')">
+<td class="py-3.5 px-4">
+<div class="flex items-center gap-3">
+<div class="w-9 h-9 rounded-full bg-error-container text-error font-headline-sm font-semibold flex items-center justify-center text-label-md">
+                      RK
+                    </div>
+<div>
+<div class="font-headline-sm text-body-md font-semibold text-primary group-hover:text-secondary transition-colors">Rajesh Kulkarni</div>
+<div class="font-body-sm text-body-sm text-on-surface-variant">rajesh.k@validure.com</div>
+</div>
+</div>
+</td>
+<td class="py-3.5 px-4 font-mono text-label-md text-secondary font-medium">VS-0034</td>
+<td class="py-3.5 px-4">
+<span class="inline-flex items-center px-2 py-0.5 rounded-full text-label-sm font-medium bg-surface-container-highest text-on-surface-variant">
+                    Infrastructure
+                  </span>
+</td>
+<td class="py-3.5 px-4 font-medium text-primary">Systems Admin</td>
+<td class="py-3.5 px-4 text-on-surface-variant flex items-center gap-1.5 mt-2">
+<span class="material-symbols-outlined text-[16px] text-outline">location_city</span>
+<span class="">Hyderabad</span>
+</td>
+<td class="py-3.5 px-4 text-on-surface-variant font-label-md">Nov 10, 2019</td>
+<td class="py-3.5 px-4">
+<span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-label-sm font-semibold bg-error-container text-error">
+<span class="w-1.5 h-1.5 rounded-full bg-error"></span>
+                    Inactive
+                  </span>
+</td>
+<td class="py-3.5 px-4 text-right">
+<div class="flex items-center justify-end gap-1" onclick="event.stopPropagation()">
+<button class="p-1.5 text-on-surface-variant hover:text-secondary hover:bg-surface-container rounded transition-colors" title="View Profile" type="button">
+<span class="material-symbols-outlined text-[18px]">visibility</span>
+</button>
+<button class="p-1.5 text-on-surface-variant hover:text-primary hover:bg-surface-container rounded transition-colors" title="Edit Employee" type="button">
+<span class="material-symbols-outlined text-[18px]">edit</span>
+</button>
+<button class="p-1.5 text-on-surface-variant hover:text-primary hover:bg-surface-container rounded transition-colors" title="More Options" type="button">
+<span class="material-symbols-outlined text-[18px]">more_vert</span>
+</button>
+</div>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+<!-- TABLE FOOTER & PAGINATION -->
+<div class="px-4 py-3 bg-surface-container-lowest border-t border-outline-variant flex flex-col sm:flex-row items-center justify-between gap-3 font-label-md text-label-md text-on-surface-variant">
+<div class="flex items-center gap-2">
+<span class="">Showing <strong class="text-primary font-semibold">1 to 8</strong> of <strong class="text-primary font-semibold">24</strong> employees</span>
+<span class="text-outline-variant">|</span>
+<div class="flex items-center gap-1.5">
+<span class="">Show:</span>
+<select class="py-1 px-2 text-label-sm border border-outline-variant rounded bg-surface-container-lowest text-on-surface focus:ring-0 focus:border-secondary">
+<option>10 per page</option>
+<option>25 per page</option>
+<option>50 per page</option>
+</select>
+</div>
+</div>
+<div class="flex items-center gap-1">
+<button class="px-2.5 py-1.5 rounded border border-outline-variant text-outline bg-surface-container-low cursor-not-allowed text-label-sm font-medium" disabled="" type="button">
+              Previous
+            </button>
+<button class="w-8 h-8 rounded border border-secondary bg-surface-container text-secondary font-semibold text-label-sm" type="button">
+              1
+            </button>
+<button class="w-8 h-8 rounded border border-outline-variant hover:bg-surface-container-low text-on-surface text-label-sm font-medium transition-colors" type="button">
+              2
+            </button>
+<button class="w-8 h-8 rounded border border-outline-variant hover:bg-surface-container-low text-on-surface text-label-sm font-medium transition-colors" type="button">
+              3
+            </button>
+<button class="px-2.5 py-1.5 rounded border border-outline-variant hover:bg-surface-container-low text-on-surface text-label-sm font-medium transition-colors" type="button">
+              Next
+            </button>
+</div>
+</div>
+</div>
+</main>
+</div>
+<!-- ========================================================================= -->
+<!-- SLIDE-OVER DRAWER: EMPLOYEE PROFILE DOSSIER (Interactive)                 -->
+<!-- ========================================================================= -->
+<div class="fixed inset-0 bg-primary/40 backdrop-blur-xs z-50 hidden transition-opacity" id="profileDrawerBackdrop" onclick="closeProfileDrawer()">
+<div class="absolute inset-y-0 right-0 max-w-2xl w-full bg-surface-container-lowest shadow-2xl flex flex-col transform transition-transform duration-300" onclick="event.stopPropagation()">
+<!-- Drawer Header -->
+<div class="p-6 border-b border-outline-variant bg-surface-container-low flex items-start justify-between">
+<div class="flex items-center gap-4">
+<div class="w-14 h-14 rounded-full bg-secondary text-on-secondary font-headline-md text-headline-sm font-bold flex items-center justify-center ring-4 ring-secondary-fixed/50" id="drawerAvatar">
+            PS
+          </div>
+<div>
+<div class="flex items-center gap-2">
+<h2 class="font-headline-md text-headline-md font-bold text-primary" id="drawerName">Priya Sharma</h2>
+<span class="inline-flex items-center px-2 py-0.5 rounded-full text-label-sm font-semibold bg-surface-container text-secondary" id="drawerStatusBadge">
+                Active
+              </span>
+</div>
+<p class="font-body-md text-body-md text-on-surface-variant font-medium" id="drawerRole">Lead Product Designer · Design</p>
+<p class="font-mono text-label-sm text-secondary font-medium" id="drawerId">VS-0142</p>
+</div>
+</div>
+<div class="flex items-center gap-2">
+<button class="p-2 text-on-surface-variant hover:text-primary hover:bg-surface-container rounded-lg" title="Print Dossier" type="button">
+<span class="material-symbols-outlined text-[20px]">print</span>
+</button>
+<button class="p-2 text-on-surface-variant hover:text-error hover:bg-error-container/30 rounded-lg" onclick="closeProfileDrawer()" type="button">
+<span class="material-symbols-outlined text-[20px]">close</span>
+</button>
+</div>
+</div>
+<!-- Drawer Tabs -->
+<div class="flex border-b border-outline-variant px-6 bg-surface-container-lowest overflow-x-auto text-label-md font-label-md">
+<button class="py-3 px-3 font-semibold text-secondary border-b-2 border-secondary whitespace-nowrap" type="button">Personal Info</button>
+<button class="py-3 px-3 font-medium text-on-surface-variant hover:text-on-surface whitespace-nowrap" type="button">Employment</button>
+<button class="py-3 px-3 font-medium text-on-surface-variant hover:text-on-surface whitespace-nowrap" type="button">Attendance &amp; Leave</button>
+<button class="py-3 px-3 font-medium text-on-surface-variant hover:text-on-surface whitespace-nowrap" type="button">Documents &amp; KYC</button>
+<button class="py-3 px-3 font-medium text-on-surface-variant hover:text-on-surface whitespace-nowrap" type="button">Payroll</button>
+</div>
+<!-- Drawer Tab Content (High-Density Enterprise Metadata) -->
+<div class="flex-1 overflow-y-auto p-6 space-y-6 custom-scroll">
+<!-- Leave Balance Metric Widget in Drawer -->
+<div class="p-4 rounded-xl bg-surface-container-low border border-outline-variant/80 grid grid-cols-3 gap-4 text-center">
+<div>
+<span class="font-label-sm text-label-sm text-on-surface-variant">Annual Leave</span>
+<div class="font-headline-sm text-headline-sm font-bold text-secondary mt-0.5">18.0</div>
+<span class="font-body-sm text-[11px] text-on-surface-variant">Days Available</span>
+</div>
+<div class="border-x border-outline-variant/60">
+<span class="font-label-sm text-label-sm text-on-surface-variant">Sick Leave</span>
+<div class="font-headline-sm text-headline-sm font-bold text-primary-container mt-0.5">6.5</div>
+<span class="font-body-sm text-[11px] text-on-surface-variant">Days Available</span>
+</div>
+<div>
+<span class="font-label-sm text-label-sm text-on-surface-variant">Attendance Rate</span>
+<div class="font-headline-sm text-headline-sm font-bold text-secondary mt-0.5">99.2%</div>
+<span class="font-body-sm text-[11px] text-on-surface-variant">Current Quarter</span>
+</div>
+</div>
+<!-- Section: Primary Enterprise Details -->
+<div>
+<h3 class="font-headline-sm text-body-md font-bold text-primary-container border-b border-outline-variant pb-2 mb-3 flex items-center gap-2">
+<span class="material-symbols-outlined text-secondary text-[18px]">badge</span>
+            Employment Dossier
+          </h3>
+<dl class="grid grid-cols-2 gap-x-4 gap-y-3 font-body-sm text-body-sm">
+<div>
+<dt class="text-on-surface-variant font-label-sm">Reporting Manager</dt>
+<dd class="font-medium text-primary mt-0.5">Aditi Roy (VP of Product Experience)</dd>
+</div>
+<div>
+<dt class="text-on-surface-variant font-label-sm">Work Email</dt>
+<dd class="font-medium text-primary mt-0.5" id="drawerEmailVal">priya.sharma@validure.com</dd>
+</div>
+<div>
+<dt class="text-on-surface-variant font-label-sm">Work Location</dt>
+<dd class="font-medium text-primary mt-0.5" id="drawerLocationVal">Bengaluru HQ (Tower B, 4th Floor)</dd>
+</div>
+<div>
+<dt class="text-on-surface-variant font-label-sm">Employment Type</dt>
+<dd class="font-medium text-primary mt-0.5">Full-Time Regular (FTE)</dd>
+</div>
+<div>
+<dt class="text-on-surface-variant font-label-sm">Biometric Terminal Badge ID</dt>
+<dd class="font-mono text-label-md text-secondary font-medium mt-0.5">#BIO-BLR-8841</dd>
+</div>
+<div>
+<dt class="text-on-surface-variant font-label-sm">Probation Status</dt>
+<dd class="font-medium text-primary mt-0.5">Confirmed (Completed Nov 2021)</dd>
+</div>
+</dl>
+</div>
+<!-- Section: Statutory & Compliance Data -->
+<div>
+<h3 class="font-headline-sm text-body-md font-bold text-primary-container border-b border-outline-variant pb-2 mb-3 flex items-center gap-2">
+<span class="material-symbols-outlined text-secondary text-[18px]">verified_user</span>
+            Statutory &amp; Tax Records (India Compliance)
+          </h3>
+<dl class="grid grid-cols-2 gap-x-4 gap-y-3 font-body-sm text-body-sm">
+<div>
+<dt class="text-on-surface-variant font-label-sm">Permanent Account Number (PAN)</dt>
+<dd class="font-mono text-body-sm text-primary font-medium mt-0.5">ABCPS****K (Verified)</dd>
+</div>
+<div>
+<dt class="text-on-surface-variant font-label-sm">Provident Fund (UAN)</dt>
+<dd class="font-mono text-body-sm text-primary font-medium mt-0.5">100984920194</dd>
+</div>
+<div>
+<dt class="text-on-surface-variant font-label-sm">ESIC Account</dt>
+<dd class="font-medium text-on-surface-variant mt-0.5">Exempt (Exceeds wage limit)</dd>
+</div>
+<div>
+<dt class="text-on-surface-variant font-label-sm">Emergency Contact</dt>
+<dd class="font-medium text-primary mt-0.5">+91 98450 12093 (Spouse)</dd>
+</div>
+</dl>
+</div>
+<!-- Section: KYC Verification Badges -->
+<div class="p-3.5 rounded-lg border border-secondary-fixed bg-surface-container flex items-center justify-between">
+<div class="flex items-center gap-2.5">
+<span class="material-symbols-outlined text-secondary">verified</span>
+<div>
+<div class="font-label-md text-label-md font-semibold text-secondary">Aadhaar &amp; Background Check Clear</div>
+<div class="font-body-sm text-[11px] text-on-surface-variant">Enterprise audit verified on Oct 14, 2024 by AuthBridge</div>
+</div>
+</div>
+<span class="px-2 py-0.5 rounded text-label-sm font-semibold bg-surface-container-lowest text-secondary border border-secondary-fixed">Level 3</span>
+</div>
+</div>
+<!-- Drawer Footer Actions -->
+<div class="p-4 border-t border-outline-variant bg-surface-container-low flex items-center justify-between">
+<button class="text-error hover:text-on-error-container font-label-md text-label-md font-semibold px-3 py-2 rounded hover:bg-error-container/40 transition-colors" type="button">
+          Deactivate Profile
+        </button>
+<div class="flex items-center gap-2">
+<button class="px-3.5 py-2 rounded-lg border border-outline-variant bg-surface-container-lowest text-on-surface font-button-text text-button-text hover:bg-surface-container-low" onclick="closeProfileDrawer()" type="button">
+            Close
+          </button>
+<button class="px-4 py-2 rounded-lg bg-primary-container text-on-primary font-button-text text-button-text hover:bg-primary transition-colors" type="button">
+            Edit Full Record
+          </button>
+</div>
+</div>
+</div>
+</div>
+<!-- ========================================================================= -->
+<!-- ADD EMPLOYEE DRAWER MODAL                                                 -->
+<!-- ========================================================================= -->
+<div class="fixed inset-0 bg-primary/40 backdrop-blur-xs z-50 hidden transition-opacity" id="addEmployeeDrawerBackdrop" onclick="toggleAddEmployeeDrawer()">
+<div class="absolute inset-y-0 right-0 max-w-xl w-full bg-surface-container-lowest shadow-2xl flex flex-col transform transition-transform duration-300" onclick="event.stopPropagation()">
+<!-- Drawer Header -->
+<div class="p-5 border-b border-outline-variant bg-surface-container-low flex items-center justify-between">
+<div>
+<h2 class="font-headline-sm text-headline-sm font-bold text-primary-container">Add New Employee</h2>
+<p class="font-body-sm text-body-sm text-on-surface-variant">Register personnel into the Validure enterprise core system.</p>
+</div>
+<button class="p-2 text-on-surface-variant hover:text-error hover:bg-error-container/30 rounded-lg" onclick="toggleAddEmployeeDrawer()" type="button">
+<span class="material-symbols-outlined text-[20px]">close</span>
+</button>
+</div>
+<!-- Form Scrollable Canvas -->
+<form class="flex-1 overflow-y-auto p-6 space-y-6 custom-scroll" onsubmit="event.preventDefault(); toggleAddEmployeeDrawer();">
+<!-- Step 1: Personal Information -->
+<div class="space-y-3">
+<h3 class="font-headline-sm text-body-md font-bold text-primary-container flex items-center gap-2 border-b border-outline-variant pb-1.5">
+<span class="w-5 h-5 rounded-full bg-secondary text-on-secondary text-[11px] font-bold flex items-center justify-center">1</span>
+            Personal Information
+          </h3>
+<div class="grid grid-cols-2 gap-3">
+<div>
+<label class="block font-label-md text-label-md text-on-surface font-medium mb-1">First Name <span class="text-secondary">*</span></label>
+<input class="w-full px-3 py-2 border border-outline-variant rounded-lg text-body-md focus:border-secondary focus:ring-1 focus:ring-secondary" placeholder="e.g. Siddharth" required="" type="text">
+</div>
+<div>
+<label class="block font-label-md text-label-md text-on-surface font-medium mb-1">Last Name <span class="text-secondary">*</span></label>
+<input class="w-full px-3 py-2 border border-outline-variant rounded-lg text-body-md focus:border-secondary focus:ring-1 focus:ring-secondary" placeholder="e.g. Varma" required="" type="text">
+</div>
+</div>
+<div class="grid grid-cols-2 gap-3">
+<div>
+<label class="block font-label-md text-label-md text-on-surface font-medium mb-1">Date of Birth <span class="text-secondary">*</span></label>
+<input class="w-full px-3 py-2 border border-outline-variant rounded-lg text-body-md focus:border-secondary focus:ring-1 focus:ring-secondary" required="" type="date">
+</div>
+<div>
+<label class="block font-label-md text-label-md text-on-surface font-medium mb-1">Gender</label>
+<select class="w-full px-3 py-2 border border-outline-variant rounded-lg text-body-md focus:border-secondary focus:ring-1 focus:ring-secondary">
+<option>Select Gender</option>
+<option>Female</option>
+<option>Male</option>
+<option>Non-Binary / Other</option>
+<option>Prefer not to say</option>
+</select>
+</div>
+</div>
+</div>
+<!-- Step 2: Employment Specifics -->
+<div class="space-y-3">
+<h3 class="font-headline-sm text-body-md font-bold text-primary-container flex items-center gap-2 border-b border-outline-variant pb-1.5">
+<span class="w-5 h-5 rounded-full bg-secondary text-on-secondary text-[11px] font-bold flex items-center justify-center">2</span>
+            Employment Details
+          </h3>
+<div class="grid grid-cols-2 gap-3">
+<div>
+<label class="block font-label-md text-label-md text-on-surface font-medium mb-1">Employee ID <span class="text-secondary">*</span></label>
+<input class="w-full px-3 py-2 bg-surface-container-low border border-outline-variant rounded-lg font-mono text-body-md text-secondary font-semibold focus:border-secondary" type="text" value="VS-0455">
+</div>
+<div>
+<label class="block font-label-md text-label-md text-on-surface font-medium mb-1">Joining Date <span class="text-secondary">*</span></label>
+<input class="w-full px-3 py-2 border border-outline-variant rounded-lg text-body-md focus:border-secondary focus:ring-1 focus:ring-secondary" required="" type="date">
+</div>
+</div>
+<div class="grid grid-cols-2 gap-3">
+<div>
+<label class="block font-label-md text-label-md text-on-surface font-medium mb-1">Department <span class="text-secondary">*</span></label>
+<select class="w-full px-3 py-2 border border-outline-variant rounded-lg text-body-md focus:border-secondary focus:ring-1 focus:ring-secondary" required="">
+<option>Engineering</option>
+<option>Product Experience</option>
+<option>Design</option>
+<option>Operations</option>
+<option>HR &amp; Talent</option>
+</select>
+</div>
+<div>
+<label class="block font-label-md text-label-md text-on-surface font-medium mb-1">Work Location <span class="text-secondary">*</span></label>
+<select class="w-full px-3 py-2 border border-outline-variant rounded-lg text-body-md focus:border-secondary focus:ring-1 focus:ring-secondary" required="">
+<option>Bengaluru HQ</option>
+<option>Pune Tech Hub</option>
+<option>Hyderabad Office</option>
+<option>Remote (India)</option>
+</select>
+</div>
+</div>
+<div>
+<label class="block font-label-md text-label-md text-on-surface font-medium mb-1">Official Designation <span class="text-secondary">*</span></label>
+<input class="w-full px-3 py-2 border border-outline-variant rounded-lg text-body-md focus:border-secondary focus:ring-1 focus:ring-secondary" placeholder="e.g. Senior Cloud Architect" required="" type="text">
+</div>
+</div>
+<!-- Step 3: Contact & Identifiers -->
+<div class="space-y-3">
+<h3 class="font-headline-sm text-body-md font-bold text-primary-container flex items-center gap-2 border-b border-outline-variant pb-1.5">
+<span class="w-5 h-5 rounded-full bg-secondary text-on-secondary text-[11px] font-bold flex items-center justify-center">3</span>
+            Work Contact &amp; Identification
+          </h3>
+<div>
+<label class="block font-label-md text-label-md text-on-surface font-medium mb-1">Enterprise Email <span class="text-secondary">*</span></label>
+<input class="w-full px-3 py-2 border border-outline-variant rounded-lg text-body-md focus:border-secondary focus:ring-1 focus:ring-secondary" placeholder="name@validure.com" required="" type="email">
+</div>
+<div class="grid grid-cols-2 gap-3">
+<div>
+<label class="block font-label-md text-label-md text-on-surface font-medium mb-1">PAN Card Number</label>
+<input class="w-full px-3 py-2 border border-outline-variant rounded-lg uppercase font-mono text-body-sm focus:border-secondary" placeholder="ABCDE1234F" type="text">
+</div>
+<div>
+<label class="block font-label-md text-label-md text-on-surface font-medium mb-1">Biometric Card ID</label>
+<input class="w-full px-3 py-2 border border-outline-variant rounded-lg font-mono text-body-sm focus:border-secondary" placeholder="BIO-BLR-XXXX" type="text">
+</div>
+</div>
+</div>
+<!-- Step 4: Documents Upload Box -->
+<div>
+<label class="block font-label-md text-label-md text-on-surface font-medium mb-1">Signed Offer Letter / National ID (PDF)</label>
+<div class="border-2 border-dashed border-outline-variant rounded-lg p-4 text-center hover:bg-surface-container-low transition-colors cursor-pointer">
+<span class="material-symbols-outlined text-outline text-[28px]">upload_file</span>
+<p class="font-label-md text-label-md font-medium text-primary mt-1">Drag and drop files here, or <span class="text-secondary underline">browse</span></p>
+<p class="font-body-sm text-[11px] text-on-surface-variant">PDF, PNG or JPG up to 10MB</p>
+</div>
+</div>
+<!-- Form CTAs -->
+<div class="pt-4 border-t border-outline-variant flex items-center justify-end gap-3">
+<button class="px-4 py-2 border border-outline-variant rounded-lg bg-surface-container-lowest text-on-surface font-button-text text-button-text hover:bg-surface-container-low" onclick="toggleAddEmployeeDrawer()" type="button">
+            Cancel
+          </button>
+<button class="px-5 py-2 rounded-lg bg-secondary hover:bg-on-secondary-container text-on-secondary font-button-text text-button-text shadow-sm transition-all" type="submit">
+            Save Employee
+          </button>
+</div>
+</form>
+</div>
+</div>
+<!-- Micro-interactions Inline Script -->
+<script>
+    function openProfileDrawer(name, id, role, dept, location, status, email) {
+      document.getElementById('drawerName').innerText = name;
+      document.getElementById('drawerId').innerText = id;
+      document.getElementById('drawerRole').innerText = role + ' · ' + dept;
+      document.getElementById('drawerLocationVal').innerText = location;
+      document.getElementById('drawerEmailVal').innerText = email;
+      document.getElementById('drawerStatusBadge').innerText = status;
+      
+      const initials = name.split(' ').map(n => n[0]).join('');
+      document.getElementById('drawerAvatar').innerText = initials;
+
+      const backdrop = document.getElementById('profileDrawerBackdrop');
+      backdrop.classList.remove('hidden');
+    }
+
+    function closeProfileDrawer() {
+      const backdrop = document.getElementById('profileDrawerBackdrop');
+      backdrop.classList.add('hidden');
+    }
+
+    function toggleAddEmployeeDrawer() {
+      const drawer = document.getElementById('addEmployeeDrawerBackdrop');
+      if (drawer.classList.contains('hidden')) {
+        drawer.classList.remove('hidden');
+      } else {
+        drawer.classList.add('hidden');
+      }
+    }
+
+    // Keyboard shortcut (Escape to close any open drawer)
+    window.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') {
+        closeProfileDrawer();
+        document.getElementById('addEmployeeDrawerBackdrop').classList.add('hidden');
+      }
+    });
+  </script>
+
+
+
+
+</body></html>

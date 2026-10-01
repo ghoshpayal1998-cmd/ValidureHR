@@ -1,0 +1,1124 @@
+<!DOCTYPE html><html lang="en"><head>
+<meta charset="utf-8">
+<meta content="width=device-width, initial-scale=1.0" name="viewport">
+<title>Validure HR — Attendance Management</title>
+<!-- Fonts -->
+<link href="https://fonts.googleapis.com" rel="preconnect">
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;family=Plus+Jakarta+Sans:wght@500;600;700;800&amp;display=swap" rel="stylesheet">
+<!-- Material Symbols -->
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<!-- Tailwind CSS -->
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          "colors": {
+            "surface-variant": "#d9e2fc",
+            "primary": "#000316",
+            "surface-container": "#e9edff",
+            "on-secondary": "#ffffff",
+            "on-primary": "#ffffff",
+            "outline-variant": "#c5c6d0",
+            "on-tertiary": "#ffffff",
+            "surface-container-lowest": "#ffffff",
+            "primary-fixed": "#dbe1ff",
+            "on-surface-variant": "#45464f",
+            "on-error": "#ffffff",
+            "outline": "#757680",
+            "surface-container-low": "#f1f3ff",
+            "secondary-fixed": "#a8edff",
+            "on-secondary-fixed": "#001f26",
+            "primary-fixed-dim": "#b5c5fa",
+            "on-primary-container": "#7584b6",
+            "tertiary-container": "#0b2123",
+            "on-tertiary-fixed-variant": "#354a4c",
+            "inverse-primary": "#b5c5fa",
+            "tertiary": "#000506",
+            "on-secondary-fixed-variant": "#004e5b",
+            "error-container": "#ffdad6",
+            "surface-bright": "#f9f9ff",
+            "secondary-container": "#88e8ff",
+            "inverse-on-surface": "#edf0ff",
+            "on-tertiary-fixed": "#081f21",
+            "tertiary-fixed-dim": "#b3cbcd",
+            "secondary-fixed-dim": "#73d4eb",
+            "surface-tint": "#4d5d8c",
+            "on-surface": "#121b2e",
+            "on-primary-fixed": "#051845",
+            "error": "#ba1a1a",
+            "tertiary-fixed": "#cfe7e9",
+            "on-secondary-container": "#006979",
+            "secondary": "#006879",
+            "surface-container-highest": "#d9e2fc",
+            "primary-container": "#081b47",
+            "on-background": "#121b2e",
+            "surface-container-high": "#e1e8ff",
+            "inverse-surface": "#273044",
+            "on-primary-fixed-variant": "#354572",
+            "background": "#f9f9ff",
+            "surface": "#f9f9ff",
+            "on-tertiary-container": "#738a8c",
+            "on-error-container": "#93000a",
+            "surface-dim": "#d1daf4"
+          },
+          "borderRadius": {
+            "DEFAULT": "0.25rem",
+            "lg": "0.5rem",
+            "xl": "0.75rem",
+            "full": "9999px"
+          },
+          "spacing": {
+            "space-md": "1rem",
+            "space-xl": "2rem",
+            "space-lg": "1.5rem",
+            "gutter-sm": "1rem",
+            "space-xs": "0.25rem",
+            "gutter-lg": "2rem",
+            "space-sm": "0.5rem",
+            "margin-desktop": "3rem",
+            "margin": "2rem",
+            "margin-mobile": "1rem",
+            "gutter": "1.5rem"
+          },
+          "fontFamily": {
+            "headline-md": ["Plus Jakarta Sans"],
+            "headline-lg-mobile": ["Plus Jakarta Sans"],
+            "body-md": ["Inter"],
+            "button-text": ["Plus Jakarta Sans"],
+            "headline-sm": ["Plus Jakarta Sans"],
+            "body-sm": ["Inter"],
+            "headline-lg": ["Plus Jakarta Sans"],
+            "body-lg": ["Inter"],
+            "display-hero": ["Plus Jakarta Sans"],
+            "label-md": ["Inter"],
+            "label-sm": ["Inter"]
+          },
+          "fontSize": {
+            "headline-md": ["22px", { "lineHeight": "28px", "letterSpacing": "-0.01em", "fontWeight": "600" }],
+            "headline-lg-mobile": ["24px", { "lineHeight": "32px", "letterSpacing": "-0.01em", "fontWeight": "600" }],
+            "body-md": ["14px", { "lineHeight": "20px", "letterSpacing": "0em", "fontWeight": "400" }],
+            "button-text": ["14px", { "lineHeight": "20px", "letterSpacing": "0.005em", "fontWeight": "600" }],
+            "headline-sm": ["18px", { "lineHeight": "24px", "letterSpacing": "0em", "fontWeight": "600" }],
+            "body-sm": ["12px", { "lineHeight": "18px", "letterSpacing": "0.01em", "fontWeight": "400" }],
+            "headline-lg": ["30px", { "lineHeight": "38px", "letterSpacing": "-0.015em", "fontWeight": "600" }],
+            "body-lg": ["16px", { "lineHeight": "24px", "letterSpacing": "-0.005em", "fontWeight": "400" }],
+            "display-hero": ["40px", { "lineHeight": "48px", "letterSpacing": "-0.02em", "fontWeight": "700" }],
+            "label-md": ["13px", { "lineHeight": "18px", "letterSpacing": "0.01em", "fontWeight": "500" }],
+            "label-sm": ["11px", { "lineHeight": "16px", "letterSpacing": "0.04em", "fontWeight": "600" }]
+          }
+        }
+      }
+    }
+  </script>
+<style>
+    .material-symbols-outlined {
+      font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+      line-height: 1;
+      display: inline-block;
+      vertical-align: middle;
+    }
+    .custom-scrollbar::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+    .custom-scrollbar::-webkit-scrollbar-track {
+      background: transparent;
+    }
+    .custom-scrollbar::-webkit-scrollbar-thumb {
+      background: #c5c6d0;
+      border-radius: 4px;
+    }
+    .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+      background: #757680;
+    }
+  </style>
+</head>
+<body class="bg-[#F6F9FB] text-on-surface antialiased font-body-md text-body-md flex min-h-screen">
+<!-- ============================================================ -->
+<!-- SIDEBAR NAVIGATION (Shared Component: SideNavBar)            -->
+<!-- ============================================================ -->
+<aside class="h-screen w-64 fixed left-0 top-0 flex flex-col justify-between bg-surface-container-lowest border-r border-outline-variant/30 shadow-sm z-30">
+<div class="flex flex-col p-4 overflow-y-auto custom-scrollbar">
+<!-- Brand & Tenant Identity Header -->
+<div class="pb-4 mb-3 border-b border-outline-variant/30">
+<div class="flex items-center gap-3">
+  <img src="https://lh3.googleusercontent.com/aida-public/AB6AXuDXolAcNl24fZkkYUX1vgcl01TcucsqjwLrqhM7FtOHIp6exHbMqo4gaiDvcy50vodzbMPR4fmXNvnThmEv9RhSgC9kme8XIycF8weO5ja8jAHIqTKOGilAQoLAmhCpoSb0YX3Sz_ZqZv3ciHeGq-o9LZopv0EWwWFQ3m56MsLVrZI2eWJMQJWJQLYJ8IkCG6ccGpt0M0xGZw4GASxaidYIb0wyuUHRNcf0eSnvBjtpNlDmzEmniV1upFx6VPl4qyk" alt="Validure Logo" class="w-9 h-9 object-contain rounded flex-shrink-0">
+  <div>
+    <div class="flex items-center tracking-tight leading-none">
+      <span class="text-secondary font-bold text-lg">VALIDURE</span>
+      <span class="text-primary-container font-black text-lg">HR</span>
+    </div>
+    <p class="text-[9px] uppercase tracking-widest font-semibold text-secondary leading-tight mt-0.5">ENTERPRISE HRMS</p>
+  </div>
+</div>
+<button class="mt-3.5 w-full flex items-center justify-center gap-1.5 py-1.5 px-2.5 rounded-lg bg-surface-container-low text-[#118A9F] hover:bg-[#D9F1F3] transition-colors duration-150 text-label-sm font-headline-sm" type="button">
+<span class="material-symbols-outlined text-sm">swap_horiz</span>
+<span class="">Switch Tenant</span>
+</button>
+</div>
+<!-- Navigation Hierarchy -->
+<nav class="space-y-1">
+<div class="px-3 py-1.5 text-[10px] uppercase tracking-wider font-bold text-on-surface-variant/70">Main Workspace</div>
+<!-- 1. Overview -->
+<a class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-on-surface-variant hover:text-on-surface hover:bg-surface-container-low transition-colors duration-150 font-medium" href="#">
+<span class="material-symbols-outlined text-[20px]">dashboard</span>
+<span class="text-label-md font-label-md">Overview</span>
+</a>
+<!-- 2. Employees -->
+<a class="flex items-center justify-between px-3 py-2.5 rounded-lg text-on-surface-variant hover:text-on-surface hover:bg-surface-container-low transition-colors duration-150 font-medium" href="#">
+<div class="flex items-center gap-3">
+<span class="material-symbols-outlined text-[20px]">group</span>
+<span class="text-label-md font-label-md">Employees</span>
+</div>
+<span class="text-[11px] font-semibold bg-surface-container text-on-surface-variant px-1.5 py-0.5 rounded-full">24</span>
+</a>
+<!-- 3. Attendance (ACTIVE AS SPECIFIED) -->
+<a class="flex items-center justify-between px-3 py-2.5 rounded-lg bg-[#D9F1F3]/70 text-[#118A9F] font-semibold border-l-4 border-[#118A9F] shadow-sm" href="#">
+<div class="flex items-center gap-3">
+<span class="material-symbols-outlined text-[20px]" style="font-variation-settings: 'FILL' 1;">how_to_reg</span>
+<span class="text-label-md font-headline-sm">Attendance</span>
+</div>
+<span class="w-2 h-2 rounded-full bg-[#118A9F]"></span>
+</a>
+<!-- 4. Leave Management -->
+<a class="flex items-center justify-between px-3 py-2.5 rounded-lg text-on-surface-variant hover:text-on-surface hover:bg-surface-container-low transition-colors duration-150 font-medium" href="#">
+<div class="flex items-center gap-3">
+<span class="material-symbols-outlined text-[20px]">event_available</span>
+<span class="text-label-md font-label-md">Leave Management</span>
+</div>
+<span class="text-[11px] font-semibold bg-amber-100 text-amber-800 px-1.5 py-0.5 rounded-full">2</span>
+</a>
+<!-- 5. Leave Balances -->
+<a class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-on-surface-variant hover:text-on-surface hover:bg-surface-container-low transition-colors duration-150 font-medium" href="#">
+<span class="material-symbols-outlined text-[20px]">account_balance_wallet</span>
+<span class="text-label-md font-label-md">Leave Balances</span>
+</a>
+<!-- 6. Payroll -->
+<a class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-on-surface-variant hover:text-on-surface hover:bg-surface-container-low transition-colors duration-150 font-medium" href="#">
+<span class="material-symbols-outlined text-[20px]">payments</span>
+<span class="text-label-md font-label-md">Payroll</span>
+</a>
+<!-- 7. Documents -->
+<a class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-on-surface-variant hover:text-on-surface hover:bg-surface-container-low transition-colors duration-150 font-medium" href="#">
+<span class="material-symbols-outlined text-[20px]">folder_shared</span>
+<span class="text-label-md font-label-md">Documents</span>
+</a>
+<!-- 8. Reports -->
+<a class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-on-surface-variant hover:text-on-surface hover:bg-surface-container-low transition-colors duration-150 font-medium" href="#">
+<span class="material-symbols-outlined text-[20px]">assessment</span>
+<span class="text-label-md font-label-md">Reports</span>
+</a>
+<!-- 9. Analytics -->
+<a class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-on-surface-variant hover:text-on-surface hover:bg-surface-container-low transition-colors duration-150 font-medium" href="#">
+<span class="material-symbols-outlined text-[20px]">insights</span>
+<span class="text-label-md font-label-md">Analytics</span>
+</a>
+</nav>
+<!-- Administration Group -->
+<div class="mt-6 pt-4 border-t border-outline-variant/30 space-y-1">
+<div class="px-3 py-1 text-[10px] uppercase tracking-wider font-bold text-on-surface-variant/70">Administration &amp; Account</div>
+<a class="flex items-center gap-3 px-3 py-2 rounded-lg text-on-surface-variant hover:text-on-surface hover:bg-surface-container-low transition-colors duration-150 font-medium" href="#">
+<span class="material-symbols-outlined text-[19px]">account_circle</span>
+<span class="text-label-md font-label-md">My Account</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2 rounded-lg text-on-surface-variant hover:text-on-surface hover:bg-surface-container-low transition-colors duration-150 font-medium" href="#">
+<span class="material-symbols-outlined text-[19px]">admin_panel_settings</span>
+<span class="text-label-md font-label-md">Roles &amp; Access</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2 rounded-lg text-on-surface-variant hover:text-on-surface hover:bg-surface-container-low transition-colors duration-150 font-medium" href="#">
+<span class="material-symbols-outlined text-[19px]">key</span>
+<span class="text-label-md font-label-md">Change Password</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2 rounded-lg text-on-surface-variant hover:text-on-surface hover:bg-surface-container-low transition-colors duration-150 font-medium" href="#">
+<span class="material-symbols-outlined text-[19px]">settings</span>
+<span class="text-label-md font-label-md">Settings</span>
+</a>
+</div>
+</div>
+<!-- Sidebar Footer -->
+<div class="p-3 border-t border-outline-variant/30 bg-surface-container-low/50">
+<div class="flex items-center justify-between px-2 py-1.5">
+<div class="flex items-center gap-2">
+<div class="w-2 h-2 rounded-full bg-emerald-500"></div>
+<span class="text-[11px] text-on-surface-variant">Gateways 1 &amp; 2 Live</span>
+</div>
+<button class="p-1 rounded text-on-surface-variant hover:text-error hover:bg-error-container/40 transition-colors" title="Logout" type="button">
+<span class="material-symbols-outlined text-[18px]">logout</span>
+</button>
+</div>
+</div>
+</aside>
+<!-- ============================================================ -->
+<!-- MAIN APPLICATION CANVAS (Padded left for Fixed Sidebar)       -->
+<!-- ============================================================ -->
+<div class="ml-64 flex-1 flex flex-col min-w-0">
+<!-- Top App Bar (Shared Component: TopNavBar) -->
+<header class="sticky top-0 h-16 w-full z-20 bg-surface-container-lowest border-b border-outline-variant/30 shadow-sm flex items-center justify-between px-8">
+<!-- Left: Breadcrumb / Page context & Search -->
+<div class="flex items-center gap-6 flex-1 max-w-2xl">
+<div class="flex items-center gap-2 text-on-surface-variant text-body-sm font-label-md whitespace-nowrap">
+<span class="">Validure Solutions Pvt. Ltd.</span>
+<span class="material-symbols-outlined text-[16px] text-outline-variant">chevron_right</span>
+<span class="text-primary-container font-semibold">Attendance</span>
+</div>
+<!-- Quick Global Filter/Search -->
+<div class="relative w-72">
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant text-[18px]">search</span>
+<input class="w-full h-9 pl-9 pr-3 text-body-sm bg-surface-container-low border border-outline-variant/40 rounded-lg focus:outline-none focus:border-[#118A9F] focus:ring-2 focus:ring-[#118A9F]/20 text-on-surface transition-all" placeholder="Search employee, ID, shift..." type="text">
+</div>
+</div>
+<!-- Right: Biometric Status, Actions & Profile -->
+<div class="flex items-center gap-4">
+<!-- Live Biometrics Status Badge -->
+<div class="hidden xl:flex items-center gap-2 px-3 py-1 bg-emerald-50 border border-emerald-200/80 rounded-full text-emerald-800 text-[12px] font-label-md">
+<span class="w-2 h-2 rounded-full bg-emerald-500 animate-ping"></span>
+<span class="">Biometrics: <strong>99.8% Online</strong></span>
+<span class="text-emerald-600/70">· Sync 09:42 AM IST</span>
+</div>
+<!-- Notification Bell with Count -->
+<button class="relative p-2 rounded-lg text-on-surface-variant hover:bg-surface-container-low hover:text-on-surface transition-colors" title="Notifications" type="button">
+<span class="material-symbols-outlined text-[22px]">notifications</span>
+<span class="absolute top-1.5 right-1.5 w-4 h-4 bg-error text-white text-[10px] font-bold rounded-full flex items-center justify-center">3</span>
+</button>
+<!-- Help Documentation -->
+<button class="p-2 rounded-lg text-on-surface-variant hover:bg-surface-container-low hover:text-on-surface transition-colors" title="Help &amp; Guides" type="button">
+<span class="material-symbols-outlined text-[22px]">help_outline</span>
+</button>
+<div class="h-6 w-px bg-outline-variant/40"></div>
+<!-- Admin Profile -->
+<div class="flex items-center gap-3 pl-1">
+<div class="w-9 h-9 rounded-full bg-primary-container text-white flex items-center justify-center font-bold text-xs ring-2 ring-white shadow-sm">
+            RP
+          </div>
+<div class="hidden md:block text-left">
+<p class="text-label-md font-semibold text-on-surface leading-tight">Rahul Paul</p>
+<p class="text-[11px] text-on-surface-variant">Enterprise Platform Admin</p>
+</div>
+<span class="material-symbols-outlined text-[18px] text-on-surface-variant">expand_more</span>
+</div>
+</div>
+</header>
+<!-- CONTENT BODY -->
+<main class="flex-1 p-8 space-y-6">
+<!-- Toast Feedback Alert (Operational Reassurance) -->
+<div class="flex items-center justify-between p-3 px-4 bg-[#D9F1F3]/80 border border-[#118A9F]/30 rounded-lg text-secondary text-body-sm shadow-sm">
+<div class="flex items-center gap-2.5">
+<span class="material-symbols-outlined text-[#118A9F] text-[20px]">sync</span>
+<span class=""><strong>Biometric Sync Operational:</strong> Successfully synchronized 24 employee access card logs from Bengaluru Gateways 1 &amp; 2 at 09:42 AM IST.</span>
+</div>
+<button class="text-secondary hover:text-primary transition-colors text-xs font-semibold" type="button">Dismiss</button>
+</div>
+<!-- PAGE TITLE & HIGH LEVEL ACTIONS -->
+<div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+<div>
+<h2 class="text-headline-md font-headline-md font-bold text-primary-container tracking-tight">Attendance</h2>
+<p class="text-body-md text-on-surface-variant mt-0.5">Monitor daily attendance, working hours and attendance exceptions across Bengaluru HQ.</p>
+</div>
+<div class="flex items-center gap-3">
+<button class="inline-flex items-center gap-2 h-10 px-4 rounded-lg bg-white border border-outline-variant/50 text-[#172033] font-button-text text-body-sm hover:bg-[#F6F9FB] hover:border-outline-variant shadow-sm transition-all" type="button">
+<span class="material-symbols-outlined text-[18px]">download</span>
+<span class="">Export</span>
+</button>
+<button class="inline-flex items-center gap-2 h-10 px-4 rounded-lg bg-white border border-outline-variant/50 text-[#172033] font-button-text text-body-sm hover:bg-[#F6F9FB] hover:border-outline-variant shadow-sm transition-all" type="button">
+<span class="material-symbols-outlined text-[18px]">tune</span>
+<span class="">Attendance Settings</span>
+</button>
+<button class="inline-flex items-center gap-2 h-10 px-4 rounded-lg bg-[#081B47] text-white font-button-text text-body-sm hover:bg-[#0F2A5A] shadow-sm active:scale-95 transition-all" onclick="document.getElementById('regularizationDrawer').classList.remove('translate-x-full')" type="button">
+<span class="material-symbols-outlined text-[18px]">edit_calendar</span>
+<span class="">+ Quick Regularize</span>
+</button>
+</div>
+</div>
+<!-- PROMINENT DATE CONTROL BAR -->
+<div class="bg-white border border-[#E2E8EF] rounded-xl p-3 shadow-sm flex flex-col md:flex-row items-center justify-between gap-4">
+<!-- Date Navigator -->
+<div class="flex items-center gap-2">
+<button class="flex items-center gap-1 px-3 py-1.5 rounded-lg border border-[#E2E8EF] hover:bg-[#F6F9FB] text-on-surface-variant text-label-md transition-colors font-medium" type="button">
+<span class="material-symbols-outlined text-[18px]">arrow_back</span>
+<span class="">Sep 29</span>
+</button>
+<!-- Current Day Pill -->
+<div class="flex items-center gap-2 px-4 py-2 bg-[#D9F1F3]/50 border border-[#118A9F]/30 rounded-lg text-[#081B47] font-semibold text-body-md cursor-pointer hover:bg-[#D9F1F3] transition-colors">
+<span class="material-symbols-outlined text-[#118A9F] text-[20px]">calendar_month</span>
+<span class="">Wednesday, September 30, 2026</span>
+<span class="material-symbols-outlined text-[18px] text-[#118A9F]">expand_more</span>
+</div>
+<button class="flex items-center gap-1 px-3 py-1.5 rounded-lg border border-[#E2E8EF] text-outline-variant text-label-md cursor-not-allowed bg-gray-50 font-medium" disabled="" type="button">
+<span class="">Oct 1</span>
+<span class="material-symbols-outlined text-[18px]">arrow_forward</span>
+</button>
+</div>
+<!-- Shortcuts -->
+<div class="flex items-center gap-2">
+<div class="inline-flex rounded-lg border border-[#E2E8EF] p-0.5 bg-surface-container-low/50">
+<button class="px-3 py-1 text-xs font-semibold rounded-md bg-white text-[#081B47] shadow-sm">Today</button>
+<button class="px-3 py-1 text-xs font-medium text-on-surface-variant hover:text-on-surface">Yesterday</button>
+<button class="px-3 py-1 text-xs font-medium text-on-surface-variant hover:text-on-surface flex items-center gap-1">
+<span class="">Date Range</span>
+<span class="material-symbols-outlined text-[14px]">calendar_view_week</span>
+</button>
+</div>
+<div class="h-5 w-px bg-outline-variant/30 mx-1"></div>
+<div class="text-body-sm text-on-surface-variant flex items-center gap-1">
+<span class="material-symbols-outlined text-[16px] text-emerald-600">sensors</span>
+<span class="text-xs">Turnstile sync: <strong class="text-on-surface">2 mins ago</strong></span>
+</div>
+</div>
+</div>
+<!-- COMPACT ATTENDANCE KPI METRICS (5 Compact Cards) -->
+<div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3.5">
+<!-- Total Scheduled -->
+<div class="bg-white border border-[#E2E8EF] rounded-xl p-4 shadow-sm relative overflow-hidden">
+<div class="flex items-center justify-between text-on-surface-variant mb-1">
+<span class="text-label-md font-medium">Total Employees</span>
+<span class="material-symbols-outlined text-[20px] text-outline">badge</span>
+</div>
+<div class="flex items-baseline gap-2">
+<span class="text-headline-md font-bold text-primary-container">24</span>
+<span class="text-body-sm text-on-surface-variant">/ 24 assigned</span>
+</div>
+<p class="text-[11px] text-on-surface-variant/80 mt-1">100% scheduled shift today</p>
+</div>
+<!-- Present -->
+<div class="bg-white border border-[#E2E8EF] rounded-xl p-4 shadow-sm relative overflow-hidden">
+<div class="flex items-center justify-between text-emerald-700 mb-1">
+<span class="text-label-md font-medium text-on-surface">Present</span>
+<span class="material-symbols-outlined text-[20px]">check_circle</span>
+</div>
+<div class="flex items-baseline gap-2">
+<span class="text-headline-md font-bold text-emerald-700">19</span>
+<span class="text-xs font-semibold px-1.5 py-0.5 rounded-full bg-emerald-100 text-emerald-800">79.2%</span>
+</div>
+<p class="text-[11px] text-on-surface-variant mt-1">16 on-time · 3 in remote mode</p>
+</div>
+<!-- Late Check-in -->
+<div class="bg-white border border-[#E2E8EF] rounded-xl p-4 shadow-sm relative overflow-hidden">
+<div class="flex items-center justify-between text-amber-700 mb-1">
+<span class="text-label-md font-medium text-on-surface">Late Arrivals</span>
+<span class="material-symbols-outlined text-[20px]">schedule</span>
+</div>
+<div class="flex items-baseline gap-2">
+<span class="text-headline-md font-bold text-amber-600">2</span>
+<span class="text-xs font-semibold px-1.5 py-0.5 rounded-full bg-amber-100 text-amber-800">Avg +22m</span>
+</div>
+<p class="text-[11px] text-amber-700/80 mt-1">Requires supervisor review</p>
+</div>
+<!-- Absent -->
+<div class="bg-white border border-[#E2E8EF] rounded-xl p-4 shadow-sm relative overflow-hidden">
+<div class="flex items-center justify-between text-rose-700 mb-1">
+<span class="text-label-md font-medium text-on-surface">Absent</span>
+<span class="material-symbols-outlined text-[20px]">person_off</span>
+</div>
+<div class="flex items-baseline gap-2">
+<span class="text-headline-md font-bold text-rose-600">1</span>
+<span class="text-xs font-semibold px-1.5 py-0.5 rounded-full bg-rose-100 text-rose-800">Uninformed</span>
+</div>
+<p class="text-[11px] text-rose-700/80 mt-1">No ticket or call reported</p>
+</div>
+<!-- On Leave -->
+<div class="bg-white border border-[#E2E8EF] rounded-xl p-4 shadow-sm relative overflow-hidden">
+<div class="flex items-center justify-between text-[#118A9F] mb-1">
+<span class="text-label-md font-medium text-on-surface">On Leave</span>
+<span class="material-symbols-outlined text-[20px]">event_busy</span>
+</div>
+<div class="flex items-baseline gap-2">
+<span class="text-headline-md font-bold text-[#118A9F]">2</span>
+<span class="text-xs font-semibold px-1.5 py-0.5 rounded-full bg-[#D9F1F3] text-[#118A9F]">Pre-approved</span>
+</div>
+<p class="text-[11px] text-on-surface-variant mt-1">1 Casual · 1 Medical leave</p>
+</div>
+</div>
+<!-- ATTENDANCE VISUALIZATION & ACTIONABLE EXCEPTIONS -->
+<div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+<!-- Left: Workforce Distribution (5 cols) -->
+<div class="lg:col-span-5 bg-white border border-[#E2E8EF] rounded-xl p-5 shadow-sm flex flex-col justify-between">
+<div>
+<div class="flex items-center justify-between mb-2">
+<h3 class="text-headline-sm font-headline-sm font-semibold text-primary-container">Daily Workforce Distribution</h3>
+<span class="text-xs font-semibold bg-[#D9F1F3] text-[#118A9F] px-2.5 py-0.5 rounded-full">87.5% in office</span>
+</div>
+<p class="text-body-sm text-on-surface-variant">Real-time attendance composition based on biometric sensor taps.</p>
+<!-- Stacked Bar Representation -->
+<div class="mt-5 space-y-2">
+<div class="w-full h-4 bg-surface-container-low rounded-full overflow-hidden flex">
+<div class="bg-[#118A9F] h-full" style="width: 79.2%;" title="Present: 19"></div>
+<div class="bg-[#F59E0B] h-full" style="width: 8.3%;" title="Late: 2"></div>
+<div class="bg-[#EF4444] h-full" style="width: 4.2%;" title="Absent: 1"></div>
+<div class="bg-[#38BDF8] h-full" style="width: 8.3%;" title="On Leave: 2"></div>
+</div>
+<!-- Legend -->
+<div class="grid grid-cols-2 gap-3 pt-4">
+<div class="flex items-center gap-2">
+<span class="w-3 h-3 rounded-full bg-[#118A9F]"></span>
+<span class="text-body-sm text-on-surface">Present: <strong>19</strong> (79.2%)</span>
+</div>
+<div class="flex items-center gap-2">
+<span class="w-3 h-3 rounded-full bg-[#F59E0B]"></span>
+<span class="text-body-sm text-on-surface">Late: <strong>2</strong> (8.3%)</span>
+</div>
+<div class="flex items-center gap-2">
+<span class="w-3 h-3 rounded-full bg-[#EF4444]"></span>
+<span class="text-body-sm text-on-surface">Absent: <strong>1</strong> (4.2%)</span>
+</div>
+<div class="flex items-center gap-2">
+<span class="w-3 h-3 rounded-full bg-[#38BDF8]"></span>
+<span class="text-body-sm text-on-surface">Approved Leave: <strong>2</strong> (8.3%)</span>
+</div>
+</div>
+</div>
+</div>
+<div class="mt-6 pt-3 border-t border-[#E2E8EF] flex items-center justify-between text-xs text-on-surface-variant">
+<span class="">Bengaluru Campus Floor 2 &amp; 3</span>
+<span class="font-medium text-[#118A9F] cursor-pointer hover:underline">View Floor Occupancy →</span>
+</div>
+</div>
+<!-- Right: Actionable Exceptions Banner (7 cols) -->
+<div class="lg:col-span-7 bg-white border border-amber-200/90 rounded-xl p-5 shadow-sm bg-gradient-to-br from-white to-amber-50/20">
+<div class="flex items-center justify-between mb-3">
+<div class="flex items-center gap-2">
+<span class="p-1 rounded-md bg-amber-100 text-amber-800 flex items-center justify-center">
+<span class="material-symbols-outlined text-[18px]">warning</span>
+</span>
+<h3 class="text-headline-sm font-headline-sm font-semibold text-primary-container">Actionable Attendance Exceptions</h3>
+</div>
+<span class="text-xs font-semibold px-2 py-0.5 rounded-full bg-amber-100 text-amber-800">4 Needs Attention</span>
+</div>
+<div class="space-y-2.5 mt-3">
+<!-- Exception Item 1 -->
+<div class="flex items-center justify-between p-2.5 bg-white border border-[#E2E8EF] rounded-lg hover:border-amber-300 transition-colors">
+<div class="flex items-center gap-3">
+<div class="w-7 h-7 rounded-full bg-slate-200 text-slate-700 text-xs font-bold flex items-center justify-center">VN</div>
+<div>
+<p class="text-body-sm font-semibold text-on-surface leading-snug">Vikram Nair <span class="text-xs font-normal text-on-surface-variant">(Backend Architect)</span></p>
+<p class="text-xs text-rose-600 font-medium">Missing check-out timestamp from yesterday (Sep 29)</p>
+</div>
+</div>
+<button class="px-2.5 py-1 text-xs font-semibold rounded bg-[#F6F9FB] border border-[#E2E8EF] text-[#081B47] hover:bg-[#D9F1F3] hover:text-[#118A9F] transition-colors">
+                Resolve
+              </button>
+</div>
+<!-- Exception Item 2 -->
+<div class="flex items-center justify-between p-2.5 bg-white border border-[#E2E8EF] rounded-lg hover:border-amber-300 transition-colors">
+<div class="flex items-center gap-3">
+<div class="w-7 h-7 rounded-full bg-slate-200 text-slate-700 text-xs font-bold flex items-center justify-center">KM</div>
+<div>
+<p class="text-body-sm font-semibold text-on-surface leading-snug">Karthik M. <span class="text-xs font-normal text-on-surface-variant">(Frontend Intern)</span></p>
+<p class="text-xs text-amber-700 font-medium">Late check-in today (10:14 AM, +44m delay recorded)</p>
+</div>
+</div>
+<button class="px-2.5 py-1 text-xs font-semibold rounded bg-[#118A9F] text-white hover:bg-[#1597A8] transition-colors" onclick="document.getElementById('regularizationDrawer').classList.remove('translate-x-full')">
+                Review / Adjust
+              </button>
+</div>
+<!-- Exception Item 3 -->
+<div class="flex items-center justify-between p-2.5 bg-white border border-[#E2E8EF] rounded-lg hover:border-amber-300 transition-colors">
+<div class="flex items-center gap-3">
+<div class="w-7 h-7 rounded-full bg-slate-200 text-slate-700 text-xs font-bold flex items-center justify-center">SK</div>
+<div>
+<p class="text-body-sm font-semibold text-on-surface leading-snug">Sanya Kapoor <span class="text-xs font-normal text-on-surface-variant">(DevOps Specialist)</span></p>
+<p class="text-xs text-on-surface-variant font-medium">Turnstile Gateway B token sync conflict reported</p>
+</div>
+</div>
+<button class="px-2.5 py-1 text-xs font-semibold rounded bg-[#F6F9FB] border border-[#E2E8EF] text-[#081B47] hover:bg-[#D9F1F3] hover:text-[#118A9F] transition-colors">
+                Regularize
+              </button>
+</div>
+<!-- Exception Item 4 -->
+<div class="flex items-center justify-between p-2.5 bg-white border border-[#E2E8EF] rounded-lg hover:border-amber-300 transition-colors">
+<div class="flex items-center gap-3">
+<div class="w-7 h-7 rounded-full bg-slate-200 text-slate-700 text-xs font-bold flex items-center justify-center">TD</div>
+<div>
+<p class="text-body-sm font-semibold text-on-surface leading-snug">Tanvi Deshmukh <span class="text-xs font-normal text-on-surface-variant">(People Operations)</span></p>
+<p class="text-xs text-rose-600 font-medium">Unplanned absence — no punch or leave ticket found</p>
+</div>
+</div>
+<div class="flex items-center gap-1.5">
+<button class="px-2.5 py-1 text-xs font-semibold rounded bg-white border border-[#E2E8EF] text-rose-700 hover:bg-rose-50 transition-colors">
+                  Contact
+                </button>
+<button class="px-2.5 py-1 text-xs font-semibold rounded bg-[#F6F9FB] border border-[#E2E8EF] text-[#081B47] hover:bg-[#D9F1F3] transition-colors">
+                  Mark Leave
+                </button>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- TAB TOGGLE BAR & OPERATIONAL SEARCH/FILTER -->
+<div class="bg-white border border-[#E2E8EF] rounded-xl p-4 shadow-sm space-y-4">
+<!-- Tab toggles -->
+<div class="flex flex-wrap items-center justify-between border-b border-[#E2E8EF] pb-3 gap-2">
+<div class="flex items-center gap-2">
+<button class="px-3.5 py-1.5 text-xs font-semibold rounded-lg bg-[#081B47] text-white">All Records (24)</button>
+<button class="px-3.5 py-1.5 text-xs font-medium rounded-lg text-on-surface-variant hover:text-on-surface hover:bg-surface-container-low transition-colors flex items-center gap-1.5">
+<span class="">Exceptions</span>
+<span class="w-5 h-5 rounded-full bg-amber-100 text-amber-800 text-[10px] font-bold flex items-center justify-center">4</span>
+</button>
+<button class="px-3.5 py-1.5 text-xs font-medium rounded-lg text-on-surface-variant hover:text-on-surface hover:bg-surface-container-low transition-colors flex items-center gap-1.5">
+<span class="">Regularization Requests</span>
+<span class="w-5 h-5 rounded-full bg-[#D9F1F3] text-[#118A9F] text-[10px] font-bold flex items-center justify-center">2</span>
+</button>
+</div>
+<div class="text-xs text-on-surface-variant">
+            Showing <strong class="text-on-surface">24 of 24</strong> employee logs
+          </div>
+</div>
+<!-- Filter Row -->
+<div class="grid grid-cols-1 md:grid-cols-12 gap-3 items-center">
+<!-- Search input -->
+<div class="md:col-span-4 relative">
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant text-[18px]">search</span>
+<input class="w-full h-10 pl-9 pr-3 text-body-sm bg-white border border-[#E2E8EF] rounded-lg focus:border-[#118A9F] focus:ring-2 focus:ring-[#118A9F]/20 text-on-surface placeholder:text-outline" placeholder="Search employee by name, ID (e.g. VS-0142), role..." type="text">
+</div>
+<!-- Department Select -->
+<div class="md:col-span-3">
+<select class="w-full h-10 px-3 text-body-sm bg-white border border-[#E2E8EF] rounded-lg text-on-surface focus:border-[#118A9F] focus:ring-2 focus:ring-[#118A9F]/20">
+<option value="">Department: All Departments</option>
+<option value="engineering">Engineering</option>
+<option value="product">Product &amp; Design</option>
+<option value="operations">Operations &amp; HR</option>
+<option value="devops">DevOps &amp; Infrastructure</option>
+</select>
+</div>
+<!-- Status Select -->
+<div class="md:col-span-2">
+<select class="w-full h-10 px-3 text-body-sm bg-white border border-[#E2E8EF] rounded-lg text-on-surface focus:border-[#118A9F] focus:ring-2 focus:ring-[#118A9F]/20">
+<option value="">Status: All Statuses</option>
+<option value="present">Present</option>
+<option value="late">Late Arrival</option>
+<option value="absent">Absent</option>
+<option value="leave">On Leave</option>
+<option value="wfh">Work From Home</option>
+</select>
+</div>
+<!-- Location / Shift Select -->
+<div class="md:col-span-2">
+<select class="w-full h-10 px-3 text-body-sm bg-white border border-[#E2E8EF] rounded-lg text-on-surface focus:border-[#118A9F] focus:ring-2 focus:ring-[#118A9F]/20">
+<option value="">Location: Bengaluru HQ</option>
+<option value="floor2">Floor 2 (Tech Wing)</option>
+<option value="floor3">Floor 3 (Operations)</option>
+<option value="remote">Remote / Traveling</option>
+</select>
+</div>
+<!-- Clear Filters -->
+<div class="md:col-span-1 text-center">
+<button class="text-body-sm text-[#118A9F] hover:underline font-medium">Reset</button>
+</div>
+</div>
+</div>
+<!-- ATTENDANCE DATA TABLE -->
+<div class="bg-white border border-[#E2E8EF] rounded-xl shadow-sm overflow-hidden">
+<div class="overflow-x-auto">
+<table class="w-full text-left border-collapse">
+<thead>
+<tr class="bg-surface-container-low/70 border-b border-[#E2E8EF] text-label-md text-on-surface-variant">
+<th class="py-3 px-4 font-semibold">Employee</th>
+<th class="py-3 px-3 font-semibold">Shift Schedule</th>
+<th class="py-3 px-3 font-semibold">Check In</th>
+<th class="py-3 px-3 font-semibold">Check Out</th>
+<th class="py-3 px-3 font-semibold">Working Hours</th>
+<th class="py-3 px-3 font-semibold">Status</th>
+<th class="py-3 px-4 font-semibold">Verification &amp; Source</th>
+<th class="py-3 px-4 font-semibold text-right">Actions</th>
+</tr>
+</thead>
+<tbody class="divide-y divide-[#E2E8EF] text-body-sm">
+<!-- ROW 1: Rahul Paul (Present) -->
+<tr class="hover:bg-[#F6F9FB] transition-colors">
+<td class="py-3.5 px-4">
+<div class="flex items-center gap-3">
+<div class="w-8 h-8 rounded-full bg-primary-container text-white flex items-center justify-center font-bold text-xs">
+                      RP
+                    </div>
+<div>
+<div class="font-semibold text-on-surface flex items-center gap-1.5">
+<span class="">Rahul Paul</span>
+<span class="text-[10px] px-1.5 py-0.2 rounded bg-surface-container text-on-surface-variant">Admin</span>
+</div>
+<div class="text-xs text-on-surface-variant">VS-0010 · HR &amp; Operations</div>
+</div>
+</div>
+</td>
+<td class="py-3.5 px-3 text-on-surface">
+<div class="font-medium">09:00 AM - 06:00 PM</div>
+<div class="text-xs text-on-surface-variant">Standard Gen Shift</div>
+</td>
+<td class="py-3.5 px-3">
+<span class="font-semibold text-emerald-700">08:45 AM</span>
+<div class="text-[11px] text-on-surface-variant">Gate 1 Turnstile</div>
+</td>
+<td class="py-3.5 px-3">
+<span class="inline-flex items-center gap-1 text-emerald-600 font-medium">
+<span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
+                    In Office (Active)
+                  </span>
+</td>
+<td class="py-3.5 px-3">
+<div class="font-medium text-on-surface">5h 12m elapsed</div>
+<div class="w-24 h-1.5 bg-gray-100 rounded-full mt-1 overflow-hidden">
+<div class="w-3/5 h-full bg-[#118A9F]"></div>
+</div>
+</td>
+<td class="py-3.5 px-3">
+<span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200">
+<span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span> Present
+                  </span>
+</td>
+<td class="py-3.5 px-4 text-xs text-on-surface-variant">
+<span class="">Biometric RFID scan (Punched on-time)</span>
+</td>
+<td class="py-3.5 px-4 text-right">
+<button class="p-1.5 text-on-surface-variant hover:text-[#118A9F] hover:bg-surface-container-low rounded-lg transition-colors" title="View Detail Log" type="button">
+<span class="material-symbols-outlined text-[18px]">visibility</span>
+</button>
+</td>
+</tr>
+<!-- ROW 2: Karthik M. (Late Check-in) -->
+<tr class="hover:bg-[#F6F9FB] transition-colors bg-amber-50/20">
+<td class="py-3.5 px-4">
+<div class="flex items-center gap-3">
+<div class="w-8 h-8 rounded-full bg-amber-100 text-amber-800 flex items-center justify-center font-bold text-xs">
+                      KM
+                    </div>
+<div>
+<div class="font-semibold text-on-surface">Karthik M.</div>
+<div class="text-xs text-on-surface-variant">VS-0312 · Frontend Engineering</div>
+</div>
+</div>
+</td>
+<td class="py-3.5 px-3 text-on-surface">
+<div class="font-medium">09:00 AM - 06:00 PM</div>
+<div class="text-xs text-on-surface-variant">Standard Gen Shift</div>
+</td>
+<td class="py-3.5 px-3">
+<span class="font-semibold text-amber-700">09:44 AM</span>
+<div class="text-[11px] text-amber-700/80 font-medium">+44m delay recorded</div>
+</td>
+<td class="py-3.5 px-3">
+<span class="inline-flex items-center gap-1 text-emerald-600 font-medium">
+<span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
+                    In Office (Active)
+                  </span>
+</td>
+<td class="py-3.5 px-3">
+<div class="font-medium text-on-surface">4h 13m elapsed</div>
+<div class="w-24 h-1.5 bg-gray-100 rounded-full mt-1 overflow-hidden">
+<div class="w-1/2 h-full bg-amber-500"></div>
+</div>
+</td>
+<td class="py-3.5 px-3">
+<span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-semibold bg-amber-50 text-amber-800 border border-amber-200">
+<span class="w-1.5 h-1.5 rounded-full bg-amber-500"></span> Late
+                  </span>
+</td>
+<td class="py-3.5 px-4 text-xs text-amber-700">
+<span class="">Turnstile Gate 2 (Traffic delay note filed)</span>
+</td>
+<td class="py-3.5 px-4 text-right">
+<button class="inline-flex items-center gap-1 px-2.5 py-1 text-xs font-semibold rounded bg-[#D9F1F3] text-[#118A9F] hover:bg-[#118A9F] hover:text-white transition-all shadow-sm" onclick="document.getElementById('regularizationDrawer').classList.remove('translate-x-full')" type="button">
+<span class="material-symbols-outlined text-[14px]">edit</span>
+<span class="">Regularize</span>
+</button>
+</td>
+</tr>
+<!-- ROW 3: Priya Sharma (On Leave - Casual) -->
+<tr class="hover:bg-[#F6F9FB] transition-colors">
+<td class="py-3.5 px-4">
+<div class="flex items-center gap-3">
+<div class="w-8 h-8 rounded-full bg-sky-100 text-sky-800 flex items-center justify-center font-bold text-xs">
+                      PS
+                    </div>
+<div>
+<div class="font-semibold text-on-surface">Priya Sharma</div>
+<div class="text-xs text-on-surface-variant">VS-0142 · Product Design</div>
+</div>
+</div>
+</td>
+<td class="py-3.5 px-3 text-on-surface">
+<div class="font-medium">09:00 AM - 06:00 PM</div>
+<div class="text-xs text-on-surface-variant">Scheduled Regular</div>
+</td>
+<td class="py-3.5 px-3 text-outline">--:--</td>
+<td class="py-3.5 px-3 text-outline">--:--</td>
+<td class="py-3.5 px-3 text-outline">0h 00m</td>
+<td class="py-3.5 px-3">
+<span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-semibold bg-[#D9F1F3] text-[#118A9F] border border-[#118A9F]/30">
+<span class="w-1.5 h-1.5 rounded-full bg-[#118A9F]"></span> Casual Leave
+                  </span>
+</td>
+<td class="py-3.5 px-4 text-xs text-on-surface-variant">
+<span class="">Approved via Leave App (Req #LV-992)</span>
+</td>
+<td class="py-3.5 px-4 text-right">
+<button class="p-1.5 text-on-surface-variant hover:text-[#118A9F] hover:bg-surface-container-low rounded-lg transition-colors" title="View Leave Application" type="button">
+<span class="material-symbols-outlined text-[18px]">receipt_long</span>
+</button>
+</td>
+</tr>
+<!-- ROW 4: Vikram Nair (Work From Home) -->
+<tr class="hover:bg-[#F6F9FB] transition-colors">
+<td class="py-3.5 px-4">
+<div class="flex items-center gap-3">
+<div class="w-8 h-8 rounded-full bg-indigo-100 text-indigo-800 flex items-center justify-center font-bold text-xs">
+                      VN
+                    </div>
+<div>
+<div class="font-semibold text-on-surface">Vikram Nair</div>
+<div class="text-xs text-on-surface-variant">VS-0089 · Backend Engineering</div>
+</div>
+</div>
+</td>
+<td class="py-3.5 px-3 text-on-surface">
+<div class="font-medium">09:00 AM - 06:00 PM</div>
+<div class="text-xs text-on-surface-variant">Remote Approved</div>
+</td>
+<td class="py-3.5 px-3">
+<span class="font-semibold text-indigo-700">09:10 AM</span>
+<div class="text-[11px] text-on-surface-variant">Web Portal Geo-tag</div>
+</td>
+<td class="py-3.5 px-3">
+<span class="inline-flex items-center gap-1 text-indigo-600 font-medium">
+<span class="w-1.5 h-1.5 rounded-full bg-indigo-500 animate-pulse"></span>
+                    Online (Remote)
+                  </span>
+</td>
+<td class="py-3.5 px-3">
+<div class="font-medium text-on-surface">4h 47m elapsed</div>
+<div class="w-24 h-1.5 bg-gray-100 rounded-full mt-1 overflow-hidden">
+<div class="w-3/5 h-full bg-indigo-500"></div>
+</div>
+</td>
+<td class="py-3.5 px-3">
+<span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-semibold bg-indigo-50 text-indigo-700 border border-indigo-200">
+<span class="w-1.5 h-1.5 rounded-full bg-indigo-500"></span> Remote / WFH
+                  </span>
+</td>
+<td class="py-3.5 px-4 text-xs text-on-surface-variant">
+<span class="">Verified IP: Bengaluru (Single Punch Alert Yesterday)</span>
+</td>
+<td class="py-3.5 px-4 text-right">
+<button class="p-1.5 text-on-surface-variant hover:text-[#118A9F] hover:bg-surface-container-low rounded-lg transition-colors" type="button">
+<span class="material-symbols-outlined text-[18px]">edit_note</span>
+</button>
+</td>
+</tr>
+<!-- ROW 5: Rohan Menon (Present) -->
+<tr class="hover:bg-[#F6F9FB] transition-colors">
+<td class="py-3.5 px-4">
+<div class="flex items-center gap-3">
+<div class="w-8 h-8 rounded-full bg-emerald-100 text-emerald-800 flex items-center justify-center font-bold text-xs">
+                      RM
+                    </div>
+<div>
+<div class="font-semibold text-on-surface">Rohan Menon</div>
+<div class="text-xs text-on-surface-variant">VS-0118 · Technical Project Mgmt</div>
+</div>
+</div>
+</td>
+<td class="py-3.5 px-3 text-on-surface">
+<div class="font-medium">09:00 AM - 06:00 PM</div>
+<div class="text-xs text-on-surface-variant">Standard Gen Shift</div>
+</td>
+<td class="py-3.5 px-3">
+<span class="font-semibold text-emerald-700">08:58 AM</span>
+<div class="text-[11px] text-on-surface-variant">Gate 2 Biometric Sentinel</div>
+</td>
+<td class="py-3.5 px-3">
+<span class="inline-flex items-center gap-1 text-emerald-600 font-medium">
+<span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
+                    In Office (Active)
+                  </span>
+</td>
+<td class="py-3.5 px-3">
+<div class="font-medium text-on-surface">4h 59m elapsed</div>
+<div class="w-24 h-1.5 bg-gray-100 rounded-full mt-1 overflow-hidden">
+<div class="w-3/5 h-full bg-[#118A9F]"></div>
+</div>
+</td>
+<td class="py-3.5 px-3">
+<span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200">
+<span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span> Present
+                  </span>
+</td>
+<td class="py-3.5 px-4 text-xs text-on-surface-variant">
+<span class="">Biometric Turnstile A</span>
+</td>
+<td class="py-3.5 px-4 text-right">
+<button class="p-1.5 text-on-surface-variant hover:text-[#118A9F] hover:bg-surface-container-low rounded-lg transition-colors" type="button">
+<span class="material-symbols-outlined text-[18px]">visibility</span>
+</button>
+</td>
+</tr>
+<!-- ROW 6: Sanya Kapoor (Present with Punch Error Note) -->
+<tr class="hover:bg-[#F6F9FB] transition-colors">
+<td class="py-3.5 px-4">
+<div class="flex items-center gap-3">
+<div class="w-8 h-8 rounded-full bg-slate-200 text-slate-700 flex items-center justify-center font-bold text-xs">
+                      SK
+                    </div>
+<div>
+<div class="font-semibold text-on-surface">Sanya Kapoor</div>
+<div class="text-xs text-on-surface-variant">VS-0204 · DevOps &amp; Cloud Infra</div>
+</div>
+</div>
+</td>
+<td class="py-3.5 px-3 text-on-surface">
+<div class="font-medium">09:00 AM - 06:00 PM</div>
+<div class="text-xs text-on-surface-variant">Infra Shift 1</div>
+</td>
+<td class="py-3.5 px-3">
+<span class="font-semibold text-emerald-700">09:02 AM</span>
+<div class="text-[11px] text-amber-700">Gate B Turnstile Failover</div>
+</td>
+<td class="py-3.5 px-3">
+<span class="inline-flex items-center gap-1 text-emerald-600 font-medium">
+<span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
+                    In Office (Floor 2)
+                  </span>
+</td>
+<td class="py-3.5 px-3">
+<div class="font-medium text-on-surface">4h 55m elapsed</div>
+<div class="w-24 h-1.5 bg-gray-100 rounded-full mt-1 overflow-hidden">
+<div class="w-3/5 h-full bg-[#118A9F]"></div>
+</div>
+</td>
+<td class="py-3.5 px-3">
+<span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200">
+<span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span> Present
+                  </span>
+</td>
+<td class="py-3.5 px-4 text-xs text-amber-700">
+<span class="">Turnstile fallback punch logged</span>
+</td>
+<td class="py-3.5 px-4 text-right">
+<button class="p-1.5 text-on-surface-variant hover:text-[#118A9F] hover:bg-surface-container-low rounded-lg transition-colors" type="button">
+<span class="material-symbols-outlined text-[18px]">edit_calendar</span>
+</button>
+</td>
+</tr>
+<!-- ROW 7: Ananya Rao (On Leave - Medical) -->
+<tr class="hover:bg-[#F6F9FB] transition-colors">
+<td class="py-3.5 px-4">
+<div class="flex items-center gap-3">
+<div class="w-8 h-8 rounded-full bg-teal-100 text-[#118A9F] flex items-center justify-center font-bold text-xs">
+                      AR
+                    </div>
+<div>
+<div class="font-semibold text-on-surface">Ananya Rao</div>
+<div class="text-xs text-on-surface-variant">VS-0064 · Lead Product Designer</div>
+</div>
+</div>
+</td>
+<td class="py-3.5 px-3 text-on-surface">
+<div class="font-medium">09:00 AM - 06:00 PM</div>
+<div class="text-xs text-on-surface-variant">Standard Gen Shift</div>
+</td>
+<td class="py-3.5 px-3 text-outline">--:--</td>
+<td class="py-3.5 px-3 text-outline">--:--</td>
+<td class="py-3.5 px-3 text-outline">0h 00m</td>
+<td class="py-3.5 px-3">
+<span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-semibold bg-teal-50 text-teal-800 border border-teal-200">
+<span class="w-1.5 h-1.5 rounded-full bg-teal-600"></span> Medical Leave
+                  </span>
+</td>
+<td class="py-3.5 px-4 text-xs text-on-surface-variant">
+<span class="">Medical Certificate attached (Day 1 of 2)</span>
+</td>
+<td class="py-3.5 px-4 text-right">
+<button class="p-1.5 text-on-surface-variant hover:text-[#118A9F] hover:bg-surface-container-low rounded-lg transition-colors" type="button">
+<span class="material-symbols-outlined text-[18px]">receipt_long</span>
+</button>
+</td>
+</tr>
+<!-- ROW 8: Tanvi Deshmukh (Absent) -->
+<tr class="hover:bg-[#F6F9FB] transition-colors bg-rose-50/20">
+<td class="py-3.5 px-4">
+<div class="flex items-center gap-3">
+<div class="w-8 h-8 rounded-full bg-rose-100 text-rose-800 flex items-center justify-center font-bold text-xs">
+                      TD
+                    </div>
+<div>
+<div class="font-semibold text-on-surface">Tanvi Deshmukh</div>
+<div class="text-xs text-on-surface-variant">VS-0220 · People Operations</div>
+</div>
+</div>
+</td>
+<td class="py-3.5 px-3 text-on-surface">
+<div class="font-medium">09:00 AM - 06:00 PM</div>
+<div class="text-xs text-on-surface-variant">Standard Gen Shift</div>
+</td>
+<td class="py-3.5 px-3 text-rose-600 font-semibold">No punch</td>
+<td class="py-3.5 px-3 text-outline">--:--</td>
+<td class="py-3.5 px-3 text-rose-600 font-medium">0h 00m</td>
+<td class="py-3.5 px-3">
+<span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-semibold bg-rose-50 text-rose-700 border border-rose-200">
+<span class="w-1.5 h-1.5 rounded-full bg-rose-600"></span> Absent
+                  </span>
+</td>
+<td class="py-3.5 px-4 text-xs text-rose-700">
+<span class="">Unplanned absence / Uninformed</span>
+</td>
+<td class="py-3.5 px-4 text-right">
+<div class="flex items-center justify-end gap-1">
+<button class="px-2 py-1 text-xs font-semibold rounded bg-white border border-[#E2E8EF] text-rose-700 hover:bg-rose-50 transition-colors">
+                      Mark
+                    </button>
+<button class="p-1.5 text-on-surface-variant hover:text-[#118A9F] rounded-lg">
+<span class="material-symbols-outlined text-[18px]">more_vert</span>
+</button>
+</div>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+<!-- Table Pagination Footer -->
+<div class="p-4 border-t border-[#E2E8EF] flex flex-col sm:flex-row items-center justify-between gap-4 bg-surface-container-low/30">
+<div class="text-xs text-on-surface-variant">
+            Showing records <strong class="text-on-surface">1 - 8</strong> of <strong class="text-on-surface">24</strong> employees
+          </div>
+<div class="flex items-center gap-2">
+<span class="text-xs text-on-surface-variant">Rows per page:</span>
+<select class="h-8 text-xs bg-white border border-[#E2E8EF] rounded px-2 text-on-surface">
+<option>10</option>
+<option selected="">25</option>
+<option>50</option>
+</select>
+<div class="inline-flex rounded-lg border border-[#E2E8EF] bg-white overflow-hidden shadow-sm ml-2">
+<button class="p-1.5 hover:bg-surface-container-low text-on-surface-variant disabled:opacity-40" disabled="">
+<span class="material-symbols-outlined text-[16px]">chevron_left</span>
+</button>
+<button class="px-3 py-1 text-xs font-semibold bg-[#081B47] text-white">1</button>
+<button class="p-1.5 hover:bg-surface-container-low text-on-surface-variant">
+<span class="material-symbols-outlined text-[16px]">chevron_right</span>
+</button>
+</div>
+</div>
+</div>
+</div>
+<!-- FOOTER NOTE -->
+<footer class="pt-4 pb-8 border-t border-[#E2E8EF]/80 flex flex-col sm:flex-row items-center justify-between text-xs text-on-surface-variant gap-2">
+<div class="flex items-center gap-2">
+<span class="w-2 h-2 rounded-full bg-[#118A9F]"></span>
+<span class="">ValidureHR Enterprise Edition v1.0.4 · Server Region: ap-south-1 (Mumbai)</span>
+</div>
+<div>
+<span class="">Bengaluru HQ Gateway Sentinels: <strong>Gate 1 (Floor 2) &amp; Gate 2 (Floor 3) Operational</strong></span>
+</div>
+</footer>
+</main>
+</div>
+<!-- ============================================================ -->
+<!-- INTERACTIVE ATTENDANCE CORRECTION DRAWER (Simulated / Modal)  -->
+<!-- ============================================================ -->
+<aside class="fixed top-0 right-0 w-full sm:w-[480px] h-full bg-white shadow-2xl border-l border-[#E2E8EF] z-50 transform translate-x-full transition-transform duration-300 ease-in-out flex flex-col" id="regularizationDrawer">
+<!-- Drawer Header -->
+<div class="p-5 border-b border-[#E2E8EF] flex items-center justify-between bg-surface-container-low/40">
+<div class="flex items-center gap-2.5">
+<span class="p-2 rounded-lg bg-[#D9F1F3] text-[#118A9F] flex items-center justify-center">
+<span class="material-symbols-outlined text-[20px]">edit_calendar</span>
+</span>
+<div>
+<h3 class="text-headline-sm font-headline-sm font-bold text-primary-container">Attendance Correction</h3>
+<p class="text-xs text-on-surface-variant">Adjust check-in time or regularize missed punch</p>
+</div>
+</div>
+<button class="p-2 rounded-lg text-on-surface-variant hover:bg-surface-container hover:text-on-surface transition-colors" onclick="document.getElementById('regularizationDrawer').classList.add('translate-x-full')" type="button">
+<span class="material-symbols-outlined text-[20px]">close</span>
+</button>
+</div>
+<!-- Drawer Body -->
+<div class="p-6 flex-1 overflow-y-auto space-y-5 custom-scrollbar">
+<!-- Employee Summary Card -->
+<div class="p-4 bg-surface-container-low/60 rounded-xl border border-[#E2E8EF]">
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 rounded-full bg-amber-100 text-amber-800 font-bold flex items-center justify-center text-sm">
+            KM
+          </div>
+<div>
+<h4 class="font-bold text-on-surface text-label-md">Karthik M.</h4>
+<p class="text-xs text-on-surface-variant">VS-0312 · Frontend Engineering Intern</p>
+</div>
+</div>
+<div class="mt-3 pt-3 border-t border-[#E2E8EF] grid grid-cols-2 gap-2 text-xs">
+<div>
+<span class="text-on-surface-variant">Shift:</span>
+<p class="font-semibold text-on-surface">09:00 AM - 06:00 PM</p>
+</div>
+<div>
+<span class="text-on-surface-variant">Recorded Today:</span>
+<p class="font-semibold text-amber-700">09:44 AM (+44m delay)</p>
+</div>
+</div>
+</div>
+<!-- Date Reference -->
+<div>
+<label class="block text-label-md font-semibold text-on-surface mb-1">Attendance Date</label>
+<div class="h-10 px-3 flex items-center bg-gray-50 border border-[#E2E8EF] rounded-lg text-body-sm text-on-surface">
+<span class="material-symbols-outlined text-[18px] text-[#118A9F] mr-2">event</span>
+<span class="">Wednesday, September 30, 2026 (Today)</span>
+</div>
+</div>
+<!-- Proposed Check-in Input -->
+<div>
+<label class="block text-label-md font-semibold text-on-surface mb-1">
+          Adjusted Check-in Time <span class="text-[#118A9F]">*</span>
+</label>
+<input class="w-full h-10 px-3 bg-white border border-[#E2E8EF] rounded-lg text-body-sm focus:border-[#118A9F] focus:ring-2 focus:ring-[#118A9F]/20 text-on-surface font-medium" type="time" value="09:00">
+<p class="text-[11px] text-on-surface-variant mt-1">Original punch: 09:44 AM recorded at Gate 2 Sentinel.</p>
+</div>
+<!-- Proposed Check-out Input -->
+<div>
+<label class="block text-label-md font-semibold text-on-surface mb-1">
+          Anticipated / Verified Check-out
+        </label>
+<input class="w-full h-10 px-3 bg-white border border-[#E2E8EF] rounded-lg text-body-sm focus:border-[#118A9F] focus:ring-2 focus:ring-[#118A9F]/20 text-on-surface font-medium" type="time" value="18:00">
+</div>
+<!-- Reason for Regularization -->
+<div>
+<label class="block text-label-md font-semibold text-on-surface mb-1">
+          Reason for Adjustment <span class="text-[#118A9F]">*</span>
+</label>
+<select class="w-full h-10 px-3 bg-white border border-[#E2E8EF] rounded-lg text-body-sm focus:border-[#118A9F] focus:ring-2 focus:ring-[#118A9F]/20 text-on-surface">
+<option selected="">Transportation Delay (Metro disruption / heavy traffic)</option>
+<option>Biometric Turnstile Scan Failed</option>
+<option>On-site Client Meeting / Field Visit</option>
+<option>Manager Approved Work Exception</option>
+<option>Other Operational Discrepancy</option>
+</select>
+</div>
+<!-- Justification / Manager Note -->
+<div>
+<label class="block text-label-md font-semibold text-on-surface mb-1">
+          Manager / HR Approval Remarks
+        </label>
+<textarea class="w-full p-3 bg-white border border-[#E2E8EF] rounded-lg text-body-sm focus:border-[#118A9F] focus:ring-2 focus:ring-[#118A9F]/20 text-on-surface placeholder:text-outline" placeholder="Enter reason and ticket reference for internal audit trail..." rows="3">Employee notified team lead regarding Purple Line metro technical breakdown at 08:35 AM. Approved one-time waiver for September tally.</textarea>
+</div>
+<!-- Audit Notice Box -->
+<div class="p-3 bg-blue-50 border border-blue-200/70 rounded-lg flex items-start gap-2.5 text-xs text-blue-900">
+<span class="material-symbols-outlined text-[18px] text-[#118A9F] mt-0.5">policy</span>
+<p class="">This override will be logged under admin ID <strong>VS-0010 (Rahul Paul)</strong> for compliance audit. Both employee and reporting manager will receive email confirmation.</p>
+</div>
+</div>
+<!-- Drawer Footer Actions -->
+<div class="p-5 border-t border-[#E2E8EF] bg-surface-container-low/40 flex items-center justify-end gap-3">
+<button class="h-10 px-4 rounded-lg bg-white border border-[#E2E8EF] text-on-surface font-semibold text-body-sm hover:bg-[#F6F9FB] transition-colors" onclick="document.getElementById('regularizationDrawer').classList.add('translate-x-full')" type="button">
+        Cancel
+      </button>
+<button class="h-10 px-5 rounded-lg bg-[#118A9F] hover:bg-[#1597A8] text-white font-semibold text-body-sm shadow-sm transition-all flex items-center gap-1.5" onclick="document.getElementById('regularizationDrawer').classList.add('translate-x-full')" type="button">
+<span class="material-symbols-outlined text-[18px]">verified</span>
+<span class="">Save Correction</span>
+</button>
+</div>
+</aside>
+
+
+
+
+
+
+</body></html>

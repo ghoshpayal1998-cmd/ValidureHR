@@ -1,0 +1,766 @@
+<!DOCTYPE html><html class="h-full bg-background" lang="en"><head>
+<meta charset="utf-8">
+<meta content="width=device-width, initial-scale=1.0" name="viewport">
+<title>My Account — Validure Solutions Pvt. Ltd.</title>
+<!-- Material Symbols Outlined -->
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<!-- Google Fonts: Plus Jakarta Sans & Inter -->
+<link href="https://fonts.googleapis.com" rel="preconnect">
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;family=Plus+Jakarta+Sans:wght@500;600;700;800&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<!-- Tailwind CSS v3 -->
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          "colors": {
+            "on-primary-fixed": "#051845",
+            "primary-fixed-dim": "#b5c5fa",
+            "on-surface": "#121b2e",
+            "surface-dim": "#d1daf4",
+            "outline": "#757680",
+            "on-surface-variant": "#45464f",
+            "surface-bright": "#f9f9ff",
+            "on-primary-fixed-variant": "#354572",
+            "on-secondary": "#ffffff",
+            "on-tertiary-fixed-variant": "#354a4c",
+            "surface-variant": "#d9e2fc",
+            "on-secondary-fixed-variant": "#004e5b",
+            "surface-container": "#e9edff",
+            "secondary-container": "#88e8ff",
+            "secondary-fixed-dim": "#73d4eb",
+            "inverse-surface": "#273044",
+            "primary-fixed": "#dbe1ff",
+            "on-background": "#121b2e",
+            "surface-container-lowest": "#ffffff",
+            "on-secondary-container": "#006979",
+            "surface": "#f9f9ff",
+            "on-tertiary-fixed": "#081f21",
+            "surface-container-highest": "#d9e2fc",
+            "secondary": "#006879",
+            "inverse-on-surface": "#edf0ff",
+            "surface-container-low": "#f1f3ff",
+            "on-tertiary-container": "#738a8c",
+            "error-container": "#ffdad6",
+            "background": "#f9f9ff",
+            "surface-tint": "#4d5d8c",
+            "tertiary-fixed": "#cfe7e9",
+            "primary": "#000316",
+            "on-primary": "#ffffff",
+            "on-error": "#ffffff",
+            "error": "#ba1a1a",
+            "primary-container": "#081b47",
+            "tertiary": "#000506",
+            "surface-container-high": "#e1e8ff",
+            "on-tertiary": "#ffffff",
+            "tertiary-container": "#0b2123",
+            "secondary-fixed": "#a8edff",
+            "on-primary-container": "#7584b6",
+            "on-error-container": "#93000a",
+            "tertiary-fixed-dim": "#b3cbcd",
+            "on-secondary-fixed": "#001f26",
+            "outline-variant": "#c5c6d0",
+            "inverse-primary": "#b5c5fa"
+          },
+          "borderRadius": {
+            "DEFAULT": "0.25rem",
+            "lg": "0.5rem",
+            "xl": "0.75rem",
+            "full": "9999px"
+          },
+          "spacing": {
+            "gutter-lg": "2rem",
+            "margin-mobile": "1rem",
+            "margin-desktop": "3rem",
+            "gutter": "1.5rem",
+            "gutter-sm": "1rem",
+            "space-xl": "2rem",
+            "space-lg": "1.5rem",
+            "space-sm": "0.5rem",
+            "margin": "2rem",
+            "space-md": "1rem",
+            "space-xs": "0.25rem"
+          },
+          "fontFamily": {
+            "headline-sm": ["Plus Jakarta Sans"],
+            "button-text": ["Plus Jakarta Sans"],
+            "body-lg": ["Inter"],
+            "headline-lg": ["Plus Jakarta Sans"],
+            "label-md": ["Inter"],
+            "display-hero": ["Plus Jakarta Sans"],
+            "headline-lg-mobile": ["Plus Jakarta Sans"],
+            "label-sm": ["Inter"],
+            "body-md": ["Inter"],
+            "headline-md": ["Plus Jakarta Sans"],
+            "body-sm": ["Inter"]
+          },
+          "fontSize": {
+            "headline-sm": ["18px", { "lineHeight": "24px", "letterSpacing": "0em", "fontWeight": "600" }],
+            "button-text": ["14px", { "lineHeight": "20px", "letterSpacing": "0.005em", "fontWeight": "600" }],
+            "body-lg": ["16px", { "lineHeight": "24px", "letterSpacing": "-0.005em", "fontWeight": "400" }],
+            "headline-lg": ["30px", { "lineHeight": "38px", "letterSpacing": "-0.015em", "fontWeight": "600" }],
+            "label-md": ["13px", { "lineHeight": "18px", "letterSpacing": "0.01em", "fontWeight": "500" }],
+            "display-hero": ["40px", { "lineHeight": "48px", "letterSpacing": "-0.02em", "fontWeight": "700" }],
+            "headline-lg-mobile": ["24px", { "lineHeight": "32px", "letterSpacing": "-0.01em", "fontWeight": "600" }],
+            "label-sm": ["11px", { "lineHeight": "16px", "letterSpacing": "0.04em", "fontWeight": "600" }],
+            "body-md": ["14px", { "lineHeight": "20px", "letterSpacing": "0em", "fontWeight": "400" }],
+            "headline-md": ["22px", { "lineHeight": "28px", "letterSpacing": "-0.01em", "fontWeight": "600" }],
+            "body-sm": ["12px", { "lineHeight": "18px", "letterSpacing": "0.01em", "fontWeight": "400" }]
+          }
+        }
+      }
+    }
+  </script>
+<style>
+    .material-symbols-outlined {
+      font-family: 'Material Symbols Outlined';
+      font-weight: normal;
+      font-style: normal;
+      font-size: 20px;
+      line-height: 1;
+      letter-spacing: normal;
+      text-transform: none;
+      display: inline-block;
+      white-space: nowrap;
+      word-wrap: normal;
+      direction: ltr;
+      -webkit-font-smoothing: antialiased;
+    }
+    
+    /* Institutional ambient elevation tokens */
+    .card-elevation {
+      box-shadow: 0 1px 3px rgba(8, 27, 71, 0.04), 0 6px 16px rgba(8, 27, 71, 0.03);
+    }
+  </style>
+</head>
+<body class="h-full bg-background font-body-md text-on-surface antialiased overflow-x-hidden">
+<div class="min-h-screen flex">
+<!-- Scoped Side Navigation (Shared Component Anchor) -->
+<aside class="h-screen w-64 fixed left-0 top-0 flex flex-col justify-between bg-surface-container-lowest border-r border-outline-variant shadow-sm z-30">
+<!-- Top Brand Header -->
+<div class="p-4 border-b border-outline-variant/60 flex flex-col gap-3">
+<div class="flex items-center gap-3"><img alt="Validure Solutions Logo" class="h-9 w-9 object-contain rounded shrink-0" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCvZPvm7fF0SdbPbXE7mLho3zTlGuTy-gCJ5ZrDPou2XwXCSmxeug1DEnUY23rccsLCRirVHQW3_DLQgiJJb7XThkPHBvvqTQGOCaH77WC4D2TigFvx4FT_SW8Jmscl8iBi6i-t_4OmL-PnbS4bZqV-Izapnzs9XOGyD1KL_H-YJ2OPchJGNRUxl8Hd5xo7PDBPerAPh_3qd3B2sl_LPQAtCMOQvTU8A89tI4Mw4sfBRLwxvfallASn_yFDQraK65A"><div class="flex flex-col min-w-0"><div class="flex items-center leading-tight tracking-tight"><span class="font-headline-sm text-lg font-bold text-secondary tracking-tight">VALIDURE</span><span class="font-headline-sm text-lg font-black text-primary-container tracking-tight">HR</span></div><span class="text-[9px] font-semibold text-secondary uppercase tracking-widest leading-none mt-0.5">ENTERPRISE HRMS</span></div></div>
+<!-- Tenant Selector Switcher -->
+<button class="w-full flex items-center justify-between px-2.5 py-1.5 rounded-lg bg-surface-container-low text-secondary hover:bg-surface-container transition-colors duration-150 text-left border border-outline-variant/40" type="button">
+<div class="flex items-center gap-1.5 overflow-hidden">
+<span class="material-symbols-outlined text-secondary" style="font-size: 16px;">domain</span>
+<span class="font-label-md text-label-md font-semibold truncate text-secondary">Switch Tenant</span>
+</div>
+<span class="material-symbols-outlined text-outline" style="font-size: 18px;">unfold_more</span>
+</button>
+</div>
+<!-- Navigation Links Cluster (Scrollable) -->
+<nav class="flex-1 overflow-y-auto px-3 py-3 space-y-1">
+<div class="px-3 pt-1 pb-1 text-[10px] font-bold tracking-wider text-outline uppercase">Core Modules</div>
+<!-- Tab: Overview -->
+<a class="flex items-center gap-3 px-3 py-2 rounded-lg text-on-surface-variant hover:text-on-surface hover:bg-surface-container-low transition-colors duration-150 font-medium" href="#">
+<span class="material-symbols-outlined">dashboard</span>
+<span class="font-label-md text-label-md">Overview</span>
+</a>
+<!-- Tab: Companies -->
+<a class="flex items-center gap-3 px-3 py-2 rounded-lg text-on-surface-variant hover:text-on-surface hover:bg-surface-container-low transition-colors duration-150 font-medium" href="#">
+<span class="material-symbols-outlined">corporate_fare</span>
+<span class="font-label-md text-label-md">Companies</span>
+</a>
+<!-- Tab: Employees -->
+<a class="flex items-center gap-3 px-3 py-2 rounded-lg text-on-surface-variant hover:text-on-surface hover:bg-surface-container-low transition-colors duration-150 font-medium" href="#">
+<span class="material-symbols-outlined">group</span>
+<span class="font-label-md text-label-md">Employees</span>
+</a>
+<!-- Tab: Attendance -->
+<a class="flex items-center gap-3 px-3 py-2 rounded-lg text-on-surface-variant hover:text-on-surface hover:bg-surface-container-low transition-colors duration-150 font-medium" href="#">
+<span class="material-symbols-outlined">how_to_reg</span>
+<span class="font-label-md text-label-md">Attendance</span>
+</a>
+<!-- Tab: Leave Management -->
+<a class="flex items-center gap-3 px-3 py-2 rounded-lg text-on-surface-variant hover:text-on-surface hover:bg-surface-container-low transition-colors duration-150 font-medium" href="#">
+<span class="material-symbols-outlined">event_available</span>
+<span class="font-label-md text-label-md">Leave Management</span>
+</a>
+<!-- Tab: Leave Balances -->
+<a class="flex items-center gap-3 px-3 py-2 rounded-lg text-on-surface-variant hover:text-on-surface hover:bg-surface-container-low transition-colors duration-150 font-medium" href="#">
+<span class="material-symbols-outlined">account_balance_wallet</span>
+<span class="font-label-md text-label-md">Leave Balances</span>
+</a>
+<!-- Tab: Payroll -->
+<a class="flex items-center gap-3 px-3 py-2 rounded-lg text-on-surface-variant hover:text-on-surface hover:bg-surface-container-low transition-colors duration-150 font-medium" href="#">
+<span class="material-symbols-outlined">payments</span>
+<span class="font-label-md text-label-md">Payroll</span>
+</a>
+<!-- Tab: Documents -->
+<a class="flex items-center gap-3 px-3 py-2 rounded-lg text-on-surface-variant hover:text-on-surface hover:bg-surface-container-low transition-colors duration-150 font-medium" href="#">
+<span class="material-symbols-outlined">folder_shared</span>
+<span class="font-label-md text-label-md">Documents</span>
+</a>
+<!-- Tab: Reports -->
+<a class="flex items-center gap-3 px-3 py-2 rounded-lg text-on-surface-variant hover:text-on-surface hover:bg-surface-container-low transition-colors duration-150 font-medium" href="#">
+<span class="material-symbols-outlined">assessment</span>
+<span class="font-label-md text-label-md">Reports</span>
+</a>
+<!-- Tab: Analytics -->
+<a class="flex items-center gap-3 px-3 py-2 rounded-lg text-on-surface-variant hover:text-on-surface hover:bg-surface-container-low transition-colors duration-150 font-medium" href="#">
+<span class="material-symbols-outlined">insights</span>
+<span class="font-label-md text-label-md">Analytics</span>
+</a>
+<!-- Section: Account & Identity (Target Area for Active Screen) -->
+<div class="pt-3 pb-1 px-3 text-[10px] font-bold tracking-wider text-outline uppercase">Administration &amp; Account</div>
+<!-- Tab: My Account (Active State) -->
+<a class="flex items-center gap-3 px-3 py-2.5 rounded-lg bg-surface-container-low text-secondary font-semibold border-l-4 border-secondary transition-all duration-150" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">account_circle</span>
+<span class="font-label-md text-label-md">My Account</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2 rounded-lg text-on-surface-variant hover:text-on-surface hover:bg-surface-container-low transition-colors duration-150 font-medium" href="#">
+<span class="material-symbols-outlined">admin_panel_settings</span>
+<span class="font-label-md text-label-md">Roles &amp; Access</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2 rounded-lg text-on-surface-variant hover:text-on-surface hover:bg-surface-container-low transition-colors duration-150 font-medium" href="#">
+<span class="material-symbols-outlined">key</span>
+<span class="font-label-md text-label-md">Change Password</span>
+</a><a class="flex items-center gap-3 px-3 py-2 rounded-lg text-on-surface-variant hover:text-on-surface hover:bg-surface-container-low transition-colors duration-150 font-medium" href="#"><span class="material-symbols-outlined">settings</span><span class="font-label-md text-label-md">Settings</span></a>
+</nav>
+<!-- Sidebar Footer -->
+<div class="p-3 border-t border-outline-variant/60 bg-surface-container-lowest">
+<div class="flex items-center justify-between p-2 rounded-lg bg-surface-container-low border border-outline-variant/50">
+<div class="flex items-center gap-2.5 min-w-0">
+<div class="w-8 h-8 rounded-full bg-primary-container text-white flex items-center justify-center font-bold text-xs ring-2 ring-secondary/20 shrink-0">
+              RP
+            </div>
+<div class="flex flex-col min-w-0">
+<span class="font-label-md text-label-md font-semibold text-on-surface truncate leading-tight">Rahul Paul</span>
+<span class="font-label-sm text-label-sm text-outline truncate">HR Director · VS-0010</span>
+</div>
+</div>
+<button class="p-1 rounded text-outline hover:text-error hover:bg-error-container/20 transition-colors" title="Logout" type="button">
+<span class="material-symbols-outlined" style="font-size: 18px;">logout</span>
+</button>
+</div>
+</div>
+</aside>
+<!-- Main Workspace Container -->
+<div class="flex-1 ml-64 flex flex-col min-w-0 bg-background">
+<!-- Top Navigation Bar (Shared Component Anchor) -->
+<header class="sticky top-0 h-16 w-full z-20 bg-surface-container-lowest border-b border-outline-variant flex justify-between items-center px-6 shadow-sm">
+<!-- Left: Breadcrumb / Product Context & Search -->
+<div class="flex items-center gap-6">
+<div class="flex items-center gap-2">
+<span class="font-body-md text-body-md font-medium text-on-surface-variant">Validure Solutions Pvt. Ltd.</span>
+<span class="text-outline-variant">/</span>
+<span class="font-label-md text-label-md font-semibold text-secondary">My Account</span>
+</div>
+<!-- Search Bar with Shortcut -->
+<div class="relative hidden lg:block w-72">
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-outline" style="font-size: 18px;">search</span>
+<input class="w-full h-9 pl-9 pr-8 text-xs bg-background rounded-lg border border-outline-variant focus:outline-none focus:border-secondary focus:ring-2 focus:ring-secondary/15 text-on-surface placeholder:text-outline" placeholder="Search account settings... (⌘K)" type="text">
+</div>
+</div>
+<!-- Right: Institutional Security Badge & Trailing Actions -->
+<div class="flex items-center gap-4">
+<!-- TLS / SSO Reassurance Badge -->
+<div class="hidden sm:flex items-center gap-2 px-2.5 py-1 bg-tertiary-fixed/60 border border-secondary/20 rounded-full">
+<span class="material-symbols-outlined text-secondary" style="font-size: 14px;">verified_user</span>
+<span class="font-label-sm text-label-sm font-semibold text-secondary">Vault TLS 1.3 · Single Sign-On Verified</span>
+</div>
+<!-- Actions -->
+<button class="relative p-2 rounded-lg text-on-surface-variant hover:bg-surface-container-low transition-colors" title="Notifications" type="button">
+<span class="material-symbols-outlined">notifications</span>
+<span class="absolute top-1.5 right-1.5 w-2 h-2 rounded-full bg-secondary"></span>
+</button>
+<button class="p-2 rounded-lg text-on-surface-variant hover:bg-surface-container-low transition-colors" title="Help &amp; Documentation" type="button">
+<span class="material-symbols-outlined">help_outline</span>
+</button>
+<div class="h-6 w-px bg-outline-variant"></div>
+<!-- User Quick Pill -->
+<div class="flex items-center gap-2.5 pl-1">
+<div class="w-8 h-8 rounded-full bg-primary-container text-white flex items-center justify-center font-bold text-xs ring-2 ring-secondary/20 shrink-0">
+              RP
+            </div>
+<div class="hidden md:flex flex-col text-left">
+<span class="font-label-md text-label-md font-semibold text-on-surface leading-none">Rahul Paul</span>
+<span class="font-label-sm text-label-sm text-secondary leading-tight mt-0.5">Admin Scope</span>
+</div>
+</div>
+</div>
+</header>
+<!-- Main Content Canvas -->
+<main class="flex-1 p-6 lg:p-8 space-y-6 max-w-7xl mx-auto w-full">
+<!-- 1. Page Header with Title and Quick Actions -->
+<div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+<div>
+<div class="flex items-center gap-2.5">
+<h1 class="font-headline-lg text-headline-lg font-bold text-primary-container tracking-tight">My Account</h1>
+<span class="px-2 py-0.5 bg-tertiary-fixed/50 text-secondary border border-secondary/20 rounded-full font-label-sm text-label-sm font-semibold">Personal</span>
+</div>
+<p class="font-body-md text-body-md text-on-surface-variant mt-1">
+              Manage your personal profile, credentials, security preferences, and active sessions.
+            </p>
+</div>
+<div class="flex items-center gap-3">
+<button class="flex items-center gap-2 px-3.5 py-2 bg-surface-container-lowest border border-outline-variant hover:bg-surface-container-low text-on-surface rounded-lg font-button-text text-button-text font-semibold shadow-sm transition-all duration-150" type="button">
+<span class="material-symbols-outlined text-on-surface-variant" style="font-size: 18px;">edit</span>
+<span class="">Edit Profile</span>
+</button>
+<button class="flex items-center gap-2 px-4 py-2 bg-primary-container hover:bg-primary-container/90 text-white rounded-lg font-button-text text-button-text font-semibold shadow-sm transition-all duration-150 focus:ring-2 focus:ring-secondary/30" type="button">
+<span class="material-symbols-outlined text-secondary-fixed" style="font-size: 18px;">lock_reset</span>
+<span class="">Change Password</span>
+</button>
+</div>
+</div>
+<!-- 2. Profile Hero / Header Card -->
+<div class="bg-surface-container-lowest border border-outline-variant rounded-xl p-6 card-elevation relative overflow-hidden">
+<div class="absolute top-0 left-0 h-1.5 w-full bg-gradient-to-r from-primary-container via-secondary to-secondary-container"></div>
+<div class="flex flex-col md:flex-row md:items-center justify-between gap-6 pt-1">
+<!-- Left: Avatar & Primary Info -->
+<div class="flex flex-col sm:flex-row items-start sm:items-center gap-5">
+<!-- Avatar with upload trigger -->
+<div class="relative group shrink-0">
+<div class="w-20 h-20 rounded-2xl bg-primary-container text-white flex items-center justify-center font-headline-lg text-headline-lg font-bold shadow-sm ring-4 ring-surface-container-low overflow-hidden">
+                  RP
+                </div>
+<button class="absolute -bottom-1.5 -right-1.5 bg-secondary text-white p-1.5 rounded-lg shadow hover:bg-secondary/90 transition-all" title="Change Photo (PNG/JPG up to 2MB)" type="button">
+<span class="material-symbols-outlined" style="font-size: 16px;">photo_camera</span>
+</button>
+</div>
+<!-- Name & System Tags -->
+<div>
+<div class="flex flex-wrap items-center gap-2.5">
+<h2 class="font-headline-md text-headline-md font-bold text-on-surface">Rahul Paul</h2>
+<span class="material-symbols-outlined text-secondary" style="font-size: 20px; font-variation-settings: 'FILL' 1;" title="Enterprise Identity Verified">verified</span>
+<span class="px-2.5 py-0.5 rounded-full bg-secondary-container/30 text-on-secondary-container border border-secondary/20 font-label-sm text-label-sm font-semibold">
+                    Acting HR Director · Platform Admin
+                  </span>
+</div>
+<!-- Quick Metadata Chips -->
+<div class="flex flex-wrap items-center gap-y-2 gap-x-4 mt-3 text-on-surface-variant font-label-md text-label-md">
+<span class="flex items-center gap-1.5">
+<span class="material-symbols-outlined text-outline" style="font-size: 16px;">badge</span>
+<strong class="font-semibold text-on-surface">ID:</strong> VS-0010
+                  </span>
+<span class="text-outline-variant">•</span>
+<span class="flex items-center gap-1.5">
+<span class="material-symbols-outlined text-outline" style="font-size: 16px;">domain</span>
+                    People Operations &amp; HR Strategy
+                  </span>
+<span class="text-outline-variant">•</span>
+<span class="flex items-center gap-1.5">
+<span class="material-symbols-outlined text-outline" style="font-size: 16px;">location_on</span>
+                    Bengaluru HQ (Karnataka, India)
+                  </span>
+<span class="text-outline-variant">•</span>
+<span class="flex items-center gap-1.5">
+<span class="material-symbols-outlined text-outline" style="font-size: 16px;">calendar_month</span>
+                    Joined June 2020 (4 yrs 3 mos)
+                  </span>
+</div>
+</div>
+</div>
+<!-- Right: Account Status Capsule -->
+<div class="shrink-0 flex md:flex-col items-center md:items-end justify-between border-t md:border-t-0 md:border-l border-outline-variant/60 pt-4 md:pt-0 md:pl-6">
+<div class="flex items-center gap-2">
+<span class="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse"></span>
+<span class="font-label-md text-label-md font-bold text-emerald-700">Active Account</span>
+</div>
+<span class="font-label-sm text-label-sm text-outline mt-1">Google SSO Protected</span>
+<span class="text-[11px] font-mono text-outline-variant mt-0.5">AUTH-TOKEN: #VS-8831</span>
+</div>
+</div>
+</div>
+<!-- 3. Detailed Information Grid (Section A & Section B) -->
+<div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+<!-- Section A: Profile & Contact Information -->
+<div class="bg-surface-container-lowest border border-outline-variant rounded-xl p-6 card-elevation flex flex-col justify-between">
+<div>
+<div class="flex items-center justify-between pb-4 border-b border-outline-variant/60 mb-5">
+<div class="flex items-center gap-2.5">
+<span class="material-symbols-outlined text-secondary">contact_mail</span>
+<h3 class="font-headline-sm text-headline-sm font-semibold text-on-surface">Profile &amp; Contact Information</h3>
+</div>
+<span class="font-label-sm text-label-sm text-outline">Personal Scope</span>
+</div>
+<div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+<div class="p-3 bg-surface rounded-lg border border-outline-variant/40">
+<label class="font-label-sm text-label-sm text-outline block">Full Legal Name</label>
+<p class="font-body-md text-body-md font-semibold text-on-surface mt-0.5">Rahul Paul</p>
+</div>
+<div class="p-3 bg-surface rounded-lg border border-outline-variant/40">
+<label class="font-label-sm text-label-sm text-outline block">Preferred Name</label>
+<p class="font-body-md text-body-md font-semibold text-on-surface mt-0.5">Rahul</p>
+</div>
+<div class="p-3 bg-surface rounded-lg border border-outline-variant/40 sm:col-span-2">
+<div class="flex items-center justify-between">
+<label class="font-label-sm text-label-sm text-outline block">Work Email</label>
+<span class="font-label-sm text-label-sm text-secondary bg-secondary-fixed/30 px-1.5 py-0.5 rounded font-medium">Primary · Verified</span>
+</div>
+<p class="font-body-md text-body-md font-semibold text-on-surface mt-0.5">rahul.p@validure.com</p>
+</div>
+<div class="p-3 bg-surface rounded-lg border border-outline-variant/40 sm:col-span-2">
+<div class="flex items-center justify-between">
+<label class="font-label-sm text-label-sm text-outline block">Personal / Recovery Email</label>
+<span class="font-label-sm text-label-sm text-outline">Encrypted</span>
+</div>
+<p class="font-body-md text-body-md font-medium text-on-surface mt-0.5">r.paul.secure@gmail.com</p>
+</div>
+<div class="p-3 bg-surface rounded-lg border border-outline-variant/40">
+<div class="flex items-center justify-between">
+<label class="font-label-sm text-label-sm text-outline block">Contact Phone</label>
+<span class="text-[10px] text-emerald-700 font-bold">2FA Enabled</span>
+</div>
+<p class="font-body-md text-body-md font-semibold text-on-surface mt-0.5">+91 98450 12890</p>
+</div>
+<div class="p-3 bg-surface rounded-lg border border-outline-variant/40">
+<label class="font-label-sm text-label-sm text-outline block">Office Extension</label>
+<p class="font-body-md text-body-md font-semibold text-on-surface mt-0.5">Ext. 4108</p>
+</div>
+<div class="p-3 bg-surface rounded-lg border border-outline-variant/40">
+<label class="font-label-sm text-label-sm text-outline block">Physical Workstation</label>
+<p class="font-body-md text-body-md font-semibold text-on-surface mt-0.5">BLR-HQ-F4-D12</p>
+</div>
+<div class="p-3 bg-surface rounded-lg border border-outline-variant/40">
+<label class="font-label-sm text-label-sm text-outline block">Work Mode &amp; Shift</label>
+<p class="font-body-md text-body-md font-semibold text-on-surface mt-0.5">General Day (09:30 AM – 06:30 PM)</p>
+</div>
+</div>
+</div>
+<div class="mt-4 pt-3 border-t border-outline-variant/40 flex items-center justify-between">
+<span class="font-label-sm text-label-sm text-outline">Last self-service profile review: Sep 24, 2026</span>
+<button class="font-label-md text-label-md text-secondary hover:underline font-semibold" type="button">Request Update</button>
+</div>
+</div>
+<!-- Section B: Role, Department & Organization Scope -->
+<div class="bg-surface-container-lowest border border-outline-variant rounded-xl p-6 card-elevation flex flex-col justify-between">
+<div>
+<div class="flex items-center justify-between pb-4 border-b border-outline-variant/60 mb-5">
+<div class="flex items-center gap-2.5">
+<span class="material-symbols-outlined text-secondary">corporate_fare</span>
+<h3 class="font-headline-sm text-headline-sm font-semibold text-on-surface">Role &amp; Organization Scope</h3>
+</div>
+<span class="font-label-sm text-label-sm text-outline">Internal Hierarchy</span>
+</div>
+<div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+<div class="p-3 bg-surface rounded-lg border border-outline-variant/40">
+<label class="font-label-sm text-label-sm text-outline block">Designation / Title</label>
+<p class="font-body-md text-body-md font-semibold text-on-surface mt-0.5">Acting HR Director</p>
+</div>
+<div class="p-3 bg-surface rounded-lg border border-outline-variant/40">
+<label class="font-label-sm text-label-sm text-outline block">Employee Identifier</label>
+<p class="font-body-md text-body-md font-mono font-bold text-secondary mt-0.5">VS-0010</p>
+</div>
+<div class="p-3 bg-surface rounded-lg border border-outline-variant/40 sm:col-span-2">
+<label class="font-label-sm text-label-sm text-outline block">Department Scope</label>
+<p class="font-body-md text-body-md font-semibold text-on-surface mt-0.5">People Operations &amp; HR Strategy</p>
+</div>
+<div class="p-3 bg-surface rounded-lg border border-outline-variant/40">
+<label class="font-label-sm text-label-sm text-outline block">Reporting Line</label>
+<p class="font-body-md text-body-md font-medium text-on-surface mt-0.5">Board of Directors / CEO Office</p>
+</div>
+<div class="p-3 bg-surface rounded-lg border border-outline-variant/40">
+<label class="font-label-sm text-label-sm text-outline block">Employment Status</label>
+<p class="font-body-md text-body-md font-semibold text-on-surface mt-0.5">Permanent · Full-Time</p>
+</div>
+<div class="p-3 bg-surface rounded-lg border border-outline-variant/40 sm:col-span-2">
+<label class="font-label-sm text-label-sm text-outline block">Platform System Role</label>
+<div class="flex items-center gap-2 mt-1">
+<span class="px-2 py-0.5 rounded bg-primary-container text-white font-label-sm text-label-sm font-semibold">HR Administrator</span>
+<span class="px-2 py-0.5 rounded bg-secondary text-white font-label-sm text-label-sm font-semibold">Platform Admin</span>
+<span class="font-label-sm text-label-sm text-outline">Full Read/Write on 8 Modules</span>
+</div>
+</div>
+<div class="p-3 bg-surface rounded-lg border border-outline-variant/40 sm:col-span-2">
+<label class="font-label-sm text-label-sm text-outline block">Direct Reports (6 Total)</label>
+<div class="flex flex-wrap items-center gap-1.5 mt-1.5">
+<span class="px-2 py-0.5 bg-surface-container-high rounded text-xs font-medium text-on-surface">Priya Sharma</span>
+<span class="px-2 py-0.5 bg-surface-container-high rounded text-xs font-medium text-on-surface">Tanvi Deshmukh</span>
+<span class="px-2 py-0.5 bg-surface-container-high rounded text-xs font-medium text-on-surface">Karthik M.</span>
+<span class="px-2 py-0.5 bg-surface-container-high rounded text-xs font-medium text-on-surface">+3 others</span>
+</div>
+</div>
+</div>
+</div>
+<div class="mt-4 pt-3 border-t border-outline-variant/40 flex items-center justify-between">
+<span class="font-label-sm text-label-sm text-outline">Assigned Business Entity: Validure BLR-01</span>
+<a class="font-label-md text-label-md text-secondary hover:underline font-semibold" href="#">View Org Chart</a>
+</div>
+</div>
+</div>
+<!-- 4. Account Security Section -->
+<div class="bg-surface-container-lowest border border-outline-variant rounded-xl p-6 card-elevation">
+<div class="flex items-center justify-between pb-4 border-b border-outline-variant/60 mb-5">
+<div class="flex items-center gap-2.5">
+<span class="material-symbols-outlined text-secondary">shield</span>
+<h3 class="font-headline-sm text-headline-sm font-semibold text-on-surface">Account Security &amp; Credentials</h3>
+</div>
+<span class="px-2 py-0.5 bg-emerald-50 text-emerald-700 border border-emerald-200 rounded font-label-sm text-label-sm font-semibold">
+              Security Health: Strong
+            </span>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+<!-- Card: Password Status -->
+<div class="p-4 rounded-xl border border-outline-variant bg-surface flex flex-col justify-between">
+<div>
+<div class="flex items-center justify-between text-outline">
+<span class="font-label-sm text-label-sm font-semibold uppercase">Password</span>
+<span class="material-symbols-outlined text-outline" style="font-size: 18px;">key</span>
+</div>
+<p class="font-headline-sm text-headline-sm font-bold text-on-surface mt-2">May 28, 2026</p>
+<p class="font-label-sm text-label-sm text-amber-700 font-medium mt-1">94 days ago · Rotation Recommended</p>
+</div>
+<button class="mt-4 w-full py-1.5 px-3 bg-surface-container-lowest border border-outline-variant hover:bg-surface-container-low text-on-surface rounded text-xs font-semibold" type="button">
+                Update Password
+              </button>
+</div>
+<!-- Card: 2FA Status -->
+<div class="p-4 rounded-xl border border-outline-variant bg-surface flex flex-col justify-between">
+<div>
+<div class="flex items-center justify-between text-outline">
+<span class="font-label-sm text-label-sm font-semibold uppercase">Multi-Factor (2FA)</span>
+<span class="material-symbols-outlined text-emerald-600" style="font-size: 18px;">verified_user</span>
+</div>
+<div class="flex items-center gap-1.5 mt-2">
+<span class="w-2 h-2 rounded-full bg-emerald-500"></span>
+<p class="font-headline-sm text-headline-sm font-bold text-on-surface">Enabled</p>
+</div>
+<p class="font-label-sm text-label-sm text-on-surface-variant mt-1">Hardware Key + TOTP Authenticator</p>
+</div>
+<button class="mt-4 w-full py-1.5 px-3 bg-surface-container-lowest border border-outline-variant hover:bg-surface-container-low text-on-surface rounded text-xs font-semibold" type="button">
+                Manage 2FA
+              </button>
+</div>
+<!-- Card: Single Sign-On -->
+<div class="p-4 rounded-xl border border-outline-variant bg-surface flex flex-col justify-between">
+<div>
+<div class="flex items-center justify-between text-outline">
+<span class="font-label-sm text-label-sm font-semibold uppercase">SSO Integration</span>
+<span class="material-symbols-outlined text-secondary" style="font-size: 18px;">cloud_sync</span>
+</div>
+<p class="font-headline-sm text-headline-sm font-bold text-on-surface mt-2">Google Workspace</p>
+<p class="font-label-sm text-label-sm text-on-surface-variant mt-1">Enterprise SSO Active (OAuth 2.0)</p>
+</div>
+<span class="mt-4 w-full py-1.5 px-3 text-center text-secondary bg-secondary-fixed/20 border border-secondary/20 rounded text-xs font-semibold">
+                Federated Identity
+              </span>
+</div>
+<!-- Card: Last Login Information -->
+<div class="p-4 rounded-xl border border-outline-variant bg-surface flex flex-col justify-between">
+<div>
+<div class="flex items-center justify-between text-outline">
+<span class="font-label-sm text-label-sm font-semibold uppercase">Last Authorization</span>
+<span class="material-symbols-outlined text-outline" style="font-size: 18px;">login</span>
+</div>
+<p class="font-headline-sm text-headline-sm font-bold text-on-surface mt-2">Today, 09:14 AM</p>
+<p class="font-label-sm text-label-sm text-on-surface-variant mt-1">Bengaluru, IN (106.51.72.18)</p>
+</div>
+<div class="mt-4 flex items-center justify-between text-[11px] text-outline pt-1 border-t border-outline-variant/40">
+<span class="">macOS · Chrome</span>
+<span class="text-emerald-700 font-semibold">TLS 1.3</span>
+</div>
+</div>
+</div>
+</div>
+<!-- 5. Active Sessions -->
+<div class="bg-surface-container-lowest border border-outline-variant rounded-xl p-6 card-elevation">
+<div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-outline-variant/60 mb-5">
+<div>
+<div class="flex items-center gap-2.5">
+<span class="material-symbols-outlined text-secondary">devices</span>
+<h3 class="font-headline-sm text-headline-sm font-semibold text-on-surface">Active Sessions &amp; Authorized Devices</h3>
+</div>
+<p class="font-label-sm text-label-sm text-on-surface-variant mt-0.5">
+                Currently 3 hardware devices authenticated with valid enterprise refresh tokens.
+              </p>
+</div>
+<button class="flex items-center gap-1.5 px-3.5 py-1.5 bg-error-container/40 text-error border border-error-container hover:bg-error-container rounded-lg font-button-text text-button-text font-semibold transition-all" type="button">
+<span class="material-symbols-outlined" style="font-size: 16px;">gpp_maybe</span>
+<span class="">Terminate All Other Sessions</span>
+</button>
+</div>
+<div class="space-y-3">
+<!-- Current Session -->
+<div class="p-4 rounded-xl border-2 border-secondary/30 bg-surface-container-low/60 flex flex-col md:flex-row md:items-center justify-between gap-4">
+<div class="flex items-start gap-3.5">
+<div class="w-10 h-10 rounded-lg bg-surface-container-lowest border border-outline-variant flex items-center justify-center text-primary-container shrink-0">
+<span class="material-symbols-outlined">laptop_mac</span>
+</div>
+<div>
+<div class="flex items-center gap-2">
+<span class="font-headline-sm text-headline-sm font-bold text-on-surface">MacBook Pro 16"</span>
+<span class="px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800 text-[11px] font-bold flex items-center gap-1">
+<span class="w-1.5 h-1.5 rounded-full bg-emerald-600"></span>
+                      Active Now (Current Device)
+                    </span>
+</div>
+<p class="font-body-sm text-body-sm text-on-surface-variant mt-0.5">
+                    Chrome v128 on macOS Sonoma · IP: <span class="font-mono text-xs">106.51.72.18</span> · Bengaluru, Karnataka, India
+                  </p>
+</div>
+</div>
+<div class="shrink-0 flex items-center gap-2">
+<span class="font-label-sm text-label-sm text-secondary bg-surface-container-lowest px-3 py-1 rounded-md border border-outline-variant">
+                  Current Session
+                </span>
+</div>
+</div>
+<!-- Other Session 1 -->
+<div class="p-4 rounded-xl border border-outline-variant bg-surface flex flex-col md:flex-row md:items-center justify-between gap-4">
+<div class="flex items-start gap-3.5">
+<div class="w-10 h-10 rounded-lg bg-surface-container-lowest border border-outline-variant flex items-center justify-center text-outline shrink-0">
+<span class="material-symbols-outlined">smartphone</span>
+</div>
+<div>
+<div class="flex items-center gap-2">
+<span class="font-headline-sm text-headline-sm font-semibold text-on-surface">iPhone 15 Pro</span>
+<span class="text-xs text-outline font-medium">Validure Mobile App v2.4 (iOS 18)</span>
+</div>
+<p class="font-body-sm text-body-sm text-on-surface-variant mt-0.5">
+                    Last active: 42 mins ago · Bengaluru, India · Cellular Gateway (Airtel)
+                  </p>
+</div>
+</div>
+<div class="shrink-0">
+<button class="px-3 py-1 text-xs font-semibold text-outline hover:text-error hover:border-error border border-outline-variant rounded transition-colors" type="button">
+                  Revoke Access
+                </button>
+</div>
+</div>
+<!-- Other Session 2 -->
+<div class="p-4 rounded-xl border border-outline-variant bg-surface flex flex-col md:flex-row md:items-center justify-between gap-4">
+<div class="flex items-start gap-3.5">
+<div class="w-10 h-10 rounded-lg bg-surface-container-lowest border border-outline-variant flex items-center justify-center text-outline shrink-0">
+<span class="material-symbols-outlined">desktop_windows</span>
+</div>
+<div>
+<div class="flex items-center gap-2">
+<span class="font-headline-sm text-headline-sm font-semibold text-on-surface">Windows Workstation</span>
+<span class="text-xs text-outline font-medium">Edge v127 (Windows 11 Enterprise)</span>
+</div>
+<p class="font-body-sm text-body-sm text-on-surface-variant mt-0.5">
+                    Last active: Sep 28, 2026 · Office Turnstile / Floor 4 Dedicated Terminal · Internal Subnet (10.20.4.88)
+                  </p>
+</div>
+</div>
+<div class="shrink-0">
+<button class="px-3 py-1 text-xs font-semibold text-outline hover:text-error hover:border-error border border-outline-variant rounded transition-colors" type="button">
+                  Revoke Access
+                </button>
+</div>
+</div>
+</div>
+</div>
+<!-- 6. Recent Account Activity Log -->
+<div class="bg-surface-container-lowest border border-outline-variant rounded-xl p-6 card-elevation">
+<div class="flex items-center justify-between pb-4 border-b border-outline-variant/60 mb-4">
+<div class="flex items-center gap-2.5">
+<span class="material-symbols-outlined text-secondary">history</span>
+<h3 class="font-headline-sm text-headline-sm font-semibold text-on-surface">Personal Security Audit Log</h3>
+</div>
+<span class="font-label-sm text-label-sm text-outline">Immutable Log (Retained 90 Days)</span>
+</div>
+<div class="overflow-x-auto">
+<table class="w-full text-left border-collapse">
+<thead>
+<tr class="border-b border-outline-variant/60 bg-surface">
+<th class="py-2.5 px-3 font-label-sm text-label-sm font-semibold text-outline uppercase tracking-wider">Date &amp; Time</th>
+<th class="py-2.5 px-3 font-label-sm text-label-sm font-semibold text-outline uppercase tracking-wider">Event / Action</th>
+<th class="py-2.5 px-3 font-label-sm text-label-sm font-semibold text-outline uppercase tracking-wider">IP Address &amp; Client</th>
+<th class="py-2.5 px-3 font-label-sm text-label-sm font-semibold text-outline uppercase tracking-wider text-right">Result</th>
+</tr>
+</thead>
+<tbody class="divide-y divide-outline-variant/40 font-body-sm text-body-sm">
+<tr class="hover:bg-surface-container-low transition-colors">
+<td class="py-3 px-3 font-mono text-xs text-on-surface whitespace-nowrap">Sep 30, 2026 · 09:14 AM IST</td>
+<td class="py-3 px-3 font-medium text-on-surface">
+<span class="flex items-center gap-1.5">
+<span class="material-symbols-outlined text-emerald-600" style="font-size: 16px;">key</span>
+                      Successful Login (SSO + Hardware MFA)
+                    </span>
+</td>
+<td class="py-3 px-3 text-on-surface-variant font-mono text-xs">Bengaluru · 106.51.72.18 (Chrome / macOS)</td>
+<td class="py-3 px-3 text-right">
+<span class="px-2 py-0.5 rounded bg-emerald-100 text-emerald-800 font-label-sm text-label-sm font-semibold">Success</span>
+</td>
+</tr>
+<tr class="hover:bg-surface-container-low transition-colors">
+<td class="py-3 px-3 font-mono text-xs text-on-surface whitespace-nowrap">Sep 29, 2026 · 06:45 PM IST</td>
+<td class="py-3 px-3 font-medium text-on-surface">
+<span class="flex items-center gap-1.5">
+<span class="material-symbols-outlined text-outline" style="font-size: 16px;">timer</span>
+                      Session Timeout (Auto Logout After Inactivity)
+                    </span>
+</td>
+<td class="py-3 px-3 text-on-surface-variant font-mono text-xs">Bengaluru · 106.51.72.18 (Chrome / macOS)</td>
+<td class="py-3 px-3 text-right">
+<span class="px-2 py-0.5 rounded bg-surface-container-high text-on-surface font-label-sm text-label-sm font-semibold">Completed</span>
+</td>
+</tr>
+<tr class="hover:bg-surface-container-low transition-colors">
+<td class="py-3 px-3 font-mono text-xs text-on-surface whitespace-nowrap">Sep 28, 2026 · 11:20 AM IST</td>
+<td class="py-3 px-3 font-medium text-on-surface">
+<span class="flex items-center gap-1.5">
+<span class="material-symbols-outlined text-secondary" style="font-size: 16px;">fingerprint</span>
+                      Biometric Turnstile Sync Auth
+                    </span>
+</td>
+<td class="py-3 px-3 text-on-surface-variant font-mono text-xs">BLR HQ Main Gate Turnstile · Internal LAN</td>
+<td class="py-3 px-3 text-right">
+<span class="px-2 py-0.5 rounded bg-emerald-100 text-emerald-800 font-label-sm text-label-sm font-semibold">Verified</span>
+</td>
+</tr>
+<tr class="hover:bg-surface-container-low transition-colors">
+<td class="py-3 px-3 font-mono text-xs text-on-surface whitespace-nowrap">Sep 24, 2026 · 03:10 PM IST</td>
+<td class="py-3 px-3 font-medium text-on-surface">
+<span class="flex items-center gap-1.5">
+<span class="material-symbols-outlined text-secondary" style="font-size: 16px;">person_edit</span>
+                      Profile Information Updated (Workstation Desk Tag)
+                    </span>
+</td>
+<td class="py-3 px-3 text-on-surface-variant font-mono text-xs">Bengaluru · 106.51.72.18 (Chrome / macOS)</td>
+<td class="py-3 px-3 text-right">
+<span class="px-2 py-0.5 rounded bg-emerald-100 text-emerald-800 font-label-sm text-label-sm font-semibold">Success</span>
+</td>
+</tr>
+<tr class="hover:bg-surface-container-low transition-colors">
+<td class="py-3 px-3 font-mono text-xs text-on-surface whitespace-nowrap">Sep 15, 2026 · 10:02 AM IST</td>
+<td class="py-3 px-3 font-medium text-on-surface">
+<span class="flex items-center gap-1.5">
+<span class="material-symbols-outlined text-secondary" style="font-size: 16px;">refresh</span>
+                      Security Refresh Token Renewed
+                    </span>
+</td>
+<td class="py-3 px-3 text-on-surface-variant font-mono text-xs">Bengaluru · 106.51.72.18 (Chrome / macOS)</td>
+<td class="py-3 px-3 text-right">
+<span class="px-2 py-0.5 rounded bg-emerald-100 text-emerald-800 font-label-sm text-label-sm font-semibold">Success</span>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="mt-4 pt-3 border-t border-outline-variant/40 flex items-center justify-between">
+<span class="font-label-sm text-label-sm text-outline">Showing 5 most recent security events</span>
+<button class="font-label-md text-label-md text-secondary hover:underline font-semibold flex items-center gap-1" type="button">
+<span class="">Export Full CSV Log</span>
+<span class="material-symbols-outlined" style="font-size: 16px;">download</span>
+</button>
+</div>
+</div>
+</main>
+<!-- Institutional Footer -->
+<footer class="py-4 px-8 border-t border-outline-variant/60 bg-surface-container-lowest flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-outline">
+<div>
+<span class="">© 2026 Validure Solutions Pvt. Ltd. · Enterprise Human Resources Management Architecture</span>
+</div>
+<div class="flex items-center gap-4">
+<span class="flex items-center gap-1">
+<span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
+            Instance: Bengaluru Production DC-1
+          </span>
+<span class="">Security Protocol: TLS 1.3 AES-GCM</span>
+</div>
+</footer>
+</div>
+</div>
+
+
+
+
+</body></html>

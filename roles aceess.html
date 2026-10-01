@@ -1,0 +1,1049 @@
+<!DOCTYPE html><html lang="en"><head>
+<meta charset="utf-8">
+<meta content="width=device-width, initial-scale=1.0" name="viewport">
+<title>Validure HR — Roles &amp; Access Screen</title>
+<!-- Material Symbols Outlined -->
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<!-- Google Fonts: Inter & Plus Jakarta Sans -->
+<link href="https://fonts.googleapis.com" rel="preconnect">
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;family=Plus+Jakarta+Sans:wght@500;600;700;800&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<!-- Tailwind CSS v3 with Container Queries -->
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<!-- Tailwind Config Verbatim -->
+<script id="tailwind-config">
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          "colors": {
+            "primary": "#000316",
+            "error": "#ba1a1a",
+            "on-error-container": "#93000a",
+            "surface-container-lowest": "#ffffff",
+            "on-error": "#ffffff",
+            "primary-fixed-dim": "#b5c5fa",
+            "on-tertiary": "#ffffff",
+            "surface-variant": "#d9e2fc",
+            "surface-container-high": "#e1e8ff",
+            "surface-dim": "#d1daf4",
+            "error-container": "#ffdad6",
+            "primary-container": "#081b47",
+            "surface-bright": "#f9f9ff",
+            "on-primary-container": "#7584b6",
+            "tertiary": "#000506",
+            "on-background": "#121b2e",
+            "outline": "#757680",
+            "surface-tint": "#4d5d8c",
+            "tertiary-container": "#0b2123",
+            "on-primary": "#ffffff",
+            "surface-container": "#e9edff",
+            "on-primary-fixed": "#051845",
+            "inverse-on-surface": "#edf0ff",
+            "secondary-fixed": "#a8edff",
+            "on-tertiary-container": "#738a8c",
+            "secondary-container": "#88e8ff",
+            "on-surface-variant": "#45464f",
+            "on-secondary-fixed": "#001f26",
+            "on-surface": "#121b2e",
+            "tertiary-fixed-dim": "#b3cbcd",
+            "secondary": "#006879",
+            "inverse-surface": "#273044",
+            "background": "#f9f9ff",
+            "on-secondary-fixed-variant": "#004e5b",
+            "surface": "#f9f9ff",
+            "on-secondary": "#ffffff",
+            "surface-container-low": "#f1f3ff",
+            "on-secondary-container": "#006979",
+            "primary-fixed": "#dbe1ff",
+            "tertiary-fixed": "#cfe7e9",
+            "on-tertiary-fixed-variant": "#354a4c",
+            "outline-variant": "#c5c6d0",
+            "secondary-fixed-dim": "#73d4eb",
+            "surface-container-highest": "#d9e2fc",
+            "on-primary-fixed-variant": "#354572",
+            "inverse-primary": "#b5c5fa",
+            "on-tertiary-fixed": "#081f21"
+          },
+          "borderRadius": {
+            "DEFAULT": "0.25rem",
+            "lg": "0.5rem",
+            "xl": "0.75rem",
+            "full": "9999px"
+          },
+          "spacing": {
+            "gutter-sm": "1rem",
+            "space-xl": "2rem",
+            "margin-mobile": "1rem",
+            "space-xs": "0.25rem",
+            "space-sm": "0.5rem",
+            "margin": "2rem",
+            "gutter-lg": "2rem",
+            "gutter": "1.5rem",
+            "space-md": "1rem",
+            "margin-desktop": "3rem",
+            "space-lg": "1.5rem"
+          },
+          "fontFamily": {
+            "body-sm": ["Inter"],
+            "label-sm": ["Inter"],
+            "body-md": ["Inter"],
+            "headline-lg": ["Plus Jakarta Sans"],
+            "headline-md": ["Plus Jakarta Sans"],
+            "body-lg": ["Inter"],
+            "headline-sm": ["Plus Jakarta Sans"],
+            "headline-lg-mobile": ["Plus Jakarta Sans"],
+            "button-text": ["Plus Jakarta Sans"],
+            "label-md": ["Inter"],
+            "display-hero": ["Plus Jakarta Sans"]
+          },
+          "fontSize": {
+            "body-sm": ["12px", { "lineHeight": "18px", "letterSpacing": "0.01em", "fontWeight": "400" }],
+            "label-sm": ["11px", { "lineHeight": "16px", "letterSpacing": "0.04em", "fontWeight": "600" }],
+            "body-md": ["14px", { "lineHeight": "20px", "letterSpacing": "0em", "fontWeight": "400" }],
+            "headline-lg": ["30px", { "lineHeight": "38px", "letterSpacing": "-0.015em", "fontWeight": "600" }],
+            "headline-md": ["22px", { "lineHeight": "28px", "letterSpacing": "-0.01em", "fontWeight": "600" }],
+            "body-lg": ["16px", { "lineHeight": "24px", "letterSpacing": "-0.005em", "fontWeight": "400" }],
+            "headline-sm": ["18px", { "lineHeight": "24px", "letterSpacing": "0em", "fontWeight": "600" }],
+            "headline-lg-mobile": ["24px", { "lineHeight": "32px", "letterSpacing": "-0.01em", "fontWeight": "600" }],
+            "button-text": ["14px", { "lineHeight": "20px", "letterSpacing": "0.005em", "fontWeight": "600" }],
+            "label-md": ["13px", { "lineHeight": "18px", "letterSpacing": "0.01em", "fontWeight": "500" }],
+            "display-hero": ["40px", { "lineHeight": "48px", "letterSpacing": "-0.02em", "fontWeight": "700" }]
+          }
+        },
+      },
+    }
+  </script>
+<style>
+    .material-symbols-outlined {
+      font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 20;
+      font-size: 20px;
+      line-height: 1;
+      display: inline-block;
+    }
+    .material-symbols-outlined.fill {
+      font-variation-settings: 'FILL' 1, 'wght' 500, 'GRAD' 0, 'opsz' 20;
+    }
+    /* Custom scrollbar for enterprise table density */
+    ::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+    ::-webkit-scrollbar-track {
+      background: #f1f3ff;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: #c5c6d0;
+      border-radius: 9999px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: #757680;
+    }
+  </style>
+</head>
+<body class="bg-surface text-on-surface antialiased font-body-md text-body-md min-h-screen flex flex-col selection:bg-secondary-fixed selection:text-on-secondary-fixed">
+<!-- ==================== SIDEBAR (Fixed Left w-64) ==================== -->
+<aside class="h-screen w-64 fixed left-0 top-0 flex flex-col justify-between bg-surface-container-lowest border-r border-outline-variant shadow-sm z-50">
+<!-- Top Branding & Tenant Context -->
+<div class="p-4 border-b border-outline-variant flex flex-col gap-3">
+<div class="flex items-center gap-3"><img src="https://lh3.googleusercontent.com/aida-public/AB6AXuD-JvcizsiLR1orQWPT0qvxfcckAv8sPIiJuV2EyV4mB7pas4Lacm_YJQqthvjDHqVVjIzhV6B4Ehd6k-as0WmNe8L_8xVKrCDzCvgqd5iL9LnBjRZkO_dtPPZ-N1tUNn4FdtzKtZVr86l4lzfIXshd9lDhbTmrZlLI1ngWeeKgqFoRX1ISD59gon89mecQT1oGdvhVGrRAlaAkGmv9qLg3mCpy1M-bAf5c-IC6nhjcnVLur-GqiMyhD365FlXHEiA" alt="Validure Logo" class="w-9 h-9 rounded-full object-cover shrink-0"><div class="overflow-hidden leading-tight"><div class="flex items-center"><span class="text-secondary font-bold tracking-tight text-lg">VALIDURE</span><span class="text-primary-container font-black tracking-tight text-lg">HR</span></div><span class="text-[10px] font-semibold text-secondary tracking-widest uppercase block">ENTERPRISE HRMS</span></div></div>
+<!-- Tenant Switcher Dropdown Pill -->
+<button class="w-full flex items-center justify-between px-3 py-1.5 rounded-lg bg-surface-container-low hover:bg-surface-container border border-outline-variant text-on-surface font-label-md text-label-md transition-all duration-150">
+<span class="flex items-center gap-2 truncate">
+<span class="material-symbols-outlined text-secondary" data-icon="apartment">apartment</span>
+<span class="truncate font-semibold">Switch Tenant</span>
+</span>
+<span class="material-symbols-outlined text-outline" data-icon="unfold_more">unfold_more</span>
+</button>
+</div>
+<!-- Navigation Scrollable Area -->
+<nav class="flex-1 overflow-y-auto px-3 py-3 space-y-1">
+<!-- Overview -->
+<a class="flex items-center gap-3 px-3 py-2 rounded-lg text-on-surface-variant hover:text-on-surface hover:bg-surface-container-low transition-colors duration-150 font-label-md text-label-md" href="#">
+<span class="material-symbols-outlined" data-icon="dashboard">dashboard</span>
+<span class="flex-1">Overview</span>
+</a>
+<!-- Companies -->
+<a class="flex items-center justify-between px-3 py-2 rounded-lg text-on-surface-variant hover:text-on-surface hover:bg-surface-container-low transition-colors duration-150 font-label-md text-label-md" href="#">
+<div class="flex items-center gap-3">
+<span class="material-symbols-outlined" data-icon="business">business</span>
+<span class="">Companies</span>
+</div>
+<span class="px-2 py-0.5 text-label-sm font-label-sm rounded-full bg-surface-container text-on-surface-variant">3</span>
+</a>
+<!-- Employees -->
+<a class="flex items-center justify-between px-3 py-2 rounded-lg text-on-surface-variant hover:text-on-surface hover:bg-surface-container-low transition-colors duration-150 font-label-md text-label-md" href="#">
+<div class="flex items-center gap-3">
+<span class="material-symbols-outlined" data-icon="group">group</span>
+<span class="">Employees</span>
+</div>
+<span class="px-2 py-0.5 text-label-sm font-label-sm rounded-full bg-surface-container text-on-surface-variant">24</span>
+</a>
+<!-- Attendance -->
+<a class="flex items-center gap-3 px-3 py-2 rounded-lg text-on-surface-variant hover:text-on-surface hover:bg-surface-container-low transition-colors duration-150 font-label-md text-label-md" href="#">
+<span class="material-symbols-outlined" data-icon="how_to_reg">how_to_reg</span>
+<span class="">Attendance</span>
+</a>
+<!-- Leave Management -->
+<a class="flex items-center justify-between px-3 py-2 rounded-lg text-on-surface-variant hover:text-on-surface hover:bg-surface-container-low transition-colors duration-150 font-label-md text-label-md" href="#">
+<div class="flex items-center gap-3">
+<span class="material-symbols-outlined" data-icon="event_available">event_available</span>
+<span class="">Leave Management</span>
+</div>
+<span class="px-2 py-0.5 text-label-sm font-label-sm rounded-full bg-secondary-fixed text-on-secondary-fixed font-semibold">2</span>
+</a>
+<!-- Leave Balances -->
+<a class="flex items-center gap-3 px-3 py-2 rounded-lg text-on-surface-variant hover:text-on-surface hover:bg-surface-container-low transition-colors duration-150 font-label-md text-label-md" href="#">
+<span class="material-symbols-outlined" data-icon="account_balance_wallet">account_balance_wallet</span>
+<span class="">Leave Balances</span>
+</a>
+<!-- Payroll -->
+<a class="flex items-center gap-3 px-3 py-2 rounded-lg text-on-surface-variant hover:text-on-surface hover:bg-surface-container-low transition-colors duration-150 font-label-md text-label-md" href="#">
+<span class="material-symbols-outlined" data-icon="payments">payments</span>
+<span class="">Payroll</span>
+</a>
+<!-- Documents -->
+<a class="flex items-center justify-between px-3 py-2 rounded-lg text-on-surface-variant hover:text-on-surface hover:bg-surface-container-low transition-colors duration-150 font-label-md text-label-md" href="#">
+<div class="flex items-center gap-3">
+<span class="material-symbols-outlined" data-icon="folder_shared">folder_shared</span>
+<span class="">Documents</span>
+</div>
+<span class="px-2 py-0.5 text-label-sm font-label-sm rounded-full bg-surface-container text-on-surface-variant">142</span>
+</a>
+<!-- Reports -->
+<a class="flex items-center gap-3 px-3 py-2 rounded-lg text-on-surface-variant hover:text-on-surface hover:bg-surface-container-low transition-colors duration-150 font-label-md text-label-md" href="#">
+<span class="material-symbols-outlined" data-icon="assessment">assessment</span>
+<span class="">Reports</span>
+</a>
+<!-- Analytics -->
+<a class="flex items-center gap-3 px-3 py-2 rounded-lg text-on-surface-variant hover:text-on-surface hover:bg-surface-container-low transition-colors duration-150 font-label-md text-label-md" href="#">
+<span class="material-symbols-outlined" data-icon="insights">insights</span>
+<span class="">Analytics</span>
+</a>
+<!-- ADMINISTRATION Divider -->
+<div class="pt-4 pb-1.5 px-3"><p class="text-[10px] font-bold tracking-wider text-outline uppercase">Administration &amp; Account</p></div>
+<!-- Roles & Access (ACTIVE) -->
+<a class="flex items-center gap-3 px-3 py-2 rounded-lg text-on-surface-variant hover:text-on-surface hover:bg-surface-container-low transition-colors duration-150 font-label-md text-label-md" href="#"><span class="material-symbols-outlined" data-icon="account_circle">account_circle</span><span class="font-label-md text-label-md">My Account</span></a><a class="flex items-center gap-3 px-3 py-2.5 rounded-lg bg-surface-container-low text-secondary font-semibold border-l-4 border-secondary shadow-xs" href="#">
+<span class="material-symbols-outlined fill text-secondary" data-icon="admin_panel_settings">admin_panel_settings</span>
+<span class="font-button-text text-button-text">Roles &amp; Access</span>
+</a><a class="flex items-center gap-3 px-3 py-2 rounded-lg text-on-surface-variant hover:text-on-surface hover:bg-surface-container-low transition-colors duration-150 font-label-md text-label-md" href="#"><span class="material-symbols-outlined" data-icon="key">key</span><span class="font-label-md text-label-md">Change Password</span></a>
+<!-- Settings -->
+<a class="flex items-center gap-3 px-3 py-2 rounded-lg text-on-surface-variant hover:text-on-surface hover:bg-surface-container-low transition-colors duration-150 font-label-md text-label-md" href="#">
+<span class="material-symbols-outlined" data-icon="settings">settings</span>
+<span class="">Settings</span>
+</a>
+</nav>
+<!-- Sidebar Bottom: Rahul Paul Profile Pill -->
+<div class="p-3 border-t border-outline-variant bg-surface-bright">
+<div class="flex items-center justify-between p-2 rounded-lg hover:bg-surface-container-low transition-colors duration-150">
+<div class="flex items-center gap-2.5 min-w-0">
+<div class="relative w-8 h-8 rounded-full overflow-hidden bg-primary-container border border-secondary-fixed shrink-0 flex items-center justify-center text-on-primary text-label-md font-bold">
+            RP
+          </div>
+<div class="truncate">
+<h2 class="text-label-md font-label-md font-bold text-on-surface truncate">Rahul Paul</h2>
+<p class="text-label-sm font-label-sm text-on-surface-variant truncate">HR Director · VS-0010</p>
+</div>
+</div>
+<button class="text-on-surface-variant hover:text-error p-1.5 rounded transition-colors duration-150" title="Sign Out">
+<span class="material-symbols-outlined" data-icon="logout">logout</span>
+</button>
+</div>
+</div>
+</aside>
+<!-- ==================== TOP NAVIGATION BAR ==================== -->
+<header class="sticky top-0 h-16 w-full z-40 bg-surface-container-lowest border-b border-outline-variant shadow-sm flex items-center pl-64">
+<div class="flex justify-between items-center h-full px-8 w-full">
+<!-- Breadcrumb Navigation & Search -->
+<div class="flex items-center gap-6 flex-1 max-w-2xl">
+<nav aria-label="Breadcrumb" class="flex items-center gap-2 text-label-md font-label-md text-on-surface-variant shrink-0">
+<span class="hover:text-primary-container transition-colors">Validure Solutions Pvt. Ltd.</span>
+<span class="text-outline-variant">/</span>
+<span class="">Administration</span>
+<span class="text-outline-variant">/</span>
+<span class="text-secondary font-semibold">Roles &amp; Access</span>
+</nav>
+<!-- Command / Shortcut Search Bar -->
+<div class="relative w-full max-w-md hidden md:block">
+<span class="material-symbols-outlined absolute left-3 top-2.5 text-outline pointer-events-none" data-icon="search">search</span>
+<input class="w-full pl-9 pr-4 py-1.5 bg-surface-container-low border border-outline-variant rounded-lg text-body-md font-body-md text-on-surface placeholder:text-outline focus:outline-none focus:border-secondary focus:ring-2 focus:ring-secondary/20 transition-all duration-150" placeholder="Search roles, permissions, members... (⌘K)" type="text">
+</div>
+</div>
+<!-- Top Right Status & Utilities -->
+<div class="flex items-center gap-4 shrink-0">
+<!-- Security Compliance Engine Badge -->
+<div class="hidden lg:flex items-center gap-2 px-3 py-1 bg-surface-container-low border border-secondary/30 rounded-full text-secondary font-label-sm text-label-sm">
+<span class="material-symbols-outlined fill text-secondary" data-icon="verified" style="font-size: 16px;">verified</span>
+<span class="">RBAC Policy Engine v2.4 · Least Privilege Enforced</span>
+</div>
+<div class="h-5 w-px bg-outline-variant hidden sm:block"></div>
+<!-- Notification Bell Action -->
+<button class="relative p-2 rounded-lg text-on-surface-variant hover:text-on-surface hover:bg-surface-container-low transition-colors duration-150" title="Notifications">
+<span class="material-symbols-outlined" data-icon="notifications">notifications</span>
+<span class="absolute top-1.5 right-1.5 w-2 h-2 bg-secondary rounded-full ring-2 ring-surface-container-lowest"></span>
+</button>
+<!-- Help Action -->
+<button class="p-2 rounded-lg text-on-surface-variant hover:text-on-surface hover:bg-surface-container-low transition-colors duration-150" title="Help &amp; Documentation">
+<span class="material-symbols-outlined" data-icon="help_outline">help_outline</span>
+</button>
+<!-- Profile Quick Action -->
+<div class="flex items-center gap-2 pl-2">
+<div class="w-8 h-8 rounded-full bg-primary-container text-surface-container-lowest flex items-center justify-center text-label-sm font-bold shadow-xs">
+            RP
+          </div>
+<span class="text-label-md font-label-md font-semibold text-on-surface hidden xl:inline">Rahul Paul</span>
+</div>
+</div>
+</div>
+</header>
+<!-- ==================== MAIN WORKSPACE ==================== -->
+<main class="ml-64 flex-1 p-8 bg-surface space-y-6 pb-28">
+<!-- Screen Header Section -->
+<section class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+<div>
+<div class="flex items-center gap-3">
+<h1 class="font-headline-lg text-headline-lg font-bold text-primary-container tracking-tight">Roles &amp; Access</h1>
+<span class="px-2.5 py-0.5 rounded-full text-label-sm font-label-sm bg-surface-container-high text-primary-container font-semibold">Enterprise Level</span>
+</div>
+<p class="font-body-md text-body-md text-on-surface-variant mt-1">
+          Manage system security roles, permission matrices, and feature access levels across your organization.
+        </p>
+</div>
+<div class="flex items-center gap-3 shrink-0">
+<button class="flex items-center gap-2 px-4 py-2 bg-surface-container-lowest border border-outline-variant hover:border-outline text-on-surface font-button-text text-button-text rounded-lg shadow-sm hover:bg-surface-container-low transition-all duration-150">
+<span class="material-symbols-outlined text-outline" data-icon="history">history</span>
+<span class="">Audit Access Logs</span>
+</button>
+<button class="flex items-center gap-2 px-4 py-2 bg-primary-container hover:bg-on-background text-on-primary font-button-text text-button-text rounded-lg shadow-sm transition-all duration-150 active:scale-95">
+<span class="material-symbols-outlined" data-icon="add">add</span>
+<span class="">+ Create Role</span>
+</button>
+</div>
+</section>
+<!-- High-Level Overview Metrics (4 Bento KPI Cards) -->
+<section class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+<!-- Card 1 -->
+<div class="p-5 bg-surface-container-lowest border border-outline-variant rounded-xl shadow-sm flex flex-col justify-between hover:border-secondary/50 transition-colors">
+<div class="flex items-center justify-between text-on-surface-variant">
+<span class="text-label-md font-label-md font-semibold">Configured Roles</span>
+<span class="p-1.5 rounded-lg bg-surface-container-low text-secondary material-symbols-outlined" data-icon="admin_panel_settings">admin_panel_settings</span>
+</div>
+<div class="mt-3">
+<div class="flex items-baseline gap-2">
+<span class="text-headline-md font-headline-md font-bold text-primary-container">5 Roles</span>
+<span class="text-label-sm font-label-sm text-secondary font-semibold">(3 Default · 2 Custom)</span>
+</div>
+<p class="text-body-sm font-body-sm text-on-surface-variant mt-1 flex items-center gap-1">
+<span class="material-symbols-outlined text-secondary" data-icon="lock_clock" style="font-size: 14px;">lock_clock</span>
+            Zero unassigned system groups
+          </p>
+</div>
+</div>
+<!-- Card 2 -->
+<div class="p-5 bg-surface-container-lowest border border-outline-variant rounded-xl shadow-sm flex flex-col justify-between hover:border-secondary/50 transition-colors">
+<div class="flex items-center justify-between text-on-surface-variant">
+<span class="text-label-md font-label-md font-semibold">Assigned Users</span>
+<span class="p-1.5 rounded-lg bg-surface-container-low text-secondary material-symbols-outlined" data-icon="badge">badge</span>
+</div>
+<div class="mt-3">
+<div class="flex items-baseline gap-2">
+<span class="text-headline-md font-headline-md font-bold text-primary-container">24 Employees</span>
+</div>
+<p class="text-body-sm font-body-sm text-on-surface-variant mt-1 flex items-center gap-1">
+<span class="material-symbols-outlined text-secondary" data-icon="check_circle" style="font-size: 14px;">check_circle</span>
+            100% accounts mapped to policy
+          </p>
+</div>
+</div>
+<!-- Card 3 -->
+<div class="p-5 bg-surface-container-lowest border border-outline-variant rounded-xl shadow-sm flex flex-col justify-between hover:border-secondary/50 transition-colors">
+<div class="flex items-center justify-between text-on-surface-variant">
+<span class="text-label-md font-label-md font-semibold">Super Admins</span>
+<span class="p-1.5 rounded-lg bg-surface-container-low text-primary-container material-symbols-outlined" data-icon="security">security</span>
+</div>
+<div class="mt-3">
+<div class="flex items-baseline gap-2">
+<span class="text-headline-md font-headline-md font-bold text-primary-container">2 Users</span>
+<span class="text-label-sm font-label-sm bg-surface-container-high text-primary-container px-2 py-0.5 rounded font-bold">MFA Forced</span>
+</div>
+<p class="text-body-sm font-body-sm text-on-surface-variant mt-1 flex items-center gap-1">
+<span class="material-symbols-outlined text-secondary" data-icon="vpn_key" style="font-size: 14px;">vpn_key</span>
+            Restricted hardware token active
+          </p>
+</div>
+</div>
+<!-- Card 4 -->
+<div class="p-5 bg-surface-container-lowest border border-outline-variant rounded-xl shadow-sm flex flex-col justify-between hover:border-secondary/50 transition-colors">
+<div class="flex items-center justify-between text-on-surface-variant">
+<span class="text-label-md font-label-md font-semibold">Pending Access Reviews</span>
+<span class="p-1.5 rounded-lg bg-surface-container-low text-secondary material-symbols-outlined" data-icon="policy">policy</span>
+</div>
+<div class="mt-3">
+<div class="flex items-baseline gap-2">
+<span class="text-headline-md font-headline-md font-bold text-primary-container">0 Pending</span>
+<span class="text-label-sm font-label-sm text-secondary font-semibold">SOC-2 Clean</span>
+</div>
+<p class="text-body-sm font-body-sm text-on-surface-variant mt-1 flex items-center gap-1">
+<span class="material-symbols-outlined text-secondary" data-icon="verified" style="font-size: 14px;">verified</span>
+            Q3 recertification complete
+          </p>
+</div>
+</div>
+</section>
+<!-- ==================== ROLES DIRECTORY DATA TABLE ==================== -->
+<section class="bg-surface-container-lowest border border-outline-variant rounded-xl shadow-sm overflow-hidden">
+<!-- Search and Filter Bar -->
+<div class="p-4 border-b border-outline-variant flex flex-col lg:flex-row lg:items-center justify-between gap-4 bg-surface-bright">
+<div class="flex flex-wrap items-center gap-3">
+<!-- Role Search Input -->
+<div class="relative min-w-[260px]">
+<span class="material-symbols-outlined absolute left-3 top-2.5 text-outline pointer-events-none" data-icon="search">search</span>
+<input class="w-full pl-9 pr-3 py-1.5 bg-surface-container-lowest border border-outline-variant rounded-lg text-body-sm font-body-sm text-on-surface placeholder:text-outline focus:outline-none focus:border-secondary focus:ring-1 focus:ring-secondary" placeholder="Filter roles by name or module..." type="text">
+</div>
+<!-- Type Filter Tabs -->
+<div class="inline-flex p-1 bg-surface-container-low border border-outline-variant rounded-lg text-label-sm font-label-sm">
+<button class="px-3 py-1 rounded bg-surface-container-lowest text-primary-container font-bold shadow-xs">All Roles (5)</button>
+<button class="px-3 py-1 rounded text-on-surface-variant hover:text-on-surface">System Default (3)</button>
+<button class="px-3 py-1 rounded text-on-surface-variant hover:text-on-surface">Custom Roles (2)</button>
+</div>
+</div>
+<div class="flex items-center gap-3">
+<!-- Status Dropdown -->
+<div class="flex items-center gap-2">
+<span class="text-label-sm font-label-sm text-on-surface-variant">Status:</span>
+<select class="bg-surface-container-lowest border border-outline-variant rounded-lg py-1 px-3 text-label-sm font-label-sm text-on-surface focus:outline-none focus:ring-1 focus:ring-secondary">
+<option>Active (5)</option>
+<option>Archived (0)</option>
+</select>
+</div>
+<button class="p-1.5 text-on-surface-variant hover:text-on-surface rounded-lg hover:bg-surface-container-low" title="Export CSV">
+<span class="material-symbols-outlined" data-icon="download">download</span>
+</button>
+</div>
+</div>
+<!-- Main Directory Table -->
+<div class="overflow-x-auto">
+<table class="w-full text-left border-collapse">
+<thead>
+<tr class="bg-surface-container-low/60 border-b border-outline-variant text-label-sm font-label-sm text-outline uppercase tracking-wider">
+<th class="py-3 px-4 font-semibold">Role Name &amp; Type</th>
+<th class="py-3 px-4 font-semibold">Description</th>
+<th class="py-3 px-4 font-semibold">Assigned Users</th>
+<th class="py-3 px-4 font-semibold">Permission Scope</th>
+<th class="py-3 px-4 font-semibold">Status</th>
+<th class="py-3 px-4 font-semibold">Last Updated</th>
+<th class="py-3 px-4 font-semibold text-right">Actions</th>
+</tr>
+</thead>
+<tbody class="divide-y divide-outline-variant text-body-md font-body-md">
+<!-- Row 1: HR Administrator -->
+<tr class="hover:bg-surface-container-low/40 transition-colors">
+<td class="py-3.5 px-4">
+<div class="flex items-center gap-2">
+<span class="font-bold text-primary-container">HR Administrator</span>
+<span class="px-2 py-0.5 rounded text-label-sm font-label-sm bg-surface-container text-on-surface-variant font-semibold">System Default</span>
+</div>
+</td>
+<td class="py-3.5 px-4 max-w-xs text-on-surface-variant text-body-sm font-body-sm truncate">
+                Full administrative privileges across company HR modules and statutory filings
+              </td>
+<td class="py-3.5 px-4">
+<div class="flex items-center gap-2">
+<div class="flex -space-x-2 overflow-hidden">
+<div class="inline-block h-6 w-6 rounded-full bg-primary-container text-surface-container-lowest text-label-sm flex items-center justify-center ring-2 ring-surface-container-lowest font-bold">RP</div>
+<div class="inline-block h-6 w-6 rounded-full bg-secondary text-surface-container-lowest text-label-sm flex items-center justify-center ring-2 ring-surface-container-lowest font-bold">AG</div>
+</div>
+<span class="text-label-sm font-label-sm font-semibold text-on-surface">2 Users</span>
+</div>
+</td>
+<td class="py-3.5 px-4">
+<span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-label-sm font-label-sm bg-surface-container-high text-primary-container font-semibold">
+<span class="w-1.5 h-1.5 rounded-full bg-primary-container"></span>
+                  All 8 Modules (Full)
+                </span>
+</td>
+<td class="py-3.5 px-4">
+<span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-label-sm font-label-sm bg-secondary-fixed text-on-secondary-fixed font-semibold">
+                  Active
+                </span>
+</td>
+<td class="py-3.5 px-4 text-body-sm font-body-sm text-on-surface-variant">
+                Sep 28, 2026 · Rahul Paul
+              </td>
+<td class="py-3.5 px-4 text-right">
+<div class="flex items-center justify-end gap-2 text-on-surface-variant">
+<button class="hover:text-secondary font-label-md text-label-md font-semibold">Inspect</button>
+<span class="text-outline-variant">|</span>
+<button class="opacity-40 cursor-not-allowed text-outline" title="System default role cannot be modified">
+<span class="material-symbols-outlined" data-icon="lock" style="font-size: 18px;">lock</span>
+</button>
+</div>
+</td>
+</tr>
+<!-- Row 2: HR Manager (SELECTED ROW) -->
+<tr class="bg-surface-container-low/80 border-l-4 border-secondary transition-colors">
+<td class="py-3.5 px-4">
+<div class="flex items-center gap-2">
+<span class="font-bold text-secondary">HR Manager</span>
+<span class="px-2 py-0.5 rounded text-label-sm font-label-sm bg-secondary-fixed text-on-secondary-fixed font-semibold">Custom</span>
+</div>
+</td>
+<td class="py-3.5 px-4 max-w-xs text-on-surface text-body-sm font-body-sm truncate">
+                Manages employee lifecycles, attendance, leave approval without payroll salary access
+              </td>
+<td class="py-3.5 px-4">
+<div class="flex items-center gap-2">
+<div class="flex -space-x-2 overflow-hidden">
+<div class="inline-block h-6 w-6 rounded-full bg-secondary text-surface-container-lowest text-label-sm flex items-center justify-center ring-2 ring-surface-container-lowest font-bold">PS</div>
+<div class="inline-block h-6 w-6 rounded-full bg-primary-container text-surface-container-lowest text-label-sm flex items-center justify-center ring-2 ring-surface-container-lowest font-bold">TD</div>
+<div class="inline-block h-6 w-6 rounded-full bg-outline text-surface-container-lowest text-label-sm flex items-center justify-center ring-2 ring-surface-container-lowest font-bold">KM</div>
+</div>
+<span class="text-label-sm font-label-sm font-bold text-secondary">3 Users</span>
+</div>
+</td>
+<td class="py-3.5 px-4">
+<span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-label-sm font-label-sm bg-secondary-fixed text-on-secondary-fixed font-semibold">
+<span class="w-1.5 h-1.5 rounded-full bg-secondary"></span>
+                  6 of 8 Modules
+                </span>
+</td>
+<td class="py-3.5 px-4">
+<span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-label-sm font-label-sm bg-secondary-fixed text-on-secondary-fixed font-semibold">
+                  Active
+                </span>
+</td>
+<td class="py-3.5 px-4 text-body-sm font-body-sm text-on-surface">
+                Sep 26, 2026 · Rahul Paul
+              </td>
+<td class="py-3.5 px-4 text-right">
+<div class="flex items-center justify-end gap-2 text-secondary">
+<span class="text-label-sm font-label-sm font-bold bg-secondary/10 px-2 py-0.5 rounded">Selected</span>
+<button class="p-1 hover:text-on-surface text-outline" title="Duplicate Role">
+<span class="material-symbols-outlined" data-icon="content_copy" style="font-size: 18px;">content_copy</span>
+</button>
+<button class="p-1 hover:text-error text-outline" title="Delete Role">
+<span class="material-symbols-outlined" data-icon="delete" style="font-size: 18px;">delete</span>
+</button>
+</div>
+</td>
+</tr>
+<!-- Row 3: Department Manager -->
+<tr class="hover:bg-surface-container-low/40 transition-colors">
+<td class="py-3.5 px-4">
+<div class="flex items-center gap-2">
+<span class="font-bold text-primary-container">Department Manager</span>
+<span class="px-2 py-0.5 rounded text-label-sm font-label-sm bg-surface-container text-on-surface-variant font-semibold">System Default</span>
+</div>
+</td>
+<td class="py-3.5 px-4 max-w-xs text-on-surface-variant text-body-sm font-body-sm truncate">
+                Direct reports oversight, team leave authorisations, and department performance reports
+              </td>
+<td class="py-3.5 px-4">
+<div class="flex items-center gap-2">
+<div class="flex -space-x-2 overflow-hidden">
+<div class="inline-block h-6 w-6 rounded-full bg-outline-variant text-on-surface text-label-sm flex items-center justify-center ring-2 ring-surface-container-lowest font-bold">DM</div>
+<div class="inline-block h-6 w-6 rounded-full bg-outline text-surface-container-lowest text-label-sm flex items-center justify-center ring-2 ring-surface-container-lowest font-bold">+4</div>
+</div>
+<span class="text-label-sm font-label-sm font-semibold text-on-surface">6 Users</span>
+</div>
+</td>
+<td class="py-3.5 px-4">
+<span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-label-sm font-label-sm bg-surface-container text-on-surface-variant font-semibold">
+<span class="w-1.5 h-1.5 rounded-full bg-outline"></span>
+                  3 of 8 Modules
+                </span>
+</td>
+<td class="py-3.5 px-4">
+<span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-label-sm font-label-sm bg-secondary-fixed text-on-secondary-fixed font-semibold">
+                  Active
+                </span>
+</td>
+<td class="py-3.5 px-4 text-body-sm font-body-sm text-on-surface-variant">
+                Aug 14, 2026 · Rahul Paul
+              </td>
+<td class="py-3.5 px-4 text-right">
+<div class="flex items-center justify-end gap-2 text-on-surface-variant">
+<button class="hover:text-secondary font-label-md text-label-md font-semibold">Inspect</button>
+<span class="text-outline-variant">|</span>
+<button class="opacity-40 cursor-not-allowed text-outline" title="System default role cannot be modified">
+<span class="material-symbols-outlined" data-icon="lock" style="font-size: 18px;">lock</span>
+</button>
+</div>
+</td>
+</tr>
+<!-- Row 4: Employee / Individual Contributor -->
+<tr class="hover:bg-surface-container-low/40 transition-colors">
+<td class="py-3.5 px-4">
+<div class="flex items-center gap-2">
+<span class="font-bold text-primary-container">Employee / Individual Contributor</span>
+<span class="px-2 py-0.5 rounded text-label-sm font-label-sm bg-surface-container text-on-surface-variant font-semibold">System Default</span>
+</div>
+</td>
+<td class="py-3.5 px-4 max-w-xs text-on-surface-variant text-body-sm font-body-sm truncate">
+                Self-service attendance check-in, leave application, and personal tax slip access
+              </td>
+<td class="py-3.5 px-4">
+<div class="flex items-center gap-2">
+<div class="flex -space-x-2 overflow-hidden">
+<div class="inline-block h-6 w-6 rounded-full bg-primary-fixed text-on-primary-fixed text-label-sm flex items-center justify-center ring-2 ring-surface-container-lowest font-bold">EM</div>
+<div class="inline-block h-6 w-6 rounded-full bg-outline text-surface-container-lowest text-label-sm flex items-center justify-center ring-2 ring-surface-container-lowest font-bold">+12</div>
+</div>
+<span class="text-label-sm font-label-sm font-semibold text-on-surface">13 Users</span>
+</div>
+</td>
+<td class="py-3.5 px-4">
+<span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-label-sm font-label-sm bg-surface-container-low text-on-surface-variant font-semibold">
+<span class="w-1.5 h-1.5 rounded-full bg-outline"></span>
+                  Self-Service Only
+                </span>
+</td>
+<td class="py-3.5 px-4">
+<span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-label-sm font-label-sm bg-secondary-fixed text-on-secondary-fixed font-semibold">
+                  Active
+                </span>
+</td>
+<td class="py-3.5 px-4 text-body-sm font-body-sm text-on-surface-variant">
+                Jun 02, 2026 · Rahul Paul
+              </td>
+<td class="py-3.5 px-4 text-right">
+<div class="flex items-center justify-end gap-2 text-on-surface-variant">
+<button class="hover:text-secondary font-label-md text-label-md font-semibold">Inspect</button>
+<span class="text-outline-variant">|</span>
+<button class="opacity-40 cursor-not-allowed text-outline" title="System default role cannot be modified">
+<span class="material-symbols-outlined" data-icon="lock" style="font-size: 18px;">lock</span>
+</button>
+</div>
+</td>
+</tr>
+<!-- Row 5: Finance & Payroll Auditor -->
+<tr class="hover:bg-surface-container-low/40 transition-colors">
+<td class="py-3.5 px-4">
+<div class="flex items-center gap-2">
+<span class="font-bold text-primary-container">Finance &amp; Payroll Auditor</span>
+<span class="px-2 py-0.5 rounded text-label-sm font-label-sm bg-secondary-fixed text-on-secondary-fixed font-semibold">Custom</span>
+</div>
+</td>
+<td class="py-3.5 px-4 max-w-xs text-on-surface-variant text-body-sm font-body-sm truncate">
+                External audit read-only access to statutory records, payroll calculations &amp; attendance
+              </td>
+<td class="py-3.5 px-4">
+<div class="flex items-center gap-2">
+<div class="flex -space-x-2 overflow-hidden">
+<div class="inline-block h-6 w-6 rounded-full bg-secondary text-surface-container-lowest text-label-sm flex items-center justify-center ring-2 ring-surface-container-lowest font-bold">FA</div>
+</div>
+<span class="text-label-sm font-label-sm font-semibold text-on-surface">1 User</span>
+</div>
+</td>
+<td class="py-3.5 px-4">
+<span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-label-sm font-label-sm bg-surface-container text-on-surface-variant font-semibold">
+<span class="w-1.5 h-1.5 rounded-full bg-outline"></span>
+                  4 of 8 Modules (Read-only)
+                </span>
+</td>
+<td class="py-3.5 px-4">
+<span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-label-sm font-label-sm bg-secondary-fixed text-on-secondary-fixed font-semibold">
+                  Active
+                </span>
+</td>
+<td class="py-3.5 px-4 text-body-sm font-body-sm text-on-surface-variant">
+                Jul 19, 2026 · Rahul Paul
+              </td>
+<td class="py-3.5 px-4 text-right">
+<div class="flex items-center justify-end gap-2 text-on-surface-variant">
+<button class="hover:text-secondary font-label-md text-label-md font-semibold">Edit</button>
+<span class="text-outline-variant">|</span>
+<button class="p-1 hover:text-error text-outline" title="Delete Custom Role">
+<span class="material-symbols-outlined" data-icon="delete" style="font-size: 18px;">delete</span>
+</button>
+</div>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</section>
+<!-- ==================== SPLIT DETAIL & PERMISSION MATRIX SECTION ==================== -->
+<section class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+<!-- Left/Main (Cols 8): Selected Role Matrix -->
+<div class="lg:col-span-8 bg-surface-container-lowest border border-outline-variant rounded-xl shadow-sm overflow-hidden flex flex-col">
+<!-- Header of Role Detail -->
+<div class="p-6 border-b border-outline-variant bg-surface-bright">
+<div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+<div>
+<div class="flex items-center gap-3">
+<h2 class="font-headline-md text-headline-md font-bold text-primary-container">Role Detail: HR Manager</h2>
+<span class="px-2.5 py-0.5 rounded-full text-label-sm font-label-sm bg-secondary-fixed text-on-secondary-fixed font-bold">Custom Role</span>
+<span class="px-2.5 py-0.5 rounded-full text-label-sm font-label-sm bg-secondary-fixed/50 text-secondary font-semibold">18 Active Permissions</span>
+</div>
+<p class="text-body-sm font-body-sm text-on-surface-variant mt-1.5">
+                Manages employee lifecycles, attendance reconciliation, leave approvals, and standard reporting without sensitive statutory payroll salary access.
+              </p>
+</div>
+<!-- Quick Bulk Actions -->
+<div class="flex items-center gap-2 shrink-0">
+<button class="px-2.5 py-1.5 text-label-sm font-label-sm text-secondary hover:bg-secondary-fixed/30 rounded border border-secondary/30 transition-colors">Select All</button>
+<button class="px-2.5 py-1.5 text-label-sm font-label-sm text-on-surface-variant hover:bg-surface-container-low rounded border border-outline-variant transition-colors">Clear All</button>
+<button class="px-2.5 py-1.5 text-label-sm font-label-sm text-outline hover:text-error rounded transition-colors" title="Reset to baseline">Reset</button>
+</div>
+</div>
+<!-- Secondary Sub-tabs -->
+<div class="flex items-center gap-6 mt-6 border-b border-outline-variant -mb-6">
+<button class="pb-3 text-label-md font-label-md font-bold text-secondary border-b-2 border-secondary flex items-center gap-1.5">
+<span class="material-symbols-outlined" data-icon="grid_view" style="font-size: 18px;">grid_view</span>
+              Permission Matrix (Active)
+            </button>
+<button class="pb-3 text-label-md font-label-md text-on-surface-variant hover:text-on-surface flex items-center gap-1.5 transition-colors">
+<span class="material-symbols-outlined" data-icon="group" style="font-size: 18px;">group</span>
+              Assigned Users (3 Employees)
+            </button>
+<button class="pb-3 text-label-md font-label-md text-on-surface-variant hover:text-on-surface flex items-center gap-1.5 transition-colors">
+<span class="material-symbols-outlined" data-icon="manage_history" style="font-size: 18px;">manage_history</span>
+              Audit History
+            </button>
+</div>
+</div>
+<!-- Matrix Table -->
+<div class="p-6 overflow-x-auto flex-1">
+<table class="w-full text-left border-collapse">
+<thead>
+<tr class="border-b border-outline-variant text-label-sm font-label-sm text-outline uppercase tracking-wider">
+<th class="py-3 px-3 font-semibold w-1/4">Module / Feature</th>
+<th class="py-3 px-3 text-center font-semibold">View</th>
+<th class="py-3 px-3 text-center font-semibold">Create</th>
+<th class="py-3 px-3 text-center font-semibold">Edit</th>
+<th class="py-3 px-3 text-center font-semibold">Delete</th>
+<th class="py-3 px-3 text-center font-semibold">Approve</th>
+<th class="py-3 px-3 text-center font-semibold">Export</th>
+</tr>
+</thead>
+<tbody class="divide-y divide-outline-variant font-body-sm text-body-sm">
+<!-- 1. Employees -->
+<tr class="hover:bg-surface-container-low/40">
+<td class="py-3 px-3 font-semibold text-primary-container flex items-center gap-2">
+<span class="material-symbols-outlined text-secondary" data-icon="group" style="font-size: 18px;">group</span>
+                  Employees
+                </td>
+<td class="py-3 px-3 text-center">
+<input checked="" class="w-4 h-4 rounded text-secondary focus:ring-secondary border-outline-variant cursor-pointer" type="checkbox">
+</td>
+<td class="py-3 px-3 text-center">
+<input checked="" class="w-4 h-4 rounded text-secondary focus:ring-secondary border-outline-variant cursor-pointer" type="checkbox">
+</td>
+<td class="py-3 px-3 text-center">
+<input checked="" class="w-4 h-4 rounded text-secondary focus:ring-secondary border-outline-variant cursor-pointer" type="checkbox">
+</td>
+<td class="py-3 px-3 text-center">
+<input class="w-4 h-4 rounded text-secondary focus:ring-secondary border-outline-variant cursor-pointer" type="checkbox">
+</td>
+<td class="py-3 px-3 text-center text-outline text-label-sm">N/A</td>
+<td class="py-3 px-3 text-center">
+<input checked="" class="w-4 h-4 rounded text-secondary focus:ring-secondary border-outline-variant cursor-pointer" type="checkbox">
+</td>
+</tr>
+<!-- 2. Attendance -->
+<tr class="hover:bg-surface-container-low/40">
+<td class="py-3 px-3 font-semibold text-primary-container flex items-center gap-2">
+<span class="material-symbols-outlined text-secondary" data-icon="how_to_reg" style="font-size: 18px;">how_to_reg</span>
+                  Attendance
+                </td>
+<td class="py-3 px-3 text-center">
+<input checked="" class="w-4 h-4 rounded text-secondary focus:ring-secondary border-outline-variant cursor-pointer" type="checkbox">
+</td>
+<td class="py-3 px-3 text-center">
+<input checked="" class="w-4 h-4 rounded text-secondary focus:ring-secondary border-outline-variant cursor-pointer" type="checkbox">
+</td>
+<td class="py-3 px-3 text-center">
+<input checked="" class="w-4 h-4 rounded text-secondary focus:ring-secondary border-outline-variant cursor-pointer" type="checkbox">
+</td>
+<td class="py-3 px-3 text-center">
+<input class="w-4 h-4 rounded text-secondary focus:ring-secondary border-outline-variant cursor-pointer" type="checkbox">
+</td>
+<td class="py-3 px-3 text-center">
+<input checked="" class="w-4 h-4 rounded text-secondary focus:ring-secondary border-outline-variant cursor-pointer" type="checkbox">
+</td>
+<td class="py-3 px-3 text-center">
+<input checked="" class="w-4 h-4 rounded text-secondary focus:ring-secondary border-outline-variant cursor-pointer" type="checkbox">
+</td>
+</tr>
+<!-- 3. Leave Management -->
+<tr class="hover:bg-surface-container-low/40">
+<td class="py-3 px-3 font-semibold text-primary-container flex items-center gap-2">
+<span class="material-symbols-outlined text-secondary" data-icon="event_available" style="font-size: 18px;">event_available</span>
+                  Leave Management
+                </td>
+<td class="py-3 px-3 text-center">
+<input checked="" class="w-4 h-4 rounded text-secondary focus:ring-secondary border-outline-variant cursor-pointer" type="checkbox">
+</td>
+<td class="py-3 px-3 text-center">
+<input checked="" class="w-4 h-4 rounded text-secondary focus:ring-secondary border-outline-variant cursor-pointer" type="checkbox">
+</td>
+<td class="py-3 px-3 text-center">
+<input checked="" class="w-4 h-4 rounded text-secondary focus:ring-secondary border-outline-variant cursor-pointer" type="checkbox">
+</td>
+<td class="py-3 px-3 text-center">
+<input class="w-4 h-4 rounded text-secondary focus:ring-secondary border-outline-variant cursor-pointer" type="checkbox">
+</td>
+<td class="py-3 px-3 text-center">
+<input checked="" class="w-4 h-4 rounded text-secondary focus:ring-secondary border-outline-variant cursor-pointer" type="checkbox">
+</td>
+<td class="py-3 px-3 text-center">
+<input checked="" class="w-4 h-4 rounded text-secondary focus:ring-secondary border-outline-variant cursor-pointer" type="checkbox">
+</td>
+</tr>
+<!-- 4. Payroll (Locked / Limited) -->
+<tr class="bg-surface-container-low/30 hover:bg-surface-container-low/50">
+<td class="py-3 px-3 font-semibold text-primary-container">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-outline" data-icon="payments" style="font-size: 18px;">payments</span>
+<span class="">Payroll</span>
+</div>
+<span class="text-label-sm font-label-sm text-outline flex items-center gap-1 mt-0.5">
+<span class="material-symbols-outlined" data-icon="lock" style="font-size: 13px;">lock</span>
+                    Restricted: Totals Only
+                  </span>
+</td>
+<td class="py-3 px-3 text-center">
+<input checked="" class="w-4 h-4 rounded text-secondary focus:ring-secondary border-outline-variant cursor-pointer" type="checkbox">
+</td>
+<td class="py-3 px-3 text-center">
+<input class="w-4 h-4 rounded text-outline bg-surface-dim border-outline-variant opacity-50 cursor-not-allowed" disabled="" type="checkbox">
+</td>
+<td class="py-3 px-3 text-center">
+<input class="w-4 h-4 rounded text-outline bg-surface-dim border-outline-variant opacity-50 cursor-not-allowed" disabled="" type="checkbox">
+</td>
+<td class="py-3 px-3 text-center">
+<input class="w-4 h-4 rounded text-outline bg-surface-dim border-outline-variant opacity-50 cursor-not-allowed" disabled="" type="checkbox">
+</td>
+<td class="py-3 px-3 text-center">
+<input class="w-4 h-4 rounded text-outline bg-surface-dim border-outline-variant opacity-50 cursor-not-allowed" disabled="" type="checkbox">
+</td>
+<td class="py-3 px-3 text-center">
+<input class="w-4 h-4 rounded text-outline bg-surface-dim border-outline-variant opacity-50 cursor-not-allowed" disabled="" type="checkbox">
+</td>
+</tr>
+<!-- 5. Documents -->
+<tr class="hover:bg-surface-container-low/40">
+<td class="py-3 px-3 font-semibold text-primary-container flex items-center gap-2">
+<span class="material-symbols-outlined text-secondary" data-icon="folder_shared" style="font-size: 18px;">folder_shared</span>
+                  Documents
+                </td>
+<td class="py-3 px-3 text-center">
+<input checked="" class="w-4 h-4 rounded text-secondary focus:ring-secondary border-outline-variant cursor-pointer" type="checkbox">
+</td>
+<td class="py-3 px-3 text-center">
+<input checked="" class="w-4 h-4 rounded text-secondary focus:ring-secondary border-outline-variant cursor-pointer" type="checkbox">
+</td>
+<td class="py-3 px-3 text-center">
+<input checked="" class="w-4 h-4 rounded text-secondary focus:ring-secondary border-outline-variant cursor-pointer" type="checkbox">
+</td>
+<td class="py-3 px-3 text-center">
+<input class="w-4 h-4 rounded text-secondary focus:ring-secondary border-outline-variant cursor-pointer" type="checkbox">
+</td>
+<td class="py-3 px-3 text-center">
+<input checked="" class="w-4 h-4 rounded text-secondary focus:ring-secondary border-outline-variant cursor-pointer" type="checkbox">
+</td>
+<td class="py-3 px-3 text-center">
+<input checked="" class="w-4 h-4 rounded text-secondary focus:ring-secondary border-outline-variant cursor-pointer" type="checkbox">
+</td>
+</tr>
+<!-- 6. Reports -->
+<tr class="hover:bg-surface-container-low/40">
+<td class="py-3 px-3 font-semibold text-primary-container flex items-center gap-2">
+<span class="material-symbols-outlined text-secondary" data-icon="assessment" style="font-size: 18px;">assessment</span>
+                  Reports
+                </td>
+<td class="py-3 px-3 text-center">
+<input checked="" class="w-4 h-4 rounded text-secondary focus:ring-secondary border-outline-variant cursor-pointer" type="checkbox">
+</td>
+<td class="py-3 px-3 text-center">
+<input checked="" class="w-4 h-4 rounded text-secondary focus:ring-secondary border-outline-variant cursor-pointer" type="checkbox">
+</td>
+<td class="py-3 px-3 text-center">
+<input checked="" class="w-4 h-4 rounded text-secondary focus:ring-secondary border-outline-variant cursor-pointer" type="checkbox">
+</td>
+<td class="py-3 px-3 text-center">
+<input class="w-4 h-4 rounded text-secondary focus:ring-secondary border-outline-variant cursor-pointer" type="checkbox">
+</td>
+<td class="py-3 px-3 text-center text-outline text-label-sm">N/A</td>
+<td class="py-3 px-3 text-center">
+<input checked="" class="w-4 h-4 rounded text-secondary focus:ring-secondary border-outline-variant cursor-pointer" type="checkbox">
+</td>
+</tr>
+<!-- 7. Analytics -->
+<tr class="hover:bg-surface-container-low/40">
+<td class="py-3 px-3 font-semibold text-primary-container flex items-center gap-2">
+<span class="material-symbols-outlined text-secondary" data-icon="insights" style="font-size: 18px;">insights</span>
+                  Analytics
+                </td>
+<td class="py-3 px-3 text-center">
+<input checked="" class="w-4 h-4 rounded text-secondary focus:ring-secondary border-outline-variant cursor-pointer" type="checkbox">
+</td>
+<td class="py-3 px-3 text-center text-outline text-label-sm">N/A</td>
+<td class="py-3 px-3 text-center text-outline text-label-sm">N/A</td>
+<td class="py-3 px-3 text-center text-outline text-label-sm">N/A</td>
+<td class="py-3 px-3 text-center text-outline text-label-sm">N/A</td>
+<td class="py-3 px-3 text-center">
+<input checked="" class="w-4 h-4 rounded text-secondary focus:ring-secondary border-outline-variant cursor-pointer" type="checkbox">
+</td>
+</tr>
+<!-- 8. Settings -->
+<tr class="hover:bg-surface-container-low/40">
+<td class="py-3 px-3 font-semibold text-primary-container flex items-center gap-2">
+<span class="material-symbols-outlined text-secondary" data-icon="settings" style="font-size: 18px;">settings</span>
+                  Settings
+                </td>
+<td class="py-3 px-3 text-center">
+<input checked="" class="w-4 h-4 rounded text-secondary focus:ring-secondary border-outline-variant cursor-pointer" type="checkbox">
+</td>
+<td class="py-3 px-3 text-center">
+<input class="w-4 h-4 rounded text-secondary focus:ring-secondary border-outline-variant cursor-pointer" type="checkbox">
+</td>
+<td class="py-3 px-3 text-center">
+<input class="w-4 h-4 rounded text-secondary focus:ring-secondary border-outline-variant cursor-pointer" type="checkbox">
+</td>
+<td class="py-3 px-3 text-center">
+<input class="w-4 h-4 rounded text-secondary focus:ring-secondary border-outline-variant cursor-pointer" type="checkbox">
+</td>
+<td class="py-3 px-3 text-center text-outline text-label-sm">N/A</td>
+<td class="py-3 px-3 text-center">
+<input class="w-4 h-4 rounded text-secondary focus:ring-secondary border-outline-variant cursor-pointer" type="checkbox">
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+<!-- Dependency Note Banner -->
+<div class="px-6 py-3 bg-surface-container-low border-t border-outline-variant flex items-center justify-between text-body-sm font-body-sm text-on-surface-variant">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-secondary" data-icon="info" style="font-size: 18px;">info</span>
+<span class="">Edit, Delete, and Export permissions automatically inherit View access.</span>
+</div>
+<span class="text-label-sm font-label-sm text-outline">Policy ID: POL-HRM-2026-V1</span>
+</div>
+</div>
+<!-- Right/Sidebar Drawer (Cols 4): Assigned Users in HR Manager Role -->
+<div class="lg:col-span-4 bg-surface-container-lowest border border-outline-variant rounded-xl shadow-sm p-6 flex flex-col justify-between">
+<div>
+<!-- Header -->
+<div class="flex items-center justify-between border-b border-outline-variant pb-4">
+<div>
+<h3 class="font-headline-sm text-headline-sm font-bold text-primary-container">Assigned Members</h3>
+<p class="text-body-sm font-body-sm text-on-surface-variant mt-0.5">3 Employees assigned to HR Manager</p>
+</div>
+<button class="flex items-center gap-1 px-3 py-1.5 bg-surface-container-low hover:bg-surface-container text-secondary font-button-text text-button-text rounded-lg border border-secondary/20 transition-colors">
+<span class="material-symbols-outlined" data-icon="person_add" style="font-size: 16px;">person_add</span>
+<span class="">+ Assign</span>
+</button>
+</div>
+<!-- Members List -->
+<div class="divide-y divide-outline-variant mt-2">
+<!-- User 1 -->
+<div class="py-3.5 flex items-center justify-between">
+<div class="flex items-center gap-3">
+<div class="w-9 h-9 rounded-full bg-secondary-fixed text-on-secondary-fixed flex items-center justify-center font-bold text-label-md shrink-0">
+                  PS
+                </div>
+<div>
+<h4 class="text-body-md font-body-md font-semibold text-on-surface">Priya Sharma</h4>
+<p class="text-label-sm font-label-sm text-on-surface-variant">VS-0142 · Design &amp; UX Lead</p>
+</div>
+</div>
+<div class="flex items-center gap-2">
+<span class="w-2 h-2 rounded-full bg-secondary" title="Active Account"></span>
+<button class="text-outline hover:text-error p-1 rounded" title="Revoke Role Access">
+<span class="material-symbols-outlined" data-icon="close" style="font-size: 18px;">close</span>
+</button>
+</div>
+</div>
+<!-- User 2 -->
+<div class="py-3.5 flex items-center justify-between">
+<div class="flex items-center gap-3">
+<div class="w-9 h-9 rounded-full bg-primary-container text-surface-container-lowest flex items-center justify-center font-bold text-label-md shrink-0">
+                  TD
+                </div>
+<div>
+<h4 class="text-body-md font-body-md font-semibold text-on-surface">Tanvi Deshmukh</h4>
+<p class="text-label-sm font-label-sm text-on-surface-variant">VS-0119 · People Ops Specialist</p>
+</div>
+</div>
+<div class="flex items-center gap-2">
+<span class="w-2 h-2 rounded-full bg-secondary" title="Active Account"></span>
+<button class="text-outline hover:text-error p-1 rounded" title="Revoke Role Access">
+<span class="material-symbols-outlined" data-icon="close" style="font-size: 18px;">close</span>
+</button>
+</div>
+</div>
+<!-- User 3 -->
+<div class="py-3.5 flex items-center justify-between">
+<div class="flex items-center gap-3">
+<div class="w-9 h-9 rounded-full bg-surface-container text-primary-container flex items-center justify-center font-bold text-label-md shrink-0">
+                  KM
+                </div>
+<div>
+<h4 class="text-body-md font-body-md font-semibold text-on-surface">Karthik M.</h4>
+<p class="text-label-sm font-label-sm text-on-surface-variant">VS-0112 · Engineering Ops</p>
+</div>
+</div>
+<div class="flex items-center gap-2">
+<span class="w-2 h-2 rounded-full bg-secondary" title="Active Account"></span>
+<button class="text-outline hover:text-error p-1 rounded" title="Revoke Role Access">
+<span class="material-symbols-outlined" data-icon="close" style="font-size: 18px;">close</span>
+</button>
+</div>
+</div>
+</div>
+</div>
+<!-- Security Rule Footnote -->
+<div class="mt-6 p-4 rounded-lg bg-surface-container-low border border-outline-variant/60">
+<div class="flex items-start gap-2.5">
+<span class="material-symbols-outlined text-secondary shrink-0 mt-0.5" data-icon="shield">shield</span>
+<div class="text-body-sm font-body-sm text-on-surface-variant">
+<span class="font-bold text-on-surface block">MFA Enforcement Note:</span>
+              All members assigned to <span class="font-semibold text-secondary">HR Manager</span> must maintain multi-factor authentication per ISO 27001 standard.
+            </div>
+</div>
+</div>
+</div>
+</section>
+</main>
+<!-- ==================== STICKY BOTTOM CONFIRMATION / ACTION BAR ==================== -->
+<footer class="fixed bottom-0 left-64 right-0 bg-surface-container-lowest border-t border-outline-variant py-3.5 px-8 shadow-lg z-30 flex flex-col sm:flex-row items-center justify-between gap-4">
+<div class="flex items-center gap-3">
+<span class="w-2.5 h-2.5 rounded-full bg-secondary animate-pulse"></span>
+<p class="text-body-sm font-body-sm text-on-surface-variant">
+        Changes to permissions will take effect on next user session / token refresh.
+      </p>
+</div>
+<div class="flex items-center gap-3 w-full sm:w-auto justify-end">
+<button class="px-4 py-2 border border-outline-variant hover:bg-surface-container-low text-on-surface font-button-text text-button-text rounded-lg transition-colors duration-150">
+        Revert Changes
+      </button>
+<button class="flex items-center gap-2 px-5 py-2 bg-secondary hover:bg-on-secondary-fixed-variant text-on-secondary font-button-text text-button-text rounded-lg shadow-sm transition-all duration-150 active:scale-95" onclick="simulateSave()">
+<span class="material-symbols-outlined" data-icon="save" style="font-size: 18px;">save</span>
+<span class="">Save Role Changes</span>
+</button>
+</div>
+</footer>
+<!-- Toast Notification Container for Micro-interaction -->
+<div class="fixed bottom-20 right-8 bg-primary-container text-surface-container-lowest px-4 py-3 rounded-lg shadow-xl border border-secondary flex items-center gap-3 transform translate-y-10 opacity-0 pointer-events-none transition-all duration-300 z-50" id="toast">
+<span class="material-symbols-outlined text-secondary-fixed" data-icon="check_circle">check_circle</span>
+<div>
+<p class="font-button-text text-button-text">Role Permissions Updated</p>
+<p class="text-body-sm font-body-sm text-on-primary-container">Security tokens updated for 3 active members.</p>
+</div>
+</div>
+<script>
+    function simulateSave() {
+      const toast = document.getElementById('toast');
+      toast.classList.remove('translate-y-10', 'opacity-0', 'pointer-events-none');
+      setTimeout(() => {
+        toast.classList.add('translate-y-10', 'opacity-0', 'pointer-events-none');
+      }, 3500);
+    }
+  </script>
+
+
+
+
+</body></html>
