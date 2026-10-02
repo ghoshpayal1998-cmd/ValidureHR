@@ -5,6 +5,9 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Validure HR — Enterprise Sign In</title>
   
+  <!-- Favicon -->
+  <link rel="icon" type="image/png" href="assets/validure-logo.png">
+  
   <!-- Tailwind CSS CDN -->
   <script src="https://cdn.tailwindcss.com"></script>
   <script>
@@ -13,11 +16,12 @@
       theme: {
         extend: {
           colors: {
-            obsidian: '#0B0F17',
-            surface: '#131924',
+            obsidian: '#080D1A',
+            surface: '#0F172A',
             surfaceBorder: 'rgba(255, 255, 255, 0.08)',
-            emeraldAccent: '#00A67C',
-            emeraldGlow: 'rgba(0, 166, 124, 0.15)',
+            tealAccent: '#118A9F',
+            tealBright: '#1597A8',
+            tealGlow: 'rgba(17, 138, 159, 0.20)',
           },
           fontFamily: {
             sans: ['"Plus Jakarta Sans"', 'sans-serif'],
@@ -39,25 +43,26 @@
   <style>
     body {
       font-family: 'Plus Jakarta Sans', sans-serif;
-      background-color: #0B0F17;
+      background-color: #080D1A;
       color: #F3F4F6;
     }
     
-    /* Ambient Glow Effects */
+    /* Ambient Glow Effects calibrated to Validure Teal & Navy */
     .glow-mesh {
       background-image: 
-        radial-gradient(at 15% 15%, rgba(0, 166, 124, 0.12) 0px, transparent 55%),
-        radial-gradient(at 85% 85%, rgba(37, 99, 235, 0.08) 0px, transparent 55%),
-        radial-gradient(at 50% 50%, rgba(15, 23, 42, 0.95) 0px, transparent 100%);
+        radial-gradient(at 15% 15%, rgba(17, 138, 159, 0.18) 0px, transparent 55%),
+        radial-gradient(at 85% 85%, rgba(14, 115, 133, 0.14) 0px, transparent 55%),
+        radial-gradient(at 50% 50%, rgba(8, 27, 71, 0.5) 0px, transparent 100%),
+        radial-gradient(at 50% 0%, rgba(8, 13, 26, 0.98) 0px, transparent 100%);
     }
 
     /* Glassmorphism Refraction Edge */
     .glass-card {
-      background: rgba(19, 25, 36, 0.75);
+      background: rgba(15, 23, 42, 0.78);
       backdrop-filter: blur(20px);
       -webkit-backdrop-filter: blur(20px);
       border: 1px solid rgba(255, 255, 255, 0.08);
-      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.1);
+      box-shadow: 0 24px 60px rgba(0, 0, 0, 0.45), inset 0 1px 0 rgba(255, 255, 255, 0.12);
     }
     
     .glass-pill {
@@ -67,8 +72,8 @@
     }
 
     .glass-pill:hover {
-      background: rgba(0, 166, 124, 0.08);
-      border-color: rgba(0, 166, 124, 0.3);
+      background: rgba(17, 138, 159, 0.08);
+      border-color: rgba(17, 138, 159, 0.35);
     }
 
     /* Subtle grid pattern background */
@@ -80,21 +85,21 @@
     }
   </style>
 </head>
-<body class="min-h-[100dvh] flex flex-col justify-between overflow-x-hidden bg-obsidian text-slate-100 antialiased glow-mesh selection:bg-emeraldAccent/30 selection:text-emerald-300">
+<body class="min-h-[100dvh] flex flex-col justify-between overflow-x-hidden bg-obsidian text-slate-100 antialiased glow-mesh selection:bg-teal-500/30 selection:text-teal-300">
 
   <!-- Background Grid -->
   <div class="fixed inset-0 bg-grid-pattern pointer-events-none opacity-60"></div>
 
   <!-- Top Navigation Header -->
   <header class="relative z-10 w-full max-w-7xl mx-auto px-6 py-6 flex items-center justify-between">
-    <a href="overview.html" class="flex items-center gap-3 group">
-      <!-- Shield Logo Mark -->
-      <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-emerald-400/20 to-emerald-600/10 border border-emerald-500/30 flex items-center justify-center shadow-lg shadow-emerald-950/40 group-hover:border-emerald-400/60 transition-all duration-300">
-        <i class="ph-bold ph-shield-check text-emerald-400 text-2xl group-hover:scale-110 transition-transform"></i>
+    <a href="overview.html" class="flex items-center gap-3.5 group">
+      <!-- Authentic Validure Logo Mark -->
+      <div class="h-11 w-11 rounded-xl bg-white p-1.5 shadow-lg shadow-teal-950/50 border border-white/20 flex items-center justify-center group-hover:scale-105 group-hover:shadow-teal-500/25 transition-all duration-300">
+        <img src="assets/validure-logo.png" alt="Validure HR Logo" class="h-full w-full object-contain">
       </div>
       <div>
         <span class="text-xl font-bold tracking-tight text-white flex items-center gap-1.5">
-          Validure <span class="text-emerald-400 font-normal">HR</span>
+          Validure <span class="text-teal-400 font-semibold">HR</span>
         </span>
         <span class="block text-[10px] font-mono tracking-widest text-slate-400 uppercase">Enterprise OS</span>
       </div>
@@ -103,8 +108,8 @@
     <!-- System Status Micro Badge -->
     <div class="hidden sm:flex items-center gap-3 px-3.5 py-1.5 rounded-full glass-pill text-xs font-mono text-slate-300">
       <span class="relative flex h-2 w-2">
-        <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
-        <span class="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
+        <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-teal-400 opacity-75"></span>
+        <span class="relative inline-flex rounded-full h-2 w-2 bg-teal-500"></span>
       </span>
       <span>SYSTEM ONLINE · 99.99% UPTIME</span>
     </div>
@@ -117,14 +122,14 @@
     <div class="lg:col-span-6 space-y-8 pr-0 lg:pr-8">
       
       <!-- Eyebrow Pill -->
-      <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-xs font-mono tracking-wider uppercase">
+      <div class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-teal-500/10 border border-teal-500/25 text-teal-400 text-xs font-mono tracking-wider uppercase">
         <i class="ph-bold ph-lock-key"></i>
-        <span>Zero-Trust Enterprise Portal</span>
+        <span>Zero-Trust Enterprise Portal · Validure HR</span>
       </div>
 
       <!-- Headline -->
       <h1 class="text-4xl md:text-5xl xl:text-6xl font-extrabold tracking-tight text-white leading-[1.08]">
-        Intelligent HR & Workforce <span class="text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 via-teal-300 to-cyan-400">Security</span>
+        Intelligent HR & Workforce <span class="text-transparent bg-clip-text bg-gradient-to-r from-teal-400 via-cyan-300 to-sky-400">Security</span>
       </h1>
 
       <!-- Subtext -->
@@ -135,7 +140,7 @@
       <!-- Key Security Feature Cards -->
       <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-2">
         <div class="p-4 rounded-xl glass-pill flex items-start gap-3">
-          <div class="p-2 rounded-lg bg-emerald-500/10 text-emerald-400 shrink-0">
+          <div class="p-2 rounded-lg bg-teal-500/10 text-teal-400 shrink-0">
             <i class="ph-bold ph-shield-checkered text-xl"></i>
           </div>
           <div>
@@ -158,7 +163,7 @@
       <!-- Live Audit Metric -->
       <div class="pt-4 flex items-center gap-4 text-xs font-mono text-slate-400 border-t border-slate-800/80">
         <span class="flex items-center gap-1.5">
-          <i class="ph-bold ph-clock text-emerald-400"></i>
+          <i class="ph-bold ph-clock text-teal-400"></i>
           Session Idle Timeout: 15m
         </span>
         <span class="text-slate-700">•</span>
@@ -174,22 +179,28 @@
       <div class="w-full max-w-md p-8 md:p-10 rounded-2xl glass-card relative overflow-hidden">
         
         <!-- Glowing Top Bar Accent -->
-        <div class="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-emerald-500 via-teal-400 to-cyan-500"></div>
+        <div class="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-teal-500 via-cyan-400 to-sky-500"></div>
 
-        <div class="mb-8 text-center sm:text-left">
-          <h2 class="text-2xl font-bold text-white tracking-tight">Sign In to Portal</h2>
-          <p class="text-sm text-slate-400 mt-1">Enter your organization credentials to proceed</p>
+        <!-- Form Header with Actual Validure Logo -->
+        <div class="mb-7 flex items-center justify-between">
+          <div>
+            <h2 class="text-2xl font-bold text-white tracking-tight">Sign In to Portal</h2>
+            <p class="text-sm text-slate-400 mt-1">Enter your organization credentials to proceed</p>
+          </div>
+          <div class="h-12 w-12 rounded-xl bg-white p-1.5 shadow-md shadow-teal-950/40 border border-white/20 shrink-0 flex items-center justify-center">
+            <img src="assets/validure-logo.png" alt="Validure" class="h-full w-full object-contain">
+          </div>
         </div>
 
         <!-- Quick Demo Accounts Auto-fill Pill Bar -->
         <div class="mb-6 p-3 rounded-xl bg-slate-900/60 border border-slate-800 text-xs">
           <div class="text-[11px] font-mono text-slate-400 uppercase tracking-wider mb-2 flex items-center justify-between">
             <span>Quick Demo Access</span>
-            <span class="text-emerald-400">Click to Auto-fill</span>
+            <span class="text-teal-400">Click to Auto-fill</span>
           </div>
           <div class="grid grid-cols-2 gap-2">
-            <button type="button" onclick="autofill('admin@validurehr.com', 'admin123')" class="px-2.5 py-1.5 rounded-lg bg-slate-800/80 hover:bg-emerald-950/50 hover:border-emerald-500/40 border border-slate-700/60 text-slate-300 font-mono text-left transition-all flex items-center gap-2">
-              <i class="ph-bold ph-user-gear text-emerald-400"></i>
+            <button type="button" onclick="autofill('admin@validurehr.com', 'admin123')" class="px-2.5 py-1.5 rounded-lg bg-slate-800/80 hover:bg-teal-950/50 hover:border-teal-500/40 border border-slate-700/60 text-slate-300 font-mono text-left transition-all flex items-center gap-2">
+              <i class="ph-bold ph-user-gear text-teal-400"></i>
               <span class="truncate">Admin Demo</span>
             </button>
             <button type="button" onclick="autofill('employee@validurehr.com', 'emp123')" class="px-2.5 py-1.5 rounded-lg bg-slate-800/80 hover:bg-cyan-950/50 hover:border-cyan-500/40 border border-slate-700/60 text-slate-300 font-mono text-left transition-all flex items-center gap-2">
@@ -218,7 +229,7 @@
                 required 
                 value="admin@validurehr.com"
                 placeholder="name@company.com" 
-                class="w-full pl-11 pr-4 py-3 bg-slate-900/80 border border-slate-700/80 rounded-xl text-white placeholder-slate-500 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500/50 focus:border-emerald-500 transition-all"
+                class="w-full pl-11 pr-4 py-3 bg-slate-900/80 border border-slate-700/80 rounded-xl text-white placeholder-slate-500 text-sm focus:outline-none focus:ring-2 focus:ring-teal-500/50 focus:border-teal-500 transition-all"
               >
             </div>
           </div>
@@ -229,7 +240,7 @@
               <label for="password" class="block text-xs font-semibold text-slate-300 tracking-wide uppercase">
                 Master Password
               </label>
-              <a href="Change password.html" class="text-xs text-emerald-400 hover:text-emerald-300 hover:underline transition-colors">
+              <a href="Change password.html" class="text-xs text-teal-400 hover:text-teal-300 hover:underline transition-colors">
                 Forgot password?
               </a>
             </div>
@@ -244,7 +255,7 @@
                 required 
                 value="••••••••••••"
                 placeholder="••••••••••••" 
-                class="w-full pl-11 pr-11 py-3 bg-slate-900/80 border border-slate-700/80 rounded-xl text-white placeholder-slate-500 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500/50 focus:border-emerald-500 transition-all"
+                class="w-full pl-11 pr-11 py-3 bg-slate-900/80 border border-slate-700/80 rounded-xl text-white placeholder-slate-500 text-sm focus:outline-none focus:ring-2 focus:ring-teal-500/50 focus:border-teal-500 transition-all"
               >
               <button 
                 type="button" 
@@ -260,7 +271,7 @@
           <!-- Remember Me Checkbox -->
           <div class="flex items-center justify-between pt-1">
             <label class="flex items-center gap-2 cursor-pointer select-none">
-              <input type="checkbox" checked class="w-4 h-4 rounded bg-slate-900 border-slate-700 text-emerald-500 focus:ring-emerald-500/40 focus:ring-offset-slate-900">
+              <input type="checkbox" checked class="w-4 h-4 rounded bg-slate-900 border-slate-700 text-teal-500 focus:ring-teal-500/40 focus:ring-offset-slate-900">
               <span class="text-xs text-slate-300">Keep session active for 30 days</span>
             </label>
           </div>
@@ -268,7 +279,7 @@
           <!-- Primary Submit CTA Button -->
           <button 
             type="submit" 
-            class="w-full py-3.5 px-6 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-400 hover:to-teal-500 text-slate-950 font-bold text-sm tracking-wide shadow-lg shadow-emerald-950/50 hover:shadow-emerald-500/20 active:scale-[0.99] transition-all flex items-center justify-center gap-2 group"
+            class="w-full py-3.5 px-6 rounded-xl bg-gradient-to-r from-teal-500 to-cyan-600 hover:from-teal-400 hover:to-cyan-500 text-slate-950 font-bold text-sm tracking-wide shadow-lg shadow-teal-950/50 hover:shadow-teal-500/25 active:scale-[0.99] transition-all flex items-center justify-center gap-2 group"
           >
             <span>Sign In to Dashboard</span>
             <i class="ph-bold ph-arrow-right text-base group-hover:translate-x-1 transition-transform"></i>
@@ -289,7 +300,7 @@
         <!-- SSO Options -->
         <div class="grid grid-cols-2 gap-3">
           <a href="overview.html" class="py-2.5 px-3 rounded-xl bg-slate-900/60 hover:bg-slate-800 border border-slate-800 hover:border-slate-700 text-xs font-semibold text-slate-300 text-center transition-all flex items-center justify-center gap-2">
-            <i class="ph-bold ph-shield-check text-emerald-400 text-base"></i>
+            <i class="ph-bold ph-shield-check text-teal-400 text-base"></i>
             <span>SAML 2.0 SSO</span>
           </a>
           <a href="overview.html" class="py-2.5 px-3 rounded-xl bg-slate-900/60 hover:bg-slate-800 border border-slate-800 hover:border-slate-700 text-xs font-semibold text-slate-300 text-center transition-all flex items-center justify-center gap-2">
@@ -305,14 +316,17 @@
 
   <!-- Footer -->
   <footer class="relative z-10 w-full max-w-7xl mx-auto px-6 py-6 border-t border-slate-800/60 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-slate-400">
-    <div class="flex items-center gap-2">
+    <div class="flex items-center gap-2.5">
+      <div class="h-5 w-5 rounded bg-white p-0.5 flex items-center justify-center shadow-xs">
+        <img src="assets/validure-logo.png" alt="Validure" class="h-full w-full object-contain">
+      </div>
       <span class="font-semibold text-slate-300">Validure HR Portal</span>
       <span>© 2026 Validure Solutions Pvt. Ltd. All rights reserved.</span>
     </div>
     <div class="flex items-center gap-6 font-mono text-[11px]">
-      <a href="document.html" class="hover:text-emerald-400 transition-colors">Privacy Policy</a>
-      <a href="document.html" class="hover:text-emerald-400 transition-colors">Security Architecture</a>
-      <a href="document.html" class="hover:text-emerald-400 transition-colors">SOC-2 Compliance</a>
+      <a href="document.html" class="hover:text-teal-400 transition-colors">Privacy Policy</a>
+      <a href="document.html" class="hover:text-teal-400 transition-colors">Security Architecture</a>
+      <a href="document.html" class="hover:text-teal-400 transition-colors">SOC-2 Compliance</a>
     </div>
   </footer>
 
@@ -323,7 +337,7 @@
       const icon = document.getElementById('eyeIcon');
       if (input.type === 'password') {
         input.type = 'text';
-        icon.className = 'ph-bold ph-eye-slash text-lg text-emerald-400';
+        icon.className = 'ph-bold ph-eye-slash text-lg text-teal-400';
       } else {
         input.type = 'password';
         icon.className = 'ph-bold ph-eye text-lg';
